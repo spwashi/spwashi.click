@@ -39,12 +39,21 @@ export function installAccessibilityEnhancements(doc = globalThis.document) {
   };
 }
 
+// Cache for nav links to avoid repeated DOM queries
+const navLinksCache = new WeakMap();
+
 export function ensureAriaCurrent(rootElement, activeRoute) {
   if (!rootElement) {
     return;
   }
 
-  const navLinks = rootElement.querySelectorAll('[data-route]');
+  // Use cached nav links if available, otherwise query and cache
+  let navLinks = navLinksCache.get(rootElement);
+  if (!navLinks) {
+    navLinks = rootElement.querySelectorAll('[data-route]');
+    navLinksCache.set(rootElement, navLinks);
+  }
+
   for (const link of navLinks) {
     const isActive = link.dataset.route === activeRoute;
     if (isActive) {
