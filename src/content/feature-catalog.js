@@ -39,11 +39,41 @@ export const SPW_FEATURE_CATALOG = Object.freeze({
     Object.freeze({
       id: 'runtime-control',
       route: 'global',
-      spw: '^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }',
+      spw: '^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind+contract+ecology }',
       files: Object.freeze([
         'src/core/runtime-control.js',
         'src/core/spw-command-surface.js',
         'src/core/boot.js'
+      ])
+    }),
+    Object.freeze({
+      id: 'host-manifest-overlays',
+      route: 'global',
+      spw: '^feature[host-manifest]{ host:spwashi.work|lore.land overlays:ecology+theme+enhancements api-window:gated }',
+      files: Object.freeze([
+        'src/core/host-manifest.js',
+        'src/core/runtime-config.js',
+        'src/core/runtime.js'
+      ])
+    }),
+    Object.freeze({
+      id: 'host-theme-combinatorics',
+      route: 'global',
+      spw: '^feature[host-theme]{ context:host+route+phase+media output:css-token composition event:spw:host:theme:changed }',
+      files: Object.freeze([
+        'src/core/host-theme.js',
+        'src/styles/tokens.css',
+        'src/core/events.js'
+      ])
+    }),
+    Object.freeze({
+      id: 'runtime-contract',
+      route: 'global',
+      spw: '^feature[runtime-contract]{ versioned-api runtime+interfaces compose:interfaces compatibility:min|max }',
+      files: Object.freeze([
+        'src/core/runtime-contract.js',
+        'src/runtime/index.js',
+        'src/core/iterative-enhancement.js'
       ])
     }),
     Object.freeze({

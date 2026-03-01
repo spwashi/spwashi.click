@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./host-manifest.js"
+  @path: ~"src/core/host-manifest.js"
+
+  ^scan{
+    @id: core.host-manifest
+    @axis: host-overlay-contract
+    @output: normalized-host-policy
+    @hotspots: host-manifest.js
+  }
+
+  ^intent[module]{ id:core.host-manifest axis:host-overlay-contract output:normalized-host-policy }
+
+  ^prefix-utility{
+    !:: role:load-host-manifest source:runtime-config.path
+    @:: role:normalize-overlay host+api+ecology+theming
+    ~:: role:fallback-contract reason-tagged
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime-config+host manifest payload }
+    view!{ write:host-manifest projection }
+    bind@{ bridge:runtime+enhancement-gating+theme-combinatorics }
+  }
+
+  ^operator-overload{
+    !{ role:load-host-manifest source:runtime-config.path }
+    @{ role:normalize-overlay host+api+ecology+theming }
+    ~{ role:fallback-contract reason-tagged }
+  }
+
+  ^state-embed{
+    @reads: runtime-config+host manifest payload
+    @writes: host-manifest projection
+    @bridge: runtime+enhancement-gating+theme-combinatorics
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_host_manifest_scan]{
+      input: prefix+state
+      flow: read->map(host-overlay-contract)->project
+      output: normalized-host-policy
+    }
+    ^macro[core_host_manifest_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: host-manifest projection
+    }
+  }
+
+  ^invariants{
+    ^invariant[shape]{ host-manifest normalized:frozen }
+    ^invariant[compat]{ api-window evaluated vs:runtime-api-version }
+    ^invariant[fallback]{ missing-or-unreadable manifest => deterministic-default }
+  }
+
+  ^potential{
+    ^potential[profiles]{ per-host manifest archetypes }
+    ^potential[lint]{ host-manifest schema validator }
+  }
+
+  ^compose[neighbors]{ ingress:runtime-config+host manifest payload egress:host-manifest projection bridge:runtime+enhancement-gating+theme-combinatorics }
+}

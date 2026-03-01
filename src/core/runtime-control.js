@@ -1,5 +1,6 @@
 import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
 import { EVENT_RUNTIME_REBIND, dispatchTypedEvent } from './events.js';
+import { createRuntimeApiContract } from './runtime-contract.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
 
 function isObject(value) {
@@ -55,6 +56,39 @@ function clampCount(value) {
   return parsed;
 }
 
+function normalizeInterfaceName(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '');
+}
+
+function resolveInterfaceList(payload = {}) {
+  if (typeof payload === 'string') {
+    return payload.split('|').map((token) => normalizeInterfaceName(token)).filter(Boolean);
+  }
+
+  if (Array.isArray(payload)) {
+    return payload.map((entry) => normalizeInterfaceName(entry)).filter(Boolean);
+  }
+
+  if (isObject(payload)) {
+    if (Array.isArray(payload.interfaces)) {
+      return payload.interfaces.map((entry) => normalizeInterfaceName(entry)).filter(Boolean);
+    }
+
+    if (typeof payload.interface === 'string') {
+      return [normalizeInterfaceName(payload.interface)].filter(Boolean);
+    }
+
+    if (typeof payload.names === 'string') {
+      return payload.names.split('|').map((token) => normalizeInterfaceName(token)).filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
 export function installRuntimeControl({ app, document, window, rebindPage }) {
   if (!app || !document || !window) {
     return () => {};
@@ -74,8 +108,15 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
   }
 
   function getIntegrationStatus() {
+    const hostManifest = isObject(app.hostManifest) ? app.hostManifest : null;
+    const hostThemeState = app.hostThemeController?.getState?.() ?? null;
+    const apiContract = isObject(app.apiContract)
+      ? app.apiContract
+      : createRuntimeApiContract();
+
     return {
       parserBridge: getParserBridgeStatus(),
+      apiContract,
       release: {
         date: app.releaseMeta?.releaseDate ?? '',
         id: app.releaseMeta?.releaseId ?? '',
@@ -87,7 +128,34 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
         baseUrl: app.runtimeConfig?.baseUrl ?? '/',
         serviceWorker: Boolean(app.runtimeConfig?.enableServiceWorker),
         hostId: app.runtimeConfig?.hostId ?? 'spwashi.click',
-        hostVersion: app.runtimeConfig?.hostVersion ?? ''
+        hostVersion: app.runtimeConfig?.hostVersion ?? '',
+        hostManifestPath: app.runtimeConfig?.hostManifestPath ?? '',
+        hostManifestRequired: Boolean(app.runtimeConfig?.hostManifestRequired)
+      },
+      hostManifest: hostManifest
+        ? {
+            version: hostManifest.version,
+            reason: hostManifest.reason,
+            source: hostManifest.source,
+            compatible: hostManifest.api?.compatible === true
+          }
+        : null,
+      hostCompatibility: app.hostCompatibility ?? {
+        compatible: true,
+        reasons: [],
+        missingInterfaces: []
+      },
+      hostTheme: hostThemeState
+        ? {
+            activeRuleIds: hostThemeState.activeRuleIds,
+            tokenCount: hostThemeState.tokenCount,
+            reason: hostThemeState.reason
+          }
+        : null,
+      enhancements: {
+        profile: app.enhancementRuntime?.manifest?.profile ?? 'baseline',
+        loadedCount: app.enhancementRuntime?.loadedEnhancements?.length ?? 0,
+        gatedCount: app.enhancementRuntime?.gatedEnhancements?.length ?? 0
       }
     };
   }
@@ -108,7 +176,10 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       hostId: app.runtimeConfig?.hostId ?? 'spwashi.click',
       hostVersion: app.runtimeConfig?.hostVersion ?? '',
       catalogVersion: SPW_FEATURE_CATALOG.version,
-      parserBridge: getParserBridgeStatus()
+      parserBridge: getParserBridgeStatus(),
+      hostManifestReason: app.hostManifest?.reason ?? 'none',
+      hostCompatibility: app.hostCompatibility?.compatible === true ? 'compatible' : 'incompatible',
+      hostThemeRuleCount: app.hostThemeController?.getState?.()?.activeRuleIds?.length ?? 0
     };
   }
 
@@ -200,6 +271,84 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     return getSnapshot();
   }
 
+  function registerEcologySpecies(payload = {}) {
+    const list = Array.isArray(payload) ? payload : [payload];
+    let registered = 0;
+
+    for (const species of list) {
+      if (!isObject(species) || typeof species.tagName !== 'string' || species.tagName.length === 0) {
+        continue;
+      }
+
+      app.ecology.registerSpecies({
+        tagName: species.tagName,
+        role: typeof species.role === 'string' ? species.role : 'host-extension',
+        dependsOn: Array.isArray(species.dependsOn) ? species.dependsOn : [],
+        emits: Array.isArray(species.emits) ? species.emits : []
+      });
+      registered += 1;
+    }
+
+    return {
+      registered,
+      snapshot: app.ecology.getSnapshot()
+    };
+  }
+
+  function noteEcologyLifecycle(payload = {}) {
+    if (!isObject(payload)) {
+      return { ok: false, reason: 'invalid-payload', snapshot: app.ecology.getSnapshot() };
+    }
+
+    const tagName = String(payload.tagName ?? payload.tag ?? '').trim();
+    const lifecycle = String(payload.lifecycle ?? payload.event ?? '').trim();
+    if (!tagName || !lifecycle) {
+      return { ok: false, reason: 'missing-tag-or-lifecycle', snapshot: app.ecology.getSnapshot() };
+    }
+
+    app.ecology.noteLifecycle(tagName, lifecycle, isObject(payload.detail) ? payload.detail : {});
+    return { ok: true, snapshot: app.ecology.getSnapshot() };
+  }
+
+  function getEcologySnapshot() {
+    return app.ecology.getSnapshot();
+  }
+
+  function getHostThemeState() {
+    return app.hostThemeController?.getState?.() ?? {
+      activeRuleIds: [],
+      tokenCount: 0,
+      reason: 'host-theme-unavailable'
+    };
+  }
+
+  function getHostManifest() {
+    return app.hostManifest ?? null;
+  }
+
+  function getApiContract() {
+    const apiContract = isObject(app.apiContract)
+      ? app.apiContract
+      : createRuntimeApiContract();
+    return {
+      runtimeApiVersion: apiContract.runtimeApiVersion,
+      interfaces: apiContract.interfaces
+    };
+  }
+
+  function listInterfaces() {
+    const apiContract = getApiContract();
+    const interfaces = Object.keys(apiContract.interfaces).map((name) => ({
+      name,
+      version: apiContract.interfaces[name]
+    }));
+
+    return {
+      runtimeApiVersion: apiContract.runtimeApiVersion,
+      interfaces
+    };
+  }
+
   function resetRuntime(config = {}) {
     app.store.resetClickCount();
 
@@ -243,11 +392,61 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     });
   }
 
+  function composeInterface(payload = {}) {
+    const interfaces = resolveInterfaceList(payload);
+    if (interfaces.length === 0) {
+      return {
+        ok: false,
+        reason: 'no-interfaces-specified',
+        available: listInterfaces()
+      };
+    }
+
+    const composed = {};
+    const missing = [];
+
+    const interfaceMethods = {
+      core: Object.freeze(['getSnapshot', 'setTopLevel', 'setRegion', 'setComponent', 'setWindowVars', 'resetRuntime', 'rebindRuntime']),
+      catalog: Object.freeze(['getCatalog']),
+      integration: Object.freeze(['getIntegrationStatus', 'getApiContract', 'listInterfaces', 'composeInterface']),
+      ecology: Object.freeze(['getEcologySnapshot', 'registerEcologySpecies', 'noteEcologyLifecycle']),
+      theming: Object.freeze(['getHostThemeState']),
+      host: Object.freeze(['getIntegrationStatus', 'getHostThemeState', 'getHostManifest'])
+    };
+
+    for (const interfaceName of interfaces) {
+      const methods = interfaceMethods[interfaceName];
+      if (!methods) {
+        missing.push(interfaceName);
+        continue;
+      }
+
+      for (const methodName of methods) {
+        composed[methodName] = runtimeApi[methodName];
+      }
+    }
+
+    return {
+      ok: missing.length === 0,
+      interfaces,
+      missing,
+      api: Object.freeze(composed)
+    };
+  }
+
   const runtimeApi = {
-    version: '1.0.0',
+    version: app.apiContract?.runtimeApiVersion ?? '1.1.0',
     getSnapshot,
     getCatalog,
     getIntegrationStatus,
+    getApiContract,
+    listInterfaces,
+    composeInterface,
+    getEcologySnapshot,
+    registerEcologySpecies,
+    noteEcologyLifecycle,
+    getHostThemeState,
+    getHostManifest,
     setTopLevel,
     setRegion,
     setComponent,
@@ -291,6 +490,38 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
 
       if (method === 'integration' || method === 'status' || method === 'getIntegrationStatus') {
         return getIntegrationStatus();
+      }
+
+      if (method === 'contract' || method === 'getApiContract') {
+        return getApiContract();
+      }
+
+      if (method === 'interfaces' || method === 'listInterfaces') {
+        return listInterfaces();
+      }
+
+      if (method === 'compose' || method === 'composeInterface') {
+        return composeInterface(payload);
+      }
+
+      if (method === 'ecology' || method === 'getEcologySnapshot') {
+        return getEcologySnapshot();
+      }
+
+      if (method === 'registerSpecies' || method === 'registerEcologySpecies') {
+        return registerEcologySpecies(payload);
+      }
+
+      if (method === 'lifecycle' || method === 'noteEcologyLifecycle') {
+        return noteEcologyLifecycle(payload);
+      }
+
+      if (method === 'theme' || method === 'getHostThemeState') {
+        return getHostThemeState();
+      }
+
+      if (method === 'hostManifest' || method === 'getHostManifest') {
+        return getHostManifest();
       }
 
       return {

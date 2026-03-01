@@ -350,3 +350,108 @@ test('runtime control evaluates Spw command forms for top-level and region opera
 
   cleanup();
 });
+
+test('runtime control exposes versioned api contract, composable interfaces, and ecology extension methods', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+
+  const app = {
+    store,
+    ecology: {
+      species: {},
+      getSnapshot() {
+        return { species: this.species };
+      },
+      registerSpecies(species) {
+        this.species[species.tagName] = species;
+      },
+      noteLifecycle(tagName, lifecycle, detail) {
+        this.species[tagName] = {
+          ...(this.species[tagName] ?? { tagName, role: 'host-extension', dependsOn: [], emits: [] }),
+          lastLifecycle: lifecycle,
+          lastDetail: detail
+        };
+      }
+    },
+    releaseMeta: { releaseDate: '2026-03-01', releaseId: 'r2', releaseArc: 'host', releaseVibe: 'adaptive' },
+    runtimeConfig: { embedMode: 'embedded', baseUrl: '/vendor/spw', enableServiceWorker: false, hostId: 'lore.land', hostVersion: '2026.03.01' },
+    apiContract: {
+      runtimeApiVersion: '1.1.0',
+      interfaces: {
+        core: '1.1.0',
+        catalog: '1.0.0',
+        integration: '1.1.0',
+        ecology: '1.0.0',
+        theming: '1.0.0',
+        host: '1.0.0'
+      }
+    },
+    hostManifest: { version: '1', reason: 'ok', source: '/seed/hosts/lore.manifest.json', api: { compatible: true } },
+    hostThemeController: {
+      getState() {
+        return { activeRuleIds: ['mobile', 'high-contrast'], tokenCount: 6, reason: 'theme:init' };
+      }
+    },
+    parserBridge: { installed: true, reason: 'adapter-loaded', adapterPath: '/seed/site/enhancements/workbench-parser-adapter.js', adapterExport: 'parseExpression' },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {}
+  });
+
+  const contract = win.__SPW_RUNTIME__.run('contract');
+  assert.equal(contract.runtimeApiVersion, '1.1.0');
+  assert.equal(contract.interfaces.ecology, '1.0.0');
+
+  const composed = win.__SPW_RUNTIME__.run('compose', { interfaces: ['ecology', 'integration'] });
+  assert.equal(composed.ok, true);
+  assert.equal(typeof composed.api.registerEcologySpecies, 'function');
+  assert.equal(typeof composed.api.getIntegrationStatus, 'function');
+
+  const registerSpeciesResult = win.__SPW_RUNTIME__.registerEcologySpecies({
+    tagName: 'spw-host-card',
+    role: 'host-widget',
+    dependsOn: ['spw-site-shell'],
+    emits: ['spw:navigate']
+  });
+  assert.equal(registerSpeciesResult.registered, 1);
+  assert.ok(registerSpeciesResult.snapshot.species['spw-host-card']);
+
+  const lifecycleResult = win.__SPW_RUNTIME__.noteEcologyLifecycle({
+    tagName: 'spw-host-card',
+    lifecycle: 'rendered',
+    detail: { source: 'host-test' }
+  });
+  assert.equal(lifecycleResult.ok, true);
+  assert.equal(lifecycleResult.snapshot.species['spw-host-card'].lastLifecycle, 'rendered');
+
+  const status = win.__SPW_RUNTIME__.getIntegrationStatus();
+  assert.equal(status.hostTheme.activeRuleIds.length, 2);
+  assert.equal(status.hostManifest.compatible, true);
+
+  const hostManifest = win.__SPW_RUNTIME__.run('hostManifest');
+  assert.equal(hostManifest.reason, 'ok');
+  assert.equal(hostManifest.source, '/seed/hosts/lore.manifest.json');
+
+  cleanup();
+});

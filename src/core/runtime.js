@@ -7,10 +7,14 @@ import {
   EVENT_NAVIGATE,
   EVENT_PHASE_CHANGED,
   EVENT_STATE_CHANGED,
+  EVENT_HOST_MANIFEST_STATE,
+  EVENT_HOST_THEME_CHANGED,
   EVENT_WORKBENCH_PARSER_STATE,
   dispatchTypedEvent,
   subscribeTypedEvent
 } from './events.js';
+import { createFallbackHostManifest, loadHostManifest } from './host-manifest.js';
+import { installHostThemeCombinatorics } from './host-theme.js';
 import { runIterativeEnhancements } from './iterative-enhancement.js';
 import { createMarginaliaLedger } from './literature.js';
 import { detectReducedMotionPreference, watchReducedMotionPreference } from './motion.js';
@@ -24,6 +28,7 @@ import { installWorkbenchParserAdapter } from './spwlang-parser.js';
 import { createStore } from './store.js';
 import { installStructureMode } from './structure-mode.js';
 import { installMediumFlow } from './medium-flow.js';
+import { createRuntimeApiContract } from './runtime-contract.js';
 import { defineAllComponents } from '../components/register.js';
 import { HOME_MANIFEST, NOTES_MANIFEST, WORK_MANIFEST } from '../content/manifests.js';
 import { initHomePage } from '../pages/home.js';
@@ -161,6 +166,10 @@ function createApp({ doc, win, runtimeConfig }) {
     route: activeRoute,
     releaseMeta,
     runtimeConfig,
+    apiContract: createRuntimeApiContract(),
+    hostManifest: createFallbackHostManifest(runtimeConfig, 'not-loaded'),
+    hostCompatibility: Object.freeze({ compatible: true, reasons: Object.freeze([]), missingInterfaces: Object.freeze([]) }),
+    hostThemeController: null,
     parserBridge: { installed: false, reason: 'not-initialized' },
     store,
     ecology,
@@ -189,6 +198,11 @@ function createApp({ doc, win, runtimeConfig }) {
         this.mediumController = null;
       }
 
+      if (this.hostThemeController) {
+        this.hostThemeController.destroy();
+        this.hostThemeController = null;
+      }
+
       for (const cleanup of cleanups) {
         cleanup();
       }
@@ -208,6 +222,11 @@ function createApp({ doc, win, runtimeConfig }) {
   doc.documentElement.dataset.spwBaseUrl = runtimeConfig.baseUrl;
   doc.documentElement.dataset.spwHostId = runtimeConfig.hostId;
   doc.documentElement.dataset.spwHostVersion = runtimeConfig.hostVersion;
+  doc.documentElement.dataset.spwHostManifest = runtimeConfig.hostManifestPath;
+  doc.documentElement.dataset.spwHostManifestRequired = runtimeConfig.hostManifestRequired
+    ? 'true'
+    : 'false';
+  doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
   ecology.setRoute(activeRoute);
   ecology.setPhase(store.getState().phase);
 
@@ -222,7 +241,8 @@ function createApp({ doc, win, runtimeConfig }) {
     embedMode: runtimeConfig.embedMode,
     baseUrl: runtimeConfig.baseUrl,
     hostId: runtimeConfig.hostId,
-    hostVersion: runtimeConfig.hostVersion
+    hostVersion: runtimeConfig.hostVersion,
+    runtimeApiVersion: app.apiContract.runtimeApiVersion
   });
   syncLiteratureAttributes(doc, marginalia);
 
@@ -243,6 +263,56 @@ function createApp({ doc, win, runtimeConfig }) {
 }
 
 async function mountRuntimeApp({ app, doc, win }) {
+  const hostManifest = await loadHostManifest({
+    runtimeConfig: app.runtimeConfig,
+    fetchImpl: win.fetch,
+    assetVersion: app.releaseMeta.assetVersion
+  });
+  app.hostManifest = hostManifest;
+  const missingHostInterfaces = (hostManifest.interfaces?.required ?? [])
+    .filter((interfaceName) => !app.apiContract.interfaces[interfaceName]);
+  const hostCompatibilityReasons = [];
+  if (hostManifest.api?.compatible !== true) {
+    hostCompatibilityReasons.push('runtime-api-window');
+  }
+  if (missingHostInterfaces.length > 0) {
+    hostCompatibilityReasons.push('missing-required-interfaces');
+  }
+  app.hostCompatibility = Object.freeze({
+    compatible: hostCompatibilityReasons.length === 0,
+    reasons: Object.freeze(hostCompatibilityReasons),
+    missingInterfaces: Object.freeze(missingHostInterfaces)
+  });
+  doc.documentElement.dataset.spwHostCompatibility =
+    app.hostCompatibility.compatible ? 'compatible' : 'incompatible';
+
+  dispatchTypedEvent(win, EVENT_HOST_MANIFEST_STATE, {
+    hostId: app.runtimeConfig.hostId,
+    hostVersion: app.runtimeConfig.hostVersion,
+    reason: hostManifest.reason,
+    source: hostManifest.source,
+    compatible: app.hostCompatibility.compatible,
+    compatibilityReasons: app.hostCompatibility.reasons,
+    missingInterfaces: app.hostCompatibility.missingInterfaces,
+    minRuntimeApi: hostManifest.api?.minRuntimeApi ?? '',
+    maxRuntimeApi: hostManifest.api?.maxRuntimeApi ?? ''
+  });
+
+  app.marginalia.write('host', 'Host manifest status', {
+    hostId: app.runtimeConfig.hostId,
+    reason: hostManifest.reason,
+    compatible: app.hostCompatibility.compatible,
+    compatibilityReasons: app.hostCompatibility.reasons,
+    source: hostManifest.source
+  });
+  syncLiteratureAttributes(doc, app.marginalia);
+
+  if (hostManifest.ecology?.species?.length > 0) {
+    for (const species of hostManifest.ecology.species) {
+      app.ecology.registerSpecies(species);
+    }
+  }
+
   const parserBridge = await installWorkbenchParserAdapter({
     assetVersion: app.releaseMeta.assetVersion,
     runtimeConfig: app.runtimeConfig
@@ -300,21 +370,51 @@ async function mountRuntimeApp({ app, doc, win }) {
     window: win
   });
 
-  app.enhancementRuntime = { manifest: { profile: 'baseline', enhancements: [] }, cleanups: [] };
+  if (app.hostCompatibility.compatible === true) {
+    app.hostThemeController = installHostThemeCombinatorics({
+      app,
+      document: doc,
+      window: win,
+      hostManifest
+    });
+  } else {
+    dispatchTypedEvent(win, EVENT_HOST_THEME_CHANGED, {
+      hostId: app.runtimeConfig.hostId,
+      route: app.route,
+      phase: app.store.getState().phase,
+      activeRuleIds: [],
+      tokenCount: 0
+    });
+  }
 
-  if (app.runtimeConfig.runEnhancements && app.runtimeConfig.embedMode !== 'assets-only') {
+  app.enhancementRuntime = {
+    manifest: { profile: 'baseline', enhancements: [] },
+    loadedEnhancements: [],
+    gatedEnhancements: [],
+    cleanups: []
+  };
+
+  if (
+    app.runtimeConfig.runEnhancements &&
+    app.runtimeConfig.embedMode !== 'assets-only' &&
+    app.hostCompatibility.compatible === true
+  ) {
     win.setTimeout(() => {
       runIterativeEnhancements({
         app,
         route: app.route,
         document: doc,
         runtimeConfig: app.runtimeConfig,
+        hostManifest,
+        runtimeApiVersion: app.apiContract.runtimeApiVersion,
+        interfaceVersions: app.apiContract.interfaces,
         manifestPath: '/seed/site/enhancements.manifest.json'
       }).then((enhancementRuntime) => {
         app.enhancementRuntime = enhancementRuntime;
         app.marginalia.write('enhancement', 'Iterative enhancement stage complete', {
           profile: enhancementRuntime.manifest.profile,
-          count: enhancementRuntime.manifest.enhancements.length
+          count: enhancementRuntime.loadedEnhancements.length,
+          gated: enhancementRuntime.gatedEnhancements.length
         });
         syncLiteratureAttributes(doc, app.marginalia);
       }).catch((error) => {
@@ -335,7 +435,11 @@ async function mountRuntimeApp({ app, doc, win }) {
     embedMode: app.runtimeConfig.embedMode,
     baseUrl: app.runtimeConfig.baseUrl,
     hostId: app.runtimeConfig.hostId,
-    hostVersion: app.runtimeConfig.hostVersion
+    hostVersion: app.runtimeConfig.hostVersion,
+    runtimeApiVersion: app.apiContract.runtimeApiVersion,
+    hostManifestReason: app.hostManifest?.reason ?? 'unknown',
+    hostCompatibility: app.hostCompatibility,
+    hostThemeRules: app.hostThemeController?.getState?.()?.activeRuleIds ?? []
   });
 
   return app;
@@ -378,6 +482,11 @@ export function createSpwRuntime(options = {}) {
       doc.documentElement.dataset.spwBaseUrl = runtimeConfig.baseUrl;
       doc.documentElement.dataset.spwHostId = runtimeConfig.hostId;
       doc.documentElement.dataset.spwHostVersion = runtimeConfig.hostVersion;
+      doc.documentElement.dataset.spwHostManifest = runtimeConfig.hostManifestPath;
+      doc.documentElement.dataset.spwHostManifestRequired = runtimeConfig.hostManifestRequired
+        ? 'true'
+        : 'false';
+      doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
       doc.documentElement.dataset.pwaState = 'disabled';
       return null;
     }

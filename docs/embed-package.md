@@ -24,7 +24,10 @@ await mountSpwRuntime({
   enableServiceWorker: false,
   autoMount: false,
   hostId: 'spwashi.work',
-  hostVersion: 'r7'
+  hostVersion: 'r7',
+  hostManifestPath: '/seed/hosts/spwashi.work.manifest.json',
+  hostManifestRequired: true,
+  hostEnhancementManifestPath: '/seed/hosts/spwashi.work.enhancements.json'
 });
 ```
 
@@ -38,6 +41,26 @@ These are read by `src/core/runtime-config.js`:
 - `spw:auto-mount` -> `true|false`
 - `spw:host-id` -> consuming host id (`spwashi.work`, `lore.land`, etc.)
 - `spw:host-version` -> optional host release/version string
+- `spw:host-manifest` -> host overlay manifest path
+- `spw:host-manifest-required` -> `true|false` compatibility guard for required host overlays
+- `spw:host-enhancements-manifest` -> host enhancement manifest overlay path
+
+## Host Manifest Overlay
+
+Host manifests can provide:
+
+- API compatibility window (`minRuntimeApi`, `maxRuntimeApi`)
+- ecology species extensions
+- host-responsive theme combinatorics (route/phase/media aware token overlays)
+- composable interface requirements and defaults
+- host enhancement manifest location + prepend/append mode
+
+At runtime, hosts can inspect compatibility and active overlays via:
+
+- `window.__SPW_RUNTIME__.getIntegrationStatus()`
+- `window.__SPW_RUNTIME__.run('contract')`
+- `window.__SPW_RUNTIME__.run('hostManifest')`
+- `window.__SPW_RUNTIME__.run('theme')`
 
 ## Assets Manifest
 

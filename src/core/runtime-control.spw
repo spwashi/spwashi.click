@@ -16,6 +16,9 @@
     @:: role:setRegion|setComponent selector-scoped
     ~:: role:setWindowVars css-var projection
     =:: role:getIntegrationStatus parser-bridge+embed+host snapshot
+    %:: role:api-contract contract+interfaces+compose
+    ^:: role:ecology-extension register-species+note-lifecycle
+    ?:: role:getHostManifest host-overlay payload
   }
 
   ^postfix-utility{
@@ -29,12 +32,15 @@
     @{ role:setRegion|setComponent selector-scoped }
     ~{ role:setWindowVars css-var projection }
     ={ role:getIntegrationStatus parser-bridge+embed+host snapshot }
+    %{ role:api-contract contract+interfaces+compose }
+    ^{ role:ecology-extension register-species+note-lifecycle }
+    ?{ role:getHostManifest host-overlay payload }
   }
 
   ^state-embed{
     @reads: runtime-app+catalog
     @writes: window.__SPW_RUNTIME__
-    @bridge: spw-command-surface+typed-runtime-rebind-event+integration-status
+    @bridge: spw-command-surface+typed-runtime-rebind-event+integration-status+ecology-extension
     @shape: deterministic-projection
   }
 
@@ -57,6 +63,7 @@
     ^invariant[reset]{ reset-runtime clears-clicks+fx-vars keeps-contract-surface }
     ^invariant[events]{ runtime-rebind emits:spw:runtime:rebind detail:route }
     ^invariant[integration]{ status reports parser-bridge+embed+host settings }
+    ^invariant[contract]{ api-version+interfaces projection stable }
   }
 
   ^potential{
@@ -64,5 +71,5 @@
     ^potential[safety]{ policy-layer around selectors+vars }
   }
 
-  ^compose[neighbors]{ ingress:runtime-app+catalog egress:window.__SPW_RUNTIME__ bridge:spw-command-surface+typed-runtime-rebind-event+integration-status }
+  ^compose[neighbors]{ ingress:runtime-app+catalog egress:window.__SPW_RUNTIME__ bridge:spw-command-surface+typed-runtime-rebind-event+integration-status+ecology-extension }
 }

@@ -19,6 +19,9 @@ test('readRuntimeConfig normalizes embed mode and base url defaults', () => {
   assert.equal(config.enableServiceWorker, true);
   assert.equal(config.hostId, 'spwashi.click');
   assert.equal(config.hostVersion, '');
+  assert.equal(config.hostManifestPath, '');
+  assert.equal(config.hostManifestRequired, false);
+  assert.equal(config.hostEnhancementManifestPath, '');
 });
 
 test('readRuntimeConfig respects embedded overrides and disables service worker by default', () => {
@@ -40,6 +43,9 @@ test('readRuntimeConfig respects embedded overrides and disables service worker 
   assert.equal(config.enableServiceWorker, false);
   assert.equal(config.hostId, 'spwashi.click');
   assert.equal(config.hostVersion, '');
+  assert.equal(config.hostManifestPath, '');
+  assert.equal(config.hostManifestRequired, false);
+  assert.equal(config.hostEnhancementManifestPath, '');
 });
 
 test('readRuntimeConfig accepts host identity from overrides and meta tags', () => {
@@ -101,6 +107,38 @@ test('readRuntimeConfig accepts host identity from overrides and meta tags', () 
   assert.equal(config.hostVersion, 'r7');
   assert.equal(metaConfig.hostId, 'lore.land');
   assert.equal(metaConfig.hostVersion, '2026.03.01');
+
+  const hostMetaValues = new Map([
+    ['spw:host-manifest', '/seed/hosts/lore.manifest.json'],
+    ['spw:host-manifest-required', 'true'],
+    ['spw:host-enhancements-manifest', '/seed/hosts/lore.enhancements.json']
+  ]);
+  const hostMetaConfig = readRuntimeConfig({
+    documentRef: {
+      documentElement: { dataset: {} },
+      querySelector(selector) {
+        const nameMatch = selector.match(/meta\[name="([^"]+)"\]/);
+        const metaName = nameMatch?.[1] ?? '';
+        if (!hostMetaValues.has(metaName)) {
+          return null;
+        }
+
+        return {
+          getAttribute(attributeName) {
+            if (attributeName !== 'content') {
+              return null;
+            }
+            return hostMetaValues.get(metaName);
+          }
+        };
+      }
+    },
+    overrides: {}
+  });
+
+  assert.equal(hostMetaConfig.hostManifestPath, '/seed/hosts/lore.manifest.json');
+  assert.equal(hostMetaConfig.hostManifestRequired, true);
+  assert.equal(hostMetaConfig.hostEnhancementManifestPath, '/seed/hosts/lore.enhancements.json');
 });
 
 test('resolveRuntimeAssetUrl rewrites root assets against embedded base url and appends release version', () => {

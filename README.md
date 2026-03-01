@@ -94,6 +94,7 @@ Package/embedded runtime entry:
 - `package.json` export: `./runtime`
 - runtime modes: `standalone | embedded | assets-only`
 - host identity controls: `hostId`, `hostVersion` (or meta tags `spw:host-id`, `spw:host-version`)
+- host manifest controls: `hostManifestPath`, `hostManifestRequired`, `hostEnhancementManifestPath`
 
 ## Release and Cache Policy
 
@@ -119,6 +120,9 @@ Package/embedded runtime entry:
 - Supports:
   - Spw command execution (`evalSpw`, `run('spw', { expression })`)
   - integration diagnostics (`getIntegrationStatus`, `run('integration')`)
+  - API contract/introspection (`getApiContract`, `listInterfaces`, `composeInterface`)
+  - ecology extensions (`registerEcologySpecies`, `noteEcologyLifecycle`, `getEcologySnapshot`)
+  - host overlay introspection (`getHostManifest`, `getHostThemeState`, `run('manifest')`, `run('theme')`)
   - top-level state control (`setTopLevel`)
   - region/component parameter control (`setRegion`, `setComponent`)
   - CSS variable/window tuning (`setWindowVars`)

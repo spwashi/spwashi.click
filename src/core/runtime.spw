@@ -13,26 +13,26 @@
 
   ^prefix-utility{
     !:: role:create-runtime seeds:store+controllers+components
-    @:: role:bridge-store->events->datasets parser-bridge->event host-metadata
+    @:: role:bridge-store->events->datasets parser-bridge->event host-metadata+manifest
     ~:: role:cleanup-on-destroy listeners+timers+controllers
   }
 
   ^postfix-utility{
     state~{ read:core-controllers }
     view!{ write:window.__SPW_RUNTIME__ }
-    bind@{ bridge:events+components+pages+workbench-parser-state+host-identity }
+    bind@{ bridge:events+components+pages+workbench-parser-state+host-identity+host-theme }
   }
 
   ^operator-overload{
     !{ role:create-runtime seeds:store+controllers+components }
-    @{ role:bridge-store->events->datasets parser-bridge->event host-metadata }
+    @{ role:bridge-store->events->datasets parser-bridge->event host-metadata+manifest }
     ~{ role:cleanup-on-destroy listeners+timers+controllers }
   }
 
   ^state-embed{
     @reads: core-controllers
     @writes: window.__SPW_RUNTIME__
-    @bridge: events+components+pages+workbench-parser-state+host-identity
+    @bridge: events+components+pages+workbench-parser-state+host-identity+host-theme
     @shape: deterministic-projection
   }
 
@@ -55,6 +55,7 @@
     ^invariant[mode]{ standalone|embedded|assets-only => explicit-branches }
     ^invariant[parser]{ parser-bridge status emits:spw:workbench:parser:state }
     ^invariant[host]{ app-ready+parser-state include:host-id+host-version }
+    ^invariant[manifest]{ host-manifest required+missing => compatibility-guard }
   }
 
   ^potential{
@@ -62,5 +63,5 @@
     ^potential[runtime-scenes]{ route-level orchestration by:operators }
   }
 
-  ^compose[neighbors]{ ingress:core-controllers egress:window.__SPW_RUNTIME__ bridge:events+components+pages+workbench-parser-state+host-identity }
+  ^compose[neighbors]{ ingress:core-controllers egress:window.__SPW_RUNTIME__ bridge:events+components+pages+workbench-parser-state+host-identity+host-theme }
 }

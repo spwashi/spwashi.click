@@ -8,11 +8,13 @@ Baseline pages render statically. Optional enhancements load from `seed/site/` a
 - Manifest path: `/seed/site/enhancements.manifest.json`
 - Entry module export: `installEnhancement(context)`
 - Release-aware cache busting is applied automatically to manifest fetches and enhancement module imports.
+- Optional host overlay manifest path: `runtimeConfig.hostEnhancementManifestPath`
 
 Enhancement failures are isolated and reported as events:
 
 - `spw:enhancement:loaded`
 - `spw:enhancement:failed`
+- `spw:enhancement:gated` (incompatible runtime API/host/interface windows)
 
 ## Manifest Shape
 
@@ -25,6 +27,10 @@ Enhancement failures are isolated and reported as events:
       "id": "seed-atlas",
       "enabled": true,
       "routes": ["home", "notes"],
+      "hosts": ["spwashi.work", "lore.land"],
+      "minRuntimeApi": "1.1.0",
+      "maxRuntimeApi": "2.0.0",
+      "requiredInterfaces": ["theming", "host"],
       "module": "/seed/site/enhancements/seed-atlas.js",
       "target": "[data-role='seed-atlas']"
     }

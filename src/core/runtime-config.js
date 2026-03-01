@@ -50,6 +50,11 @@ function normalizeHostVersion(value) {
   return String(value ?? '').trim();
 }
 
+function normalizePathToken(value) {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : '';
+}
+
 function hasScheme(value) {
   return /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value);
 }
@@ -99,6 +104,12 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     documentRef?.querySelector('meta[name="spw:host-id"]')?.getAttribute('content') ?? '';
   const metaHostVersion =
     documentRef?.querySelector('meta[name="spw:host-version"]')?.getAttribute('content') ?? '';
+  const metaHostManifest =
+    documentRef?.querySelector('meta[name="spw:host-manifest"]')?.getAttribute('content') ?? '';
+  const metaHostManifestRequired =
+    documentRef?.querySelector('meta[name="spw:host-manifest-required"]')?.getAttribute('content') ?? '';
+  const metaHostEnhancementManifest =
+    documentRef?.querySelector('meta[name="spw:host-enhancements-manifest"]')?.getAttribute('content') ?? '';
 
   const embedMode = normalizeEmbedMode(
     overrides.embedMode ?? overrides.mode ?? metaEmbedMode ?? root?.dataset?.spwEmbedMode
@@ -120,6 +131,20 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
   const hostVersion = normalizeHostVersion(
     overrides.hostVersion ?? metaHostVersion ?? root?.dataset?.spwHostVersion ?? ''
   );
+  const hostManifestPath = normalizePathToken(
+    overrides.hostManifestPath ?? metaHostManifest ?? root?.dataset?.spwHostManifest ?? ''
+  );
+  const hostManifestRequired = parseBooleanToken(
+    overrides.hostManifestRequired ?? metaHostManifestRequired ?? root?.dataset?.spwHostManifestRequired,
+    false
+  );
+  const hostEnhancementManifestPath = normalizePathToken(
+    overrides.hostEnhancementManifestPath ??
+      overrides.hostEnhancementsManifestPath ??
+      metaHostEnhancementManifest ??
+      root?.dataset?.spwHostEnhancementsManifest ??
+      ''
+  );
 
   return Object.freeze({
     embedMode,
@@ -129,7 +154,10 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     runEnhancements,
     mountSelector,
     hostId,
-    hostVersion
+    hostVersion,
+    hostManifestPath,
+    hostManifestRequired,
+    hostEnhancementManifestPath
   });
 }
 

@@ -66,6 +66,8 @@ Use `window.__SPW_RUNTIME__.getCatalog()` for runtime-readable feature inventory
 - `getCatalog({ summaryOnly: true })` for small payload
 - `run('catalog', { summaryOnly: true })` for command-style access
 - `run('integration')` to inspect parser bridge + embed/runtime + host settings
+- `run('contract')` / `run('interfaces')` to inspect runtime API version + interface map
+- `run('hostManifest')` / `run('theme')` to inspect host overlay + active combinatoric theme rules
 - `evalSpw('!top{ route:work clicks:9 profile:field llm:true }')` for Spw-native control execution
 - `run('spw', { expression: '!region{ selector:.chapter-panel attr.data-state:active }' })` for command-router parity
 

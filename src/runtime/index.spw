@@ -12,7 +12,7 @@
   ^intent[module]{ id:runtime.index axis:public-package-entry output:host-import-surface }
 
   ^prefix-utility{
-    !:: role:export runtime APIs create|mount|config helpers
+    !:: role:export runtime APIs create|mount|config+contract helpers
     @:: role:side-effect-free imports safe-for-host-bundles
     ~:: role:align-with-package-exports contracts
   }
@@ -24,7 +24,7 @@
   }
 
   ^operator-overload{
-    !{ role:export runtime APIs create|mount|config helpers }
+    !{ role:export runtime APIs create|mount|config+contract helpers }
     @{ role:side-effect-free imports safe-for-host-bundles }
     ~{ role:align-with-package-exports contracts }
   }
@@ -53,6 +53,7 @@
     ^invariant[api]{ named exports only stable entry ids }
     ^invariant[sidefx]{ import does-not-auto-mount }
     ^invariant[compat]{ supports standalone+embedded hosts }
+    ^invariant[version]{ runtime-api+interface versions exported }
   }
 
   ^potential{

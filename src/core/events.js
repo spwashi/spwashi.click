@@ -9,6 +9,9 @@ export const EVENT_ENHANCEMENT_FAILED = 'spw:enhancement:failed';
 export const EVENT_PWA_STATE_CHANGED = 'spw:pwa:state-changed';
 export const EVENT_RUNTIME_REBIND = 'spw:runtime:rebind';
 export const EVENT_WORKBENCH_PARSER_STATE = 'spw:workbench:parser:state';
+export const EVENT_HOST_MANIFEST_STATE = 'spw:host:manifest:state';
+export const EVENT_HOST_THEME_CHANGED = 'spw:host:theme:changed';
+export const EVENT_ENHANCEMENT_GATED = 'spw:enhancement:gated';
 
 export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_INTENT_CLICK,
@@ -21,7 +24,10 @@ export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_ENHANCEMENT_FAILED,
   EVENT_PWA_STATE_CHANGED,
   EVENT_RUNTIME_REBIND,
-  EVENT_WORKBENCH_PARSER_STATE
+  EVENT_WORKBENCH_PARSER_STATE,
+  EVENT_HOST_MANIFEST_STATE,
+  EVENT_HOST_THEME_CHANGED,
+  EVENT_ENHANCEMENT_GATED
 ]);
 
 export function isKnownEventName(eventName) {

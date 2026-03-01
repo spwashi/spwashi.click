@@ -16,7 +16,15 @@ const SYMBOL_METHOD = Object.freeze({
   catalog: 'getCatalog',
   status: 'getIntegrationStatus',
   integration: 'getIntegrationStatus',
-  bridge: 'getIntegrationStatus'
+  bridge: 'getIntegrationStatus',
+  contract: 'getApiContract',
+  interfaces: 'listInterfaces',
+  compose: 'composeInterface',
+  ecology: 'getEcologySnapshot',
+  species: 'registerEcologySpecies',
+  lifecycle: 'noteEcologyLifecycle',
+  theme: 'getHostThemeState',
+  manifest: 'getHostManifest'
 });
 
 const VALUE_PATTERN =
@@ -267,6 +275,79 @@ function mapWindowVars(pairs) {
   return vars;
 }
 
+function toArray(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.length > 0) {
+    return value.split('|').map((token) => token.trim()).filter((token) => token.length > 0);
+  }
+
+  return [];
+}
+
+function mapRegisterSpeciesPayload(selectorHint, pairs) {
+  const tagName =
+    String(pairs.tagName ?? pairs.tag ?? selectorHint ?? '')
+      .trim();
+
+  const payload = {
+    tagName
+  };
+
+  if (typeof pairs.role === 'string' && pairs.role.length > 0) {
+    payload.role = pairs.role;
+  }
+
+  const dependsOn = toArray(pairs.dependsOn ?? pairs.depends);
+  if (dependsOn.length > 0) {
+    payload.dependsOn = dependsOn;
+  }
+
+  const emits = toArray(pairs.emits ?? pairs.events);
+  if (emits.length > 0) {
+    payload.emits = emits;
+  }
+
+  return payload;
+}
+
+function mapLifecyclePayload(selectorHint, pairs) {
+  const detail = {};
+  for (const [key, value] of Object.entries(pairs)) {
+    if (!key.startsWith('detail.')) {
+      continue;
+    }
+
+    const detailKey = key.slice(7);
+    if (!detailKey) {
+      continue;
+    }
+    detail[detailKey] = value;
+  }
+
+  return {
+    tagName: String(pairs.tagName ?? pairs.tag ?? selectorHint ?? '').trim(),
+    lifecycle: String(pairs.lifecycle ?? pairs.event ?? '').trim(),
+    detail
+  };
+}
+
+function mapComposePayload(selectorHint, pairs) {
+  const interfaces = [];
+
+  if (selectorHint) {
+    interfaces.push(...toArray(selectorHint));
+  }
+
+  interfaces.push(...toArray(pairs.interfaces ?? pairs.names ?? pairs.interface));
+
+  return {
+    interfaces: Array.from(new Set(interfaces.map((value) => String(value).trim()).filter(Boolean)))
+  };
+}
+
 function parseCommandExpression(expression) {
   const source = String(expression ?? '').trim();
   if (source.length === 0) {
@@ -365,12 +446,58 @@ function parseCommandExpression(expression) {
     };
   }
 
+  if (
+    method === 'getApiContract' ||
+    method === 'listInterfaces' ||
+    method === 'getEcologySnapshot' ||
+    method === 'getHostThemeState' ||
+    method === 'getHostManifest'
+  ) {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: {},
+      parsed
+    };
+  }
+
   if (method === 'getIntegrationStatus') {
     return {
       ok: true,
       command: symbol,
       method,
       payload: {},
+      parsed
+    };
+  }
+
+  if (method === 'composeInterface') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapComposePayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'registerEcologySpecies') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapRegisterSpeciesPayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'noteEcologyLifecycle') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapLifecyclePayload(selector, pairs),
       parsed
     };
   }
@@ -483,6 +610,94 @@ export function runSpwRuntimeCommand({ expression, runtimeApi }) {
       method,
       payload,
       result: runtimeApi.getIntegrationStatus(),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getApiContract') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getApiContract(),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'listInterfaces') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.listInterfaces(),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'composeInterface') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.composeInterface(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getEcologySnapshot') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getEcologySnapshot(),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'registerEcologySpecies') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.registerEcologySpecies(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'noteEcologyLifecycle') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.noteEcologyLifecycle(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getHostThemeState') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getHostThemeState(),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getHostManifest') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getHostManifest(),
       parser: parsed.parser
     };
   }

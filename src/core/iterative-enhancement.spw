@@ -12,27 +12,27 @@
   ^intent[module]{ id:core.iterative-enhancement axis:optional-enhancement-loader output:baseline-safe-evolution }
 
   ^prefix-utility{
-    !:: role:load-manifest source:seed/site/enhancements
+    !:: role:load-manifest source:seed/site+host overlays
     @:: role:bind-enhancement api:app+store+zones
-    ~:: role:isolate-failure scope:per-enhancement
+    ~:: role:isolate-failure scope:per-enhancement+compatibility-gating
   }
 
   ^postfix-utility{
     state~{ read:runtime+release+runtime-config }
-    view!{ write:enhancement-mounts }
-    bind@{ bridge:seed-atlas+feature-zones }
+    view!{ write:enhancement-mounts+gating diagnostics }
+    bind@{ bridge:seed-atlas+feature-zones+host-overlays }
   }
 
   ^operator-overload{
-    !{ role:load-manifest source:seed/site/enhancements }
+    !{ role:load-manifest source:seed/site+host overlays }
     @{ role:bind-enhancement api:app+store+zones }
-    ~{ role:isolate-failure scope:per-enhancement }
+    ~{ role:isolate-failure scope:per-enhancement+compatibility-gating }
   }
 
   ^state-embed{
     @reads: runtime+release+runtime-config
-    @writes: enhancement-mounts
-    @bridge: seed-atlas+feature-zones
+    @writes: enhancement-mounts+gating diagnostics
+    @bridge: seed-atlas+feature-zones+host-overlays
     @shape: deterministic-projection
   }
 
@@ -53,12 +53,14 @@
     ^invariant[baseline]{ missing-manifest => core-site-still-runs }
     ^invariant[order]{ manifest-sequence deterministic }
     ^invariant[errors]{ one-failure != cascade-failure }
+    ^invariant[gating]{ incompatible enhancement => spw:enhancement:gated }
   }
 
   ^potential{
     ^potential[arc-releases]{ swap:enhancement-manifests by:release-arc+vibe }
     ^potential[live-tuning]{ runtime-toggle zone-level-enhancements }
+    ^potential[host-targeting]{ gate enhancements by:host+runtime-api+interfaces }
   }
 
-  ^compose[neighbors]{ ingress:runtime+release+runtime-config egress:enhancement-mounts bridge:seed-atlas+feature-zones }
+  ^compose[neighbors]{ ingress:runtime+release+runtime-config egress:enhancement-mounts+gating diagnostics bridge:seed-atlas+feature-zones+host-overlays }
 }

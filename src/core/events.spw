@@ -12,27 +12,27 @@
   ^intent[module]{ id:core.events axis:typed-event-contracts output:explicit-runtime-signals }
 
   ^prefix-utility{
-    !:: role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind
+    !:: role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating
     @:: role:subscribe event:known-contract returns:unsubscribe
     =:: role:registry anchor:KNOWN_EVENT_NAMES
   }
 
   ^postfix-utility{
     state~{ read:store+components+controllers }
-    view!{ write:state|phase|navigate|pwa|workbench events }
-    bind@{ bridge:runtime-control+crawler-tools+parser-observability }
+    view!{ write:state|phase|navigate|pwa|workbench|host events }
+    bind@{ bridge:runtime-control+crawler-tools+parser-observability+host-extensions }
   }
 
   ^operator-overload{
-    !{ role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind }
+    !{ role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating }
     @{ role:subscribe event:known-contract returns:unsubscribe }
     ={ role:registry anchor:KNOWN_EVENT_NAMES }
   }
 
   ^state-embed{
     @reads: store+components+controllers
-    @writes: state|phase|navigate|pwa|workbench events
-    @bridge: runtime-control+crawler-tools+parser-observability
+    @writes: state|phase|navigate|pwa|workbench|host events
+    @bridge: runtime-control+crawler-tools+parser-observability+host-extensions
     @shape: deterministic-projection
   }
 
@@ -53,12 +53,13 @@
     ^invariant[registry]{ runtime-events declared:once }
     ^invariant[payload]{ detail:frozen shape:serializable-first }
     ^invariant[transport]{ window|element dispatch parity:true runtime-rebind typed:true }
+    ^invariant[host]{ host-manifest+theme+gating events included in-registry }
   }
 
   ^potential{
     ^potential[contract-doc]{ generate:machine-readable-event-spec }
-    ^potential[trace]{ layer:event-graph replay-for-debug+workbench-bridge }
+    ^potential[trace]{ layer:event-graph replay-for-debug+workbench-bridge+host-overlays }
   }
 
-  ^compose[neighbors]{ ingress:store+components+controllers egress:state|phase|navigate|pwa|workbench events bridge:runtime-control+crawler-tools+parser-observability }
+  ^compose[neighbors]{ ingress:store+components+controllers egress:state|phase|navigate|pwa|workbench|host events bridge:runtime-control+crawler-tools+parser-observability+host-extensions }
 }
