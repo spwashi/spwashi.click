@@ -24,7 +24,9 @@ function parseArgs(argv) {
   const args = {
     target: '',
     mode: 'copy',
-    clean: false
+    clean: false,
+    consumer: '',
+    consumerVersion: ''
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -44,6 +46,18 @@ function parseArgs(argv) {
 
     if (token === '--clean') {
       args.clean = true;
+      continue;
+    }
+
+    if (token === '--consumer' || token === '--host') {
+      args.consumer = argv[index + 1] ?? '';
+      index += 1;
+      continue;
+    }
+
+    if (token === '--consumer-version' || token === '--host-version') {
+      args.consumerVersion = argv[index + 1] ?? '';
+      index += 1;
     }
   }
 
@@ -73,13 +87,21 @@ async function replicateTarget({ sourcePath, destinationPath, mode }) {
   await cp(sourcePath, destinationPath, { recursive: true });
 }
 
-async function writeExportManifest({ targetDir, mode, copiedTargets }) {
+async function writeExportManifest({
+  targetDir,
+  mode,
+  copiedTargets,
+  consumer = '',
+  consumerVersion = ''
+}) {
   const payload = {
     schema: 'spw-export/v1',
     sourceRepo: 'spwashi.click',
     exportedAt: new Date().toISOString(),
     mode,
-    targets: copiedTargets
+    targets: copiedTargets,
+    consumer: consumer || null,
+    consumerVersion: consumerVersion || null
   };
 
   const destinationPath = path.join(targetDir, 'spw-export.manifest.json');
@@ -121,7 +143,13 @@ async function main() {
     copiedTargets.push('package.json');
   }
 
-  await writeExportManifest({ targetDir, mode, copiedTargets });
+  await writeExportManifest({
+    targetDir,
+    mode,
+    copiedTargets,
+    consumer: args.consumer,
+    consumerVersion: args.consumerVersion
+  });
 
   console.log(
     `Export complete: mode=${mode} target=${targetDir} copied=${copiedTargets.length}`

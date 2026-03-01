@@ -40,7 +40,7 @@ git submodule update --init --recursive
 - `npm run lint`: checks source modules for sidecar Spw contracts and named exports only.
 - `npm run test`: runs unit and static e2e scenario tests.
 - `npm run build`: outputs deployable static artifacts into `dist/`.
-- `npm run export:assets -- --target <path> [--mode copy|symlink] [--clean]`: exports runtime/assets/contracts for host repos.
+- `npm run export:assets -- --target <path> [--mode copy|symlink] [--clean] [--consumer <id>] [--consumer-version <version>]`: exports runtime/assets/contracts for host repos.
 
 ## Deploy
 
@@ -93,6 +93,7 @@ Package/embedded runtime entry:
 - `src/runtime/index.js`
 - `package.json` export: `./runtime`
 - runtime modes: `standalone | embedded | assets-only`
+- host identity controls: `hostId`, `hostVersion` (or meta tags `spw:host-id`, `spw:host-version`)
 
 ## Release and Cache Policy
 
@@ -117,6 +118,7 @@ Package/embedded runtime entry:
 - Global API: `window.__SPW_RUNTIME__` (alias: `window.spwRuntime`).
 - Supports:
   - Spw command execution (`evalSpw`, `run('spw', { expression })`)
+  - integration diagnostics (`getIntegrationStatus`, `run('integration')`)
   - top-level state control (`setTopLevel`)
   - region/component parameter control (`setRegion`, `setComponent`)
   - CSS variable/window tuning (`setWindowVars`)

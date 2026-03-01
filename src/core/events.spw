@@ -12,27 +12,27 @@
   ^intent[module]{ id:core.events axis:typed-event-contracts output:explicit-runtime-signals }
 
   ^prefix-utility{
-    !:: role:dispatch event:CustomEvent detail:frozen
+    !:: role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind
     @:: role:subscribe event:known-contract returns:unsubscribe
     =:: role:registry anchor:KNOWN_EVENT_NAMES
   }
 
   ^postfix-utility{
     state~{ read:store+components+controllers }
-    view!{ write:state|phase|navigate|pwa events }
-    bind@{ bridge:runtime-control+crawler-tools }
+    view!{ write:state|phase|navigate|pwa|workbench events }
+    bind@{ bridge:runtime-control+crawler-tools+parser-observability }
   }
 
   ^operator-overload{
-    !{ role:dispatch event:CustomEvent detail:frozen }
+    !{ role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind }
     @{ role:subscribe event:known-contract returns:unsubscribe }
     ={ role:registry anchor:KNOWN_EVENT_NAMES }
   }
 
   ^state-embed{
     @reads: store+components+controllers
-    @writes: state|phase|navigate|pwa events
-    @bridge: runtime-control+crawler-tools
+    @writes: state|phase|navigate|pwa|workbench events
+    @bridge: runtime-control+crawler-tools+parser-observability
     @shape: deterministic-projection
   }
 
@@ -52,13 +52,13 @@
   ^invariants{
     ^invariant[registry]{ runtime-events declared:once }
     ^invariant[payload]{ detail:frozen shape:serializable-first }
-    ^invariant[transport]{ window|element dispatch parity:true }
+    ^invariant[transport]{ window|element dispatch parity:true runtime-rebind typed:true }
   }
 
   ^potential{
     ^potential[contract-doc]{ generate:machine-readable-event-spec }
-    ^potential[trace]{ layer:event-graph replay-for-debug }
+    ^potential[trace]{ layer:event-graph replay-for-debug+workbench-bridge }
   }
 
-  ^compose[neighbors]{ ingress:store+components+controllers egress:state|phase|navigate|pwa events bridge:runtime-control+crawler-tools }
+  ^compose[neighbors]{ ingress:store+components+controllers egress:state|phase|navigate|pwa|workbench events bridge:runtime-control+crawler-tools+parser-observability }
 }

@@ -7,6 +7,7 @@ import {
   EVENT_NAVIGATE,
   EVENT_PHASE_CHANGED,
   EVENT_STATE_CHANGED,
+  EVENT_WORKBENCH_PARSER_STATE,
   dispatchTypedEvent,
   subscribeTypedEvent
 } from './events.js';
@@ -160,6 +161,7 @@ function createApp({ doc, win, runtimeConfig }) {
     route: activeRoute,
     releaseMeta,
     runtimeConfig,
+    parserBridge: { installed: false, reason: 'not-initialized' },
     store,
     ecology,
     marginalia,
@@ -204,6 +206,8 @@ function createApp({ doc, win, runtimeConfig }) {
   doc.documentElement.dataset.performanceProfile = performanceController.getProfile();
   doc.documentElement.dataset.spwEmbedMode = runtimeConfig.embedMode;
   doc.documentElement.dataset.spwBaseUrl = runtimeConfig.baseUrl;
+  doc.documentElement.dataset.spwHostId = runtimeConfig.hostId;
+  doc.documentElement.dataset.spwHostVersion = runtimeConfig.hostVersion;
   ecology.setRoute(activeRoute);
   ecology.setPhase(store.getState().phase);
 
@@ -216,7 +220,9 @@ function createApp({ doc, win, runtimeConfig }) {
     releaseVibe: releaseMeta.releaseVibe,
     performanceProfile: performanceController.getProfile(),
     embedMode: runtimeConfig.embedMode,
-    baseUrl: runtimeConfig.baseUrl
+    baseUrl: runtimeConfig.baseUrl,
+    hostId: runtimeConfig.hostId,
+    hostVersion: runtimeConfig.hostVersion
   });
   syncLiteratureAttributes(doc, marginalia);
 
@@ -241,7 +247,17 @@ async function mountRuntimeApp({ app, doc, win }) {
     assetVersion: app.releaseMeta.assetVersion,
     runtimeConfig: app.runtimeConfig
   });
+  app.parserBridge = parserBridge;
   app.marginalia.write('parser', 'Spw parser bridge status', parserBridge);
+  dispatchTypedEvent(win, EVENT_WORKBENCH_PARSER_STATE, {
+    installed: Boolean(parserBridge.installed),
+    reason: parserBridge.reason ?? 'unknown',
+    adapterPath: parserBridge.adapterPath ?? '',
+    adapterExport: parserBridge.adapterExport ?? '',
+    releaseId: app.releaseMeta.releaseId,
+    hostId: app.runtimeConfig.hostId,
+    hostVersion: app.runtimeConfig.hostVersion
+  });
   syncLiteratureAttributes(doc, app.marginalia);
 
   const textureTuner = await app.performanceController.loadTextureTuner({
@@ -317,7 +333,9 @@ async function mountRuntimeApp({ app, doc, win }) {
     performanceProfile: app.performanceController.getProfile(),
     textureTunerState: doc.documentElement.dataset.textureTunerState ?? 'unknown',
     embedMode: app.runtimeConfig.embedMode,
-    baseUrl: app.runtimeConfig.baseUrl
+    baseUrl: app.runtimeConfig.baseUrl,
+    hostId: app.runtimeConfig.hostId,
+    hostVersion: app.runtimeConfig.hostVersion
   });
 
   return app;
@@ -358,6 +376,8 @@ export function createSpwRuntime(options = {}) {
     if (runtimeConfig.embedMode === 'assets-only') {
       doc.documentElement.dataset.spwEmbedMode = runtimeConfig.embedMode;
       doc.documentElement.dataset.spwBaseUrl = runtimeConfig.baseUrl;
+      doc.documentElement.dataset.spwHostId = runtimeConfig.hostId;
+      doc.documentElement.dataset.spwHostVersion = runtimeConfig.hostVersion;
       doc.documentElement.dataset.pwaState = 'disabled';
       return null;
     }

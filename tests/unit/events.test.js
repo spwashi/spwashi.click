@@ -5,6 +5,8 @@ import {
   EVENT_INTENT_CLICK,
   EVENT_NAVIGATE,
   EVENT_PWA_STATE_CHANGED,
+  EVENT_RUNTIME_REBIND,
+  EVENT_WORKBENCH_PARSER_STATE,
   KNOWN_EVENT_NAMES,
   createTypedEvent,
   dispatchTypedEvent,
@@ -16,6 +18,8 @@ test('known event names include core contracts', () => {
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_INTENT_CLICK));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_NAVIGATE));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_PWA_STATE_CHANGED));
+  assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_RUNTIME_REBIND));
+  assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_WORKBENCH_PARSER_STATE));
   assert.equal(isKnownEventName('spw:missing'), false);
   assert.equal(isKnownEventName(EVENT_INTENT_CLICK), true);
 });

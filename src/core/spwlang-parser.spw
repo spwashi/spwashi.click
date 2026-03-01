@@ -12,8 +12,8 @@
   ^intent[module]{ id:core.spwlang-parser axis:spw-form-parse output:structured-copy-semantics }
 
   ^prefix-utility{
-    !:: role:parse-form returns:{ok,kind,sigil,name,fields}
-    @:: role:register-adapter source:spw-workbench
+    !:: role:parse-form returns:{ok,parser,ast:sigil+symbol+selector+body}
+    @:: role:register-adapter source:spw-workbench exports:parseSpwForm|parseExpression|parse
     ~:: role:fallback-parser subset:sigil+braces
   }
 
@@ -24,8 +24,8 @@
   }
 
   ^operator-overload{
-    !{ role:parse-form returns:{ok,kind,sigil,name,fields} }
-    @{ role:register-adapter source:spw-workbench }
+    !{ role:parse-form returns:{ok,parser,ast:sigil+symbol+selector+body} }
+    @{ role:register-adapter source:spw-workbench exports:parseSpwForm|parseExpression|parse }
     ~{ role:fallback-parser subset:sigil+braces }
   }
 
@@ -50,7 +50,7 @@
   }
 
   ^invariants{
-    ^invariant[result]{ parse-return shape:stable }
+    ^invariant[result]{ parse-return shape:stable ast:canonicalized }
     ^invariant[adapter]{ adapter-fail => fallback-parse }
     ^invariant[subset]{ unsupported-form => reason:explicit }
   }

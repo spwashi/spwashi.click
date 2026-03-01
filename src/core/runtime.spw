@@ -13,26 +13,26 @@
 
   ^prefix-utility{
     !:: role:create-runtime seeds:store+controllers+components
-    @:: role:bridge-store->events->datasets
+    @:: role:bridge-store->events->datasets parser-bridge->event host-metadata
     ~:: role:cleanup-on-destroy listeners+timers+controllers
   }
 
   ^postfix-utility{
     state~{ read:core-controllers }
     view!{ write:window.__SPW_RUNTIME__ }
-    bind@{ bridge:events+components+pages }
+    bind@{ bridge:events+components+pages+workbench-parser-state+host-identity }
   }
 
   ^operator-overload{
     !{ role:create-runtime seeds:store+controllers+components }
-    @{ role:bridge-store->events->datasets }
+    @{ role:bridge-store->events->datasets parser-bridge->event host-metadata }
     ~{ role:cleanup-on-destroy listeners+timers+controllers }
   }
 
   ^state-embed{
     @reads: core-controllers
     @writes: window.__SPW_RUNTIME__
-    @bridge: events+components+pages
+    @bridge: events+components+pages+workbench-parser-state+host-identity
     @shape: deterministic-projection
   }
 
@@ -53,6 +53,8 @@
     ^invariant[lifecycle]{ mount:idempotent destroy:full-cleanup }
     ^invariant[state]{ store:single-source phase:click-derived }
     ^invariant[mode]{ standalone|embedded|assets-only => explicit-branches }
+    ^invariant[parser]{ parser-bridge status emits:spw:workbench:parser:state }
+    ^invariant[host]{ app-ready+parser-state include:host-id+host-version }
   }
 
   ^potential{
@@ -60,5 +62,5 @@
     ^potential[runtime-scenes]{ route-level orchestration by:operators }
   }
 
-  ^compose[neighbors]{ ingress:core-controllers egress:window.__SPW_RUNTIME__ bridge:events+components+pages }
+  ^compose[neighbors]{ ingress:core-controllers egress:window.__SPW_RUNTIME__ bridge:events+components+pages+workbench-parser-state+host-identity }
 }

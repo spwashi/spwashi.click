@@ -25,16 +25,61 @@ test('parseSpwForm fallback parses supported forms', () => {
 });
 
 test('registerSpwParserAdapter delegates parsing', () => {
-  registerSpwParserAdapter('test-adapter', (input) => ({
+  registerSpwParserAdapter('test-adapter', (_input) => ({
     ok: true,
     parser: 'test-adapter',
-    ast: { input }
+    ast: {}
   }));
 
   const parsed = parseSpwForm('^module{ geometry }');
   assert.equal(parsed.ok, true);
   assert.equal(parsed.parser, 'test-adapter');
-  assert.equal(parsed.ast.input, '^module{ geometry }');
+  assert.equal(parsed.ast.sigil, '^');
+  assert.equal(parsed.ast.symbol, 'module');
+  assert.equal(parsed.ast.body, 'geometry');
+
+  clearSpwParserAdapter();
+});
+
+test('parseSpwForm normalizes workbench success-shape AST to canonical contract', () => {
+  registerSpwParserAdapter('workbench-shape', () => ({
+    success: true,
+    ast: {
+      type: 'Seed',
+      expression: {
+        type: 'Expression',
+        terms: [
+          {
+            type: 'Operation',
+            operator: { value: '!' },
+            modifiers: { modifiers: [{ value: 'top' }] },
+            frame: {
+              content: [{ type: 'Literal', token: { value: '"home"' } }]
+            }
+          }
+        ]
+      }
+    }
+  }));
+
+  const parsed = parseSpwForm('!top[home]{ route:notes profile:maximal }');
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.parser, 'workbench-shape');
+  assert.equal(parsed.ast.sigil, '!');
+  assert.equal(parsed.ast.symbol, 'top');
+  assert.equal(parsed.ast.selector, 'home');
+  assert.equal(parsed.ast.body, 'route:notes profile:maximal');
+
+  clearSpwParserAdapter();
+});
+
+test('parseSpwForm guards against async adapter parse returns', () => {
+  registerSpwParserAdapter('async-adapter', () => Promise.resolve({ ok: true }));
+
+  const parsed = parseSpwForm('!top{ route:home }');
+  assert.equal(parsed.ok, false);
+  assert.equal(parsed.parser, 'async-adapter');
+  assert.equal(parsed.reason, 'adapter-returned-promise');
 
   clearSpwParserAdapter();
 });

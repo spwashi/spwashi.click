@@ -7,6 +7,8 @@ export const EVENT_ECOLOGY_CHANGED = 'spw:ecology:changed';
 export const EVENT_ENHANCEMENT_LOADED = 'spw:enhancement:loaded';
 export const EVENT_ENHANCEMENT_FAILED = 'spw:enhancement:failed';
 export const EVENT_PWA_STATE_CHANGED = 'spw:pwa:state-changed';
+export const EVENT_RUNTIME_REBIND = 'spw:runtime:rebind';
+export const EVENT_WORKBENCH_PARSER_STATE = 'spw:workbench:parser:state';
 
 export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_INTENT_CLICK,
@@ -17,7 +19,9 @@ export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_ECOLOGY_CHANGED,
   EVENT_ENHANCEMENT_LOADED,
   EVENT_ENHANCEMENT_FAILED,
-  EVENT_PWA_STATE_CHANGED
+  EVENT_PWA_STATE_CHANGED,
+  EVENT_RUNTIME_REBIND,
+  EVENT_WORKBENCH_PARSER_STATE
 ]);
 
 export function isKnownEventName(eventName) {

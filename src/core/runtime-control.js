@@ -1,4 +1,5 @@
 import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
+import { EVENT_RUNTIME_REBIND, dispatchTypedEvent } from './events.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
 
 function isObject(value) {
@@ -61,6 +62,36 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
 
   const root = document.documentElement;
 
+  function getParserBridgeStatus() {
+    const parserBridge = isObject(app.parserBridge) ? app.parserBridge : {};
+    return {
+      installed: Boolean(parserBridge.installed),
+      reason: typeof parserBridge.reason === 'string' ? parserBridge.reason : 'unknown',
+      adapterPath: typeof parserBridge.adapterPath === 'string' ? parserBridge.adapterPath : '',
+      adapterExport: typeof parserBridge.adapterExport === 'string' ? parserBridge.adapterExport : '',
+      error: typeof parserBridge.error === 'string' ? parserBridge.error : ''
+    };
+  }
+
+  function getIntegrationStatus() {
+    return {
+      parserBridge: getParserBridgeStatus(),
+      release: {
+        date: app.releaseMeta?.releaseDate ?? '',
+        id: app.releaseMeta?.releaseId ?? '',
+        arc: app.releaseMeta?.releaseArc ?? '',
+        vibe: app.releaseMeta?.releaseVibe ?? ''
+      },
+      runtime: {
+        embedMode: app.runtimeConfig?.embedMode ?? 'standalone',
+        baseUrl: app.runtimeConfig?.baseUrl ?? '/',
+        serviceWorker: Boolean(app.runtimeConfig?.enableServiceWorker),
+        hostId: app.runtimeConfig?.hostId ?? 'spwashi.click',
+        hostVersion: app.runtimeConfig?.hostVersion ?? ''
+      }
+    };
+  }
+
   function getSnapshot() {
     return {
       route: app.store.getState().activeRoute,
@@ -74,7 +105,10 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       networkState: root.dataset.networkState ?? 'unknown',
       embedMode: app.runtimeConfig?.embedMode ?? 'standalone',
       baseUrl: app.runtimeConfig?.baseUrl ?? '/',
-      catalogVersion: SPW_FEATURE_CATALOG.version
+      hostId: app.runtimeConfig?.hostId ?? 'spwashi.click',
+      hostVersion: app.runtimeConfig?.hostVersion ?? '',
+      catalogVersion: SPW_FEATURE_CATALOG.version,
+      parserBridge: getParserBridgeStatus()
     };
   }
 
@@ -191,7 +225,9 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
   function rebindRuntime() {
     rebindPage?.();
     app.store.update((draft) => draft, 'runtime:rebind');
-    window.dispatchEvent(new Event('spw:runtime:rebind'));
+    dispatchTypedEvent(window, EVENT_RUNTIME_REBIND, {
+      route: app.store.getState().activeRoute
+    });
 
     app.marginalia.write('runtime', 'runtime-control rebind', {
       route: app.store.getState().activeRoute
@@ -211,6 +247,7 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     version: '1.0.0',
     getSnapshot,
     getCatalog,
+    getIntegrationStatus,
     setTopLevel,
     setRegion,
     setComponent,
@@ -250,6 +287,10 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
 
       if (method === 'catalog' || method === 'getCatalog') {
         return getCatalog(payload);
+      }
+
+      if (method === 'integration' || method === 'status' || method === 'getIntegrationStatus') {
+        return getIntegrationStatus();
       }
 
       return {

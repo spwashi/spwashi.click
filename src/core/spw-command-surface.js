@@ -13,7 +13,10 @@ const SYMBOL_METHOD = Object.freeze({
   css: 'setWindowVars',
   reset: 'resetRuntime',
   rebind: 'rebindRuntime',
-  catalog: 'getCatalog'
+  catalog: 'getCatalog',
+  status: 'getIntegrationStatus',
+  integration: 'getIntegrationStatus',
+  bridge: 'getIntegrationStatus'
 });
 
 const VALUE_PATTERN =
@@ -362,6 +365,16 @@ function parseCommandExpression(expression) {
     };
   }
 
+  if (method === 'getIntegrationStatus') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: {},
+      parsed
+    };
+  }
+
   return {
     ok: true,
     command: symbol,
@@ -459,6 +472,17 @@ export function runSpwRuntimeCommand({ expression, runtimeApi }) {
       method,
       payload,
       result: runtimeApi.getCatalog(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getIntegrationStatus') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getIntegrationStatus(),
       parser: parsed.parser
     };
   }

@@ -22,7 +22,9 @@ await mountSpwRuntime({
   embedMode: 'embedded',
   baseUrl: '/vendor/spwashi.click/',
   enableServiceWorker: false,
-  autoMount: false
+  autoMount: false,
+  hostId: 'spwashi.work',
+  hostVersion: 'r7'
 });
 ```
 
@@ -34,6 +36,8 @@ These are read by `src/core/runtime-config.js`:
 - `spw:base-url` -> asset root prefix for parser/enhancement/PWA URLs
 - `spw:sw-enabled` -> `true|false`
 - `spw:auto-mount` -> `true|false`
+- `spw:host-id` -> consuming host id (`spwashi.work`, `lore.land`, etc.)
+- `spw:host-version` -> optional host release/version string
 
 ## Assets Manifest
 
@@ -51,7 +55,7 @@ This is the canonical machine-readable handoff for host repos.
 Use:
 
 ```bash
-npm run export:assets -- --target ../host/public/vendor/spwashi.click --mode copy --clean
+npm run export:assets -- --target ../host/public/vendor/spwashi.click --mode copy --clean --consumer spwashi.work --consumer-version r7
 ```
 
 Modes:
@@ -60,4 +64,4 @@ Modes:
 - `symlink`: link files/directories into target for local development.
 
 The exporter writes `spw-export.manifest.json` into the target directory.
-
+`spw-export.manifest.json` includes optional `consumer` and `consumerVersion` fields when provided.

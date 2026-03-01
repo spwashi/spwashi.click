@@ -13,7 +13,7 @@
 
   ^prefix-utility{
     !:: role:run-command expression:spw-form
-    @:: role:map-symbol->runtime-method table:explicit
+    @:: role:map-symbol->runtime-method table:explicit includes:status+integration
     ~:: role:coerce-values bool|num|list|string
   }
 
@@ -25,7 +25,7 @@
 
   ^operator-overload{
     !{ role:run-command expression:spw-form }
-    @{ role:map-symbol->runtime-method table:explicit }
+    @{ role:map-symbol->runtime-method table:explicit includes:status+integration }
     ~{ role:coerce-values bool|num|list|string }
   }
 
@@ -53,6 +53,7 @@
     ^invariant[parse]{ parser:adapter-or-fallback unsupported:structured-error }
     ^invariant[mapping]{ symbol=>method explicit no-ad-hoc-dispatch:true }
     ^invariant[payload]{ scalar-coercion typed selector/vars payloads:normalized }
+    ^invariant[integration]{ status symbols resolve:getIntegrationStatus }
   }
 
   ^potential{

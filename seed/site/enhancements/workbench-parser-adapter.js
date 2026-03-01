@@ -1,4 +1,5 @@
 const FORM_PATTERN = /^([~!%^@#?&*.])([a-z0-9_-]+)?(?:\[([a-z0-9_.:+-]+)\])?\{([\s\S]*)\}$/;
+const PARSE_METHODS = Object.freeze(['parseSpwForm', 'parseExpression', 'parse']);
 
 function fallbackParse(input) {
   const trimmed = String(input ?? '').trim();
@@ -25,12 +26,80 @@ function fallbackParse(input) {
   };
 }
 
-export function parseSpwForm(input) {
-  const runtimeParser = globalThis.__spwWorkbenchParser;
+function isRecord(value) {
+  return typeof value === 'object' && value !== null;
+}
 
-  if (runtimeParser && typeof runtimeParser.parseSpwForm === 'function') {
-    return runtimeParser.parseSpwForm(input);
+function resolveFromHost(host) {
+  if (typeof host === 'function') {
+    return { parseFn: host, parseTarget: null, method: 'callable' };
   }
 
-  return fallbackParse(input);
+  if (!isRecord(host)) {
+    return null;
+  }
+
+  const candidates = [
+    host,
+    host.parser,
+    host.seed,
+    host.seed?.parser,
+    host.runtime,
+    host.runtime?.parser
+  ];
+
+  for (const candidate of candidates) {
+    if (!isRecord(candidate)) {
+      continue;
+    }
+
+    for (const method of PARSE_METHODS) {
+      if (typeof candidate[method] === 'function') {
+        return {
+          parseFn: candidate[method],
+          parseTarget: candidate,
+          method
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+function resolveRuntimeParser() {
+  const hosts = [
+    globalThis.__spwWorkbenchParser,
+    globalThis.spwWorkbenchParser,
+    globalThis.__SPW_WORKBENCH__,
+    globalThis.spwWorkbench,
+    globalThis.SPW_WORKBENCH
+  ];
+
+  for (const host of hosts) {
+    const resolved = resolveFromHost(host);
+    if (resolved) {
+      return resolved;
+    }
+  }
+
+  return null;
+}
+
+export function parseSpwForm(input) {
+  const resolved = resolveRuntimeParser();
+  if (!resolved) {
+    return fallbackParse(input);
+  }
+
+  try {
+    const result = resolved.parseFn.call(resolved.parseTarget, input);
+    if (result && typeof result.then === 'function') {
+      return fallbackParse(input);
+    }
+
+    return result ?? fallbackParse(input);
+  } catch {
+    return fallbackParse(input);
+  }
 }

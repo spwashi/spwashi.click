@@ -92,8 +92,10 @@ function createWindowStub() {
   const events = [];
   return {
     events,
+    dispatched: [],
     dispatchEvent(event) {
       events.push(event.type);
+      this.dispatched.push(event);
       return true;
     }
   };
@@ -108,6 +110,8 @@ test('runtime control setTopLevel and setRegion mutate state and nodes', () => {
     store,
     ecology: { getSnapshot: () => ({ species: {} }) },
     releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    runtimeConfig: { embedMode: 'standalone', baseUrl: '/', enableServiceWorker: true, hostId: 'spwashi.work', hostVersion: 'r7' },
+    parserBridge: { installed: true, reason: 'adapter-loaded', adapterPath: '/seed/site/enhancements/workbench-parser-adapter.js', adapterExport: 'parseSpwForm' },
     performanceController: {
       profile: 'field',
       getProfile() {
@@ -144,6 +148,10 @@ test('runtime control setTopLevel and setRegion mutate state and nodes', () => {
   assert.equal(snapshot.state.clickCount, 6);
   assert.equal(snapshot.performanceProfile, 'maximal');
   assert.equal(snapshot.llmReadableStructure, true);
+  assert.equal(snapshot.parserBridge.installed, true);
+  assert.equal(snapshot.parserBridge.reason, 'adapter-loaded');
+  assert.equal(snapshot.hostId, 'spwashi.work');
+  assert.equal(snapshot.hostVersion, 'r7');
 
   const regionResult = win.__SPW_RUNTIME__.setRegion({
     selector: '.region',
@@ -174,6 +182,7 @@ test('runtime control reset and rebind methods are available', () => {
     store,
     ecology: { getSnapshot: () => ({ species: {} }) },
     releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    runtimeConfig: { embedMode: 'standalone', baseUrl: '/', enableServiceWorker: true, hostId: 'spwashi.work', hostVersion: 'r7' },
     performanceController: {
       profile: 'field',
       getProfile() {
@@ -210,6 +219,7 @@ test('runtime control reset and rebind methods are available', () => {
   assert.equal(rebindCalls, 1);
   assert.equal(rebindSnapshot.state.activeRoute, 'home');
   assert.ok(win.events.includes('spw:runtime:rebind'));
+  assert.equal(win.dispatched.at(-1)?.detail?.route, 'home');
 
   cleanup();
 });
@@ -223,6 +233,8 @@ test('runtime control exposes feature catalog for agents', () => {
     store,
     ecology: { getSnapshot: () => ({ species: {} }) },
     releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    runtimeConfig: { embedMode: 'embedded', baseUrl: '/vendor/spw', enableServiceWorker: false, hostId: 'lore.land', hostVersion: '2026.03.01' },
+    parserBridge: { installed: true, reason: 'adapter-loaded', adapterPath: '/seed/site/enhancements/workbench-parser-adapter.js', adapterExport: 'parseExpression' },
     performanceController: {
       profile: 'field',
       getProfile() {
@@ -257,6 +269,14 @@ test('runtime control exposes feature catalog for agents', () => {
   assert.equal(Array.isArray(fullCatalog.features), true);
   assert.ok(fullCatalog.features.length > 0);
 
+  const integrationStatus = win.__SPW_RUNTIME__.run('integration');
+  assert.equal(integrationStatus.parserBridge.installed, true);
+  assert.equal(integrationStatus.parserBridge.adapterExport, 'parseExpression');
+  assert.equal(integrationStatus.runtime.embedMode, 'embedded');
+  assert.equal(integrationStatus.runtime.baseUrl, '/vendor/spw');
+  assert.equal(integrationStatus.runtime.hostId, 'lore.land');
+  assert.equal(integrationStatus.runtime.hostVersion, '2026.03.01');
+
   cleanup();
 });
 
@@ -269,6 +289,8 @@ test('runtime control evaluates Spw command forms for top-level and region opera
     store,
     ecology: { getSnapshot: () => ({ species: {} }) },
     releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    runtimeConfig: { embedMode: 'standalone', baseUrl: '/', enableServiceWorker: true, hostId: 'spwashi.work', hostVersion: 'r7' },
+    parserBridge: { installed: false, reason: 'adapter-not-available' },
     performanceController: {
       profile: 'field',
       getProfile() {
@@ -319,6 +341,12 @@ test('runtime control evaluates Spw command forms for top-level and region opera
   const invalidCommandResult = win.__SPW_RUNTIME__.evalSpw('!unknown{ route:home }');
   assert.equal(invalidCommandResult.ok, false);
   assert.match(invalidCommandResult.error, /Unsupported Spw runtime symbol/i);
+
+  const statusCommandResult = win.__SPW_RUNTIME__.evalSpw('!status{ compact:true }');
+  assert.equal(statusCommandResult.ok, true);
+  assert.equal(statusCommandResult.method, 'getIntegrationStatus');
+  assert.equal(statusCommandResult.result.parserBridge.reason, 'adapter-not-available');
+  assert.equal(statusCommandResult.result.runtime.hostId, 'spwashi.work');
 
   cleanup();
 });

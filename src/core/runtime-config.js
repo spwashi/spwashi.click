@@ -2,6 +2,7 @@ import { appendAssetVersion } from './release.js';
 
 const DEFAULT_EMBED_MODE = 'standalone';
 const KNOWN_EMBED_MODES = Object.freeze(['standalone', 'embedded', 'assets-only']);
+const DEFAULT_HOST_ID = 'spwashi.click';
 
 function parseBooleanToken(value, fallbackValue) {
   if (typeof value === 'boolean') {
@@ -30,6 +31,23 @@ function normalizeEmbedMode(value) {
   }
 
   return DEFAULT_EMBED_MODE;
+}
+
+function normalizeHostToken(value, fallbackValue = '') {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, '');
+
+  if (normalized.length === 0) {
+    return fallbackValue;
+  }
+
+  return normalized;
+}
+
+function normalizeHostVersion(value) {
+  return String(value ?? '').trim();
 }
 
 function hasScheme(value) {
@@ -77,6 +95,10 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     documentRef?.querySelector('meta[name="spw:auto-mount"]')?.getAttribute('content') ?? '';
   const metaServiceWorker =
     documentRef?.querySelector('meta[name="spw:sw-enabled"]')?.getAttribute('content') ?? '';
+  const metaHostId =
+    documentRef?.querySelector('meta[name="spw:host-id"]')?.getAttribute('content') ?? '';
+  const metaHostVersion =
+    documentRef?.querySelector('meta[name="spw:host-version"]')?.getAttribute('content') ?? '';
 
   const embedMode = normalizeEmbedMode(
     overrides.embedMode ?? overrides.mode ?? metaEmbedMode ?? root?.dataset?.spwEmbedMode
@@ -91,6 +113,13 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
   );
   const runEnhancements = parseBooleanToken(overrides.runEnhancements, true);
   const mountSelector = String(overrides.mountSelector ?? '').trim();
+  const hostId = normalizeHostToken(
+    overrides.hostId ?? overrides.host ?? metaHostId ?? root?.dataset?.spwHostId,
+    DEFAULT_HOST_ID
+  );
+  const hostVersion = normalizeHostVersion(
+    overrides.hostVersion ?? metaHostVersion ?? root?.dataset?.spwHostVersion ?? ''
+  );
 
   return Object.freeze({
     embedMode,
@@ -98,7 +127,9 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     autoMount,
     enableServiceWorker,
     runEnhancements,
-    mountSelector
+    mountSelector,
+    hostId,
+    hostVersion
   });
 }
 
@@ -129,4 +160,3 @@ export function resolveRuntimeAssetUrl(path, runtimeConfig = {}, { assetVersion 
 
   return appendAssetVersion(resolved, assetVersion);
 }
-
