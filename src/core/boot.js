@@ -258,17 +258,25 @@ async function bootstrap() {
     }
   });
 
-  app.enhancementRuntime = await runIterativeEnhancements({
-    app,
-    route: app.route,
-    document
-  });
+  app.enhancementRuntime = { manifest: { profile: 'baseline', enhancements: [] }, cleanups: [] };
 
-  app.marginalia.write('enhancement', 'Iterative enhancement stage complete', {
-    profile: app.enhancementRuntime.manifest.profile,
-    count: app.enhancementRuntime.manifest.enhancements.length
-  });
-  syncLiteratureAttributes(app.marginalia);
+  // Defer enhancement loading to not block initial rendering
+  setTimeout(() => {
+    runIterativeEnhancements({
+      app,
+      route: app.route,
+      document
+    }).then((enhancementRuntime) => {
+      app.enhancementRuntime = enhancementRuntime;
+      app.marginalia.write('enhancement', 'Iterative enhancement stage complete', {
+        profile: enhancementRuntime.manifest.profile,
+        count: enhancementRuntime.manifest.enhancements.length
+      });
+      syncLiteratureAttributes(app.marginalia);
+    }).catch((error) => {
+      console.warn('Enhancement loading failed, continuing with baseline', error);
+    });
+  }, 0);
 
   dispatchTypedEvent(window, EVENT_APP_READY, {
     route: app.route,
