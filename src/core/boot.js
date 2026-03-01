@@ -299,7 +299,15 @@ async function bootstrap() {
  */
 function showBootFailureMessage() {
   const fallback = document.createElement('div');
-  fallback.style.cssText = 'padding: 2rem; max-width: 48rem; margin: 2rem auto; background: #fff3cd; border: 2px solid #856404; border-radius: 0.5rem; color: #856404;';
+  fallback.style.cssText = [
+    'padding: 2rem',
+    'max-width: 48rem',
+    'margin: 2rem auto',
+    'background: #fff3cd',
+    'border: 2px solid #856404',
+    'border-radius: 0.5rem',
+    'color: #856404'
+  ].join('; ');
   fallback.innerHTML = '<p style="margin: 0;"><strong>Site initialization failed.</strong> Please refresh the page. If the issue persists, try clearing your browser cache.</p>';
   document.body.prepend(fallback);
 }
