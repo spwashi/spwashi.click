@@ -14,7 +14,7 @@ The component layer is modeled as a small ecology with explicit roles.
 
 ## Ecology Ledger
 
-`src/core/ecology.js` maintains a snapshot with:
+`src/core/runtime/js/ecology.js` maintains a snapshot with:
 
 - Current route and phase
 - Species lifecycle counters (`connected`, `disconnected`, `rendered`, `intent`)
@@ -45,7 +45,7 @@ This means symbolic navigation is not isolated to the lab; it can reframe page l
 
 ## Medium Flow
 
-`src/core/medium-flow.js` installs an optional cadence controller:
+`src/core/runtime/js/medium-flow.js` installs an optional cadence controller:
 
 - Treats `[data-layout-region]` sections as facets in a continuous medium.
 - Advances click-phase state over time (`medium:auto`) to keep composition moving.
@@ -55,7 +55,7 @@ The console overlay is descriptive, not decorative; it exposes current facet, ph
 
 ## Runtime Command Surface
 
-`src/core/spw-command-surface.js` maps compact Spw forms into runtime API calls:
+`src/core/runtime/js/spw-command-surface.js` maps compact Spw forms into runtime API calls:
 
 - `!top{ ... }` -> top-level state/perf/structure
 - `!region{ ... }` -> selector-scoped attribute/data/style/text tuning
@@ -70,7 +70,7 @@ Use through runtime control:
 
 ## Space-Aware Behavior
 
-`src/core/space-metrics.js` provides a sporadic sampler used by interactive components/enhancements.
+`src/core/runtime/js/space-metrics.js` provides a sporadic sampler used by interactive components/enhancements.
 
 - Components project local geometry as `data-inline-band`, `data-block-band`, `data-area-band`.
 - Components also expose CSS vars (`--stage-inline-size`, `--syntax-inline-size`, `--atlas-inline-size`) so style can respond without tight JS loops.

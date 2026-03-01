@@ -5,13 +5,13 @@ Static multi-page website built with vanilla ES modules, Web Components, and CSS
 ## Architecture
 
 - Routes: `/`, `/work/`, `/notes/`, `404.html`
-- Entry point: `src/core/boot.js`
-- State model: immutable app store in `src/core/store.js`
-- Ecology model: lifecycle ledger in `src/core/ecology.js`
-- Iterative enhancement loader: `src/core/iterative-enhancement.js`
-- Medium flow cadence controller: `src/core/medium-flow.js`
-- Software literature marginalia: `src/core/literature.js`
-- Interaction contracts: typed custom events in `src/core/events.js`
+- Entry point: `src/core/runtime/js/boot.js`
+- State model: immutable app store in `src/core/runtime/js/store.js`
+- Ecology model: lifecycle ledger in `src/core/runtime/js/ecology.js`
+- Iterative enhancement loader: `src/core/runtime/js/iterative-enhancement.js`
+- Medium flow cadence controller: `src/core/runtime/js/medium-flow.js`
+- Software literature marginalia: `src/core/runtime/js/literature.js`
+- Interaction contracts: typed custom events in `src/core/runtime/js/events.js`
 - Components:
   - `spw-site-shell`
   - `spw-click-stage`
@@ -127,12 +127,12 @@ Package/embedded runtime entry:
   - region/component parameter control (`setRegion`, `setComponent`)
   - CSS variable/window tuning (`setWindowVars`)
   - runtime lifecycle controls (`resetRuntime`, `rebindRuntime`, `run`)
-- Installed in `src/core/runtime-control.js` during boot.
+- Installed in `src/core/runtime/js/runtime-control.js` during boot.
 
 ## Spw Copy Parsing
 
 - Copy strings can be authored as executable spw-like forms (e.g. `^identity[spwashi]{ physics: spw }`).
-- Runtime parser bridge: `src/core/spwlang-parser.js`.
+- Runtime parser bridge: `src/core/runtime/js/spwlang-parser.js`.
 - Optional adapter path: `seed/site/enhancements/workbench-parser-adapter.js`.
 
 ## Texture Cache + Tuner

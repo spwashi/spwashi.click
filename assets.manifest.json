@@ -9,7 +9,7 @@
   },
   "runtime": {
     "module": "/src/runtime/index.js?v=__ASSET_VERSION__",
-    "boot": "/src/core/boot.js?v=__ASSET_VERSION__",
+    "boot": "/src/core/runtime/js/boot.js?v=__ASSET_VERSION__",
     "config_meta": [
       "spw:embed-mode",
       "spw:base-url",

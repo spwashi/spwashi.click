@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./runtime.js"
-  @path: ~"src/core/runtime.js"
+  @source: ~"../js/runtime.js"
+  @path: ~"src/core/runtime/js/runtime.js"
 
   ^scan{
     @id: core.runtime

@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./store.js"
-  @path: ~"src/core/store.js"
+  @source: ~"../js/store.js"
+  @path: ~"src/core/runtime/js/store.js"
 
   ^scan{
     @id: core.store

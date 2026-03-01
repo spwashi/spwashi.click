@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./boot.js"
-  @path: ~"src/core/boot.js"
+  @source: ~"../js/boot.js"
+  @path: ~"src/core/runtime/js/boot.js"
 
   ^scan{
     @id: core.boot

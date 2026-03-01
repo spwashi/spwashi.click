@@ -15,7 +15,7 @@ import {
   dispatchTypedEvent,
   freezeDetail,
   isKnownEventName
-} from '../../src/core/events.js';
+} from '../../src/core/runtime/js/events.js';
 
 test('known event names include core contracts', () => {
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_INTENT_CLICK));

@@ -22,10 +22,10 @@
     "spw": "spw.index.spw",
     "workspace": ".spw/workspace.spw",
     "runtime_module": "src/runtime/index.js",
-    "runtime_boot": "src/core/boot.js",
-    "runtime_control": "src/core/runtime-control.js",
-    "runtime_config": "src/core/runtime-config.js",
-    "pwa_runtime": "src/core/pwa.js",
+    "runtime_boot": "src/core/runtime/js/boot.js",
+    "runtime_control": "src/core/runtime/js/runtime-control.js",
+    "runtime_config": "src/core/runtime/js/runtime-config.js",
+    "pwa_runtime": "src/core/runtime/js/pwa.js",
     "pwa_manifest": "manifest.webmanifest",
     "service_worker": "sw.js",
     "assets_manifest": "assets.manifest.json",
@@ -97,8 +97,8 @@
         "!catalog{ summary:true }"
       ],
       "source": [
-        "src/core/spw-command-surface.js",
-        "src/core/runtime-control.js"
+        "src/core/runtime/js/spw-command-surface.js",
+        "src/core/runtime/js/runtime-control.js"
       ]
     },
     "pwa_state": {
@@ -111,8 +111,8 @@
         "error"
       ],
       "source": [
-        "src/core/pwa.js",
-        "src/core/events.js"
+        "src/core/runtime/js/pwa.js",
+        "src/core/runtime/js/events.js"
       ]
     },
     "embed_modes": {
@@ -128,15 +128,15 @@
         "spw:auto-mount"
       ],
       "source": [
-        "src/core/runtime-config.js",
-        "src/core/runtime.js",
+        "src/core/runtime/js/runtime-config.js",
+        "src/core/runtime/js/runtime.js",
         "src/runtime/index.js"
       ]
     },
     "medium_flow": {
       "map": "facet-cadence + auto-phase + language-console",
       "source": [
-        "src/core/medium-flow.js",
+        "src/core/runtime/js/medium-flow.js",
         "src/styles/components.css"
       ]
     }
@@ -181,8 +181,8 @@
       "spw": "^feature[click-stage]{ input:click|enter|space|arrow-right output:phase+lumen+layers }",
       "files": [
         "src/components/click-stage.js",
-        "src/core/store.js",
-        "src/core/motion.js",
+        "src/core/runtime/js/store.js",
+        "src/core/runtime/js/motion.js",
         "src/styles/components.css"
       ]
     },
@@ -192,7 +192,7 @@
       "spw": "^feature[shader-field]{ input:pointer+keyboard output:harmonics+intent-click profile-aware:true }",
       "files": [
         "src/components/shader-field.js",
-        "src/core/space-metrics.js",
+        "src/core/runtime/js/space-metrics.js",
         "src/styles/components.css"
       ]
     },
@@ -202,7 +202,7 @@
       "spw": "^feature[syntax-lab]{ braces:layout-view operators:component-view nodes:facet-nav }",
       "files": [
         "src/components/syntax-lab.js",
-        "src/core/spwlang-parser.js",
+        "src/core/runtime/js/spwlang-parser.js",
         "src/styles/components.css",
         "src/styles/layout.css"
       ]
@@ -213,7 +213,7 @@
       "spw": "^feature[seed-atlas]{ source:seed-manifest behavior:thumb+keyboard+phase-lighting }",
       "files": [
         "seed/site/enhancements/seed-atlas.js",
-        "src/core/iterative-enhancement.js",
+        "src/core/runtime/js/iterative-enhancement.js",
         "seed/site/enhancements.manifest.json"
       ]
     },
@@ -222,9 +222,9 @@
       "route": "global",
       "spw": "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }",
       "files": [
-        "src/core/runtime-control.js",
-        "src/core/spw-command-surface.js",
-        "src/core/boot.js"
+        "src/core/runtime/js/runtime-control.js",
+        "src/core/runtime/js/spw-command-surface.js",
+        "src/core/runtime/js/boot.js"
       ]
     },
     {
@@ -232,7 +232,7 @@
       "route": "global",
       "spw": "^feature[structure-mode]{ toggle:data-llm-readable-structure projection:aria-description }",
       "files": [
-        "src/core/structure-mode.js",
+        "src/core/runtime/js/structure-mode.js",
         "src/components/syntax-lab.js",
         "src/styles/components.css"
       ]
@@ -242,8 +242,8 @@
       "route": "global",
       "spw": "^feature[medium-flow]{ cadence:autoplay facets:layout-region controls:arrow+space+home }",
       "files": [
-        "src/core/medium-flow.js",
-        "src/core/runtime.js",
+        "src/core/runtime/js/medium-flow.js",
+        "src/core/runtime/js/runtime.js",
         "src/styles/components.css"
       ]
     },
@@ -252,8 +252,8 @@
       "route": "global",
       "spw": "^feature[package]{ entry:src/runtime/index.js modes:standalone|embedded|assets-only assets:manifest+export-script }",
       "files": [
-        "src/core/runtime.js",
-        "src/core/runtime-config.js",
+        "src/core/runtime/js/runtime.js",
+        "src/core/runtime/js/runtime-config.js",
         "src/runtime/index.js",
         "assets.manifest.json",
         "scripts/export-assets.js",
@@ -265,7 +265,7 @@
       "route": "global",
       "spw": "^feature[performance]{ profiles:seed|field|maximal source:tealstripesvibes }",
       "files": [
-        "src/core/performance-tuning.js",
+        "src/core/runtime/js/performance-tuning.js",
         "src/styles/tokens.css",
         "src/styles/components.css"
       ]
@@ -275,7 +275,7 @@
       "route": "global",
       "spw": "^feature[pwa]{ install:manifest+sw state:online|offline|ready release-cache:date-arc-vibe }",
       "files": [
-        "src/core/pwa.js",
+        "src/core/runtime/js/pwa.js",
         "manifest.webmanifest",
         "sw.js",
         "scripts/build-static.js"
@@ -315,9 +315,9 @@
       "spw.index.json",
       "spw.index.spw",
       ".spw/workspace.spw",
-      "src/core/boot.js",
-      "src/core/runtime-control.js",
-      "src/core/pwa.js",
+      "src/core/runtime/js/boot.js",
+      "src/core/runtime/js/runtime-control.js",
+      "src/core/runtime/js/pwa.js",
       "manifest.webmanifest",
       "sw.js",
       "assets.manifest.json",

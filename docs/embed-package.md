@@ -33,7 +33,7 @@ await mountSpwRuntime({
 
 ## HTML Meta Controls
 
-These are read by `src/core/runtime-config.js`:
+These are read by `src/core/runtime/js/runtime-config.js`:
 
 - `spw:embed-mode` -> `standalone|embedded|assets-only`
 - `spw:base-url` -> asset root prefix for parser/enhancement/PWA URLs

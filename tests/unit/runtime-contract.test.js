@@ -7,7 +7,7 @@ import {
   createRuntimeApiContract,
   evaluateCompatibilityWindow,
   isVersionInRange
-} from '../../src/core/runtime-contract.js';
+} from '../../src/core/runtime/js/runtime-contract.js';
 
 test('compareVersion orders semantic versions deterministically', () => {
   assert.equal(compareVersion('1.0.0', '1.0.0'), 0);

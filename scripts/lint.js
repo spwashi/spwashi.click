@@ -32,6 +32,13 @@ async function walkFiles(directoryPath) {
 }
 
 function sidecarPathForModule(filePath) {
+  const normalized = filePath.split(path.sep).join('/');
+  const coreAdjacentMatch = normalized.match(/^(.*\/src\/core\/.+)\/js\/([^/]+)\.js$/);
+  if (coreAdjacentMatch) {
+    const [, prefix, baseName] = coreAdjacentMatch;
+    return `${prefix}/spw/${baseName}.spw`.split('/').join(path.sep);
+  }
+
   return filePath.replace(/\.js$/, '.spw');
 }
 
@@ -124,7 +131,7 @@ async function runLint() {
   const files = await walkFiles(SRC_DIR);
   const issues = [];
   const manifests = await import(path.join(ROOT_DIR, 'src/content/manifests.js'));
-  const parser = await import(path.join(ROOT_DIR, 'src/core/spwlang-parser.js'));
+  const parser = await import(path.join(ROOT_DIR, 'src/core/runtime/js/spwlang-parser.js'));
 
   for (const filePath of files.sort()) {
     const contents = await readFile(filePath, 'utf8');

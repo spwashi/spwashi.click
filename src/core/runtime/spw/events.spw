@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./events.js"
-  @path: ~"src/core/events.js"
+  @source: ~"../js/events.js"
+  @path: ~"src/core/runtime/js/events.js"
 
   ^scan{
     @id: core.events

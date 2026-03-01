@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./runtime-control.js"
-  @path: ~"src/core/runtime-control.js"
+  @source: ~"../js/runtime-control.js"
+  @path: ~"src/core/runtime/js/runtime-control.js"
 
   ^scan{
     @id: core.runtime-control

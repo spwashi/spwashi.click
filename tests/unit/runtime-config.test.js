@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { readRuntimeConfig, resolveRuntimeAssetUrl } from '../../src/core/runtime-config.js';
+import { readRuntimeConfig, resolveRuntimeAssetUrl } from '../../src/core/runtime/js/runtime-config.js';
 
 test('readRuntimeConfig normalizes embed mode and base url defaults', () => {
   const config = readRuntimeConfig({
@@ -142,13 +142,13 @@ test('readRuntimeConfig accepts host identity from overrides and meta tags', () 
 });
 
 test('resolveRuntimeAssetUrl rewrites root assets against embedded base url and appends release version', () => {
-  const url = resolveRuntimeAssetUrl('/src/core/boot.js', {
+  const url = resolveRuntimeAssetUrl('/src/core/runtime/js/boot.js', {
     baseUrl: '/vendor/spwashi.click/'
   }, {
     assetVersion: '20260228-r1'
   });
 
-  assert.equal(url, '/vendor/spwashi.click/src/core/boot.js?v=20260228-r1');
+  assert.equal(url, '/vendor/spwashi.click/src/core/runtime/js/boot.js?v=20260228-r1');
 });
 
 test('resolveRuntimeAssetUrl preserves external urls and appends release version', () => {

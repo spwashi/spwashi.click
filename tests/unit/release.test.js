@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { appendAssetVersion, readReleaseMeta } from '../../src/core/release.js';
+import { appendAssetVersion, readReleaseMeta } from '../../src/core/runtime/js/release.js';
 
 function createMeta(content) {
   return {
@@ -21,8 +21,8 @@ function createDocumentStub(metaMap) {
 
 test('appendAssetVersion preserves existing query parameters', () => {
   assert.equal(
-    appendAssetVersion('/src/core/boot.js', '20260228-genesis-chorus-mathematical-jazz-r1'),
-    '/src/core/boot.js?v=20260228-genesis-chorus-mathematical-jazz-r1'
+    appendAssetVersion('/src/core/runtime/js/boot.js', '20260228-genesis-chorus-mathematical-jazz-r1'),
+    '/src/core/runtime/js/boot.js?v=20260228-genesis-chorus-mathematical-jazz-r1'
   );
   assert.equal(
     appendAssetVersion('/seed/site/enhancements.manifest.json?draft=true', '20260228-genesis-chorus-mathematical-jazz-r1'),

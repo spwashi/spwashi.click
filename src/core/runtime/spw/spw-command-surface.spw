@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./spw-command-surface.js"
-  @path: ~"src/core/spw-command-surface.js"
+  @source: ~"../js/spw-command-surface.js"
+  @path: ~"src/core/runtime/js/spw-command-surface.js"
 
   ^scan{
     @id: core.spw-command-surface

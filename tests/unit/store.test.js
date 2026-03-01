@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createStore } from '../../src/core/store.js';
+import { createStore } from '../../src/core/runtime/js/store.js';
 
 test('store initializes with immutable snapshot', () => {
   const store = createStore({ activeRoute: 'home' });

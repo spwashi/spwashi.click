@@ -1,0 +1,62 @@
+~#module{
+  @source: ~"../js/index.js"
+  @path: ~"src/core/runtime/js/index.js"
+
+  ^scan{
+    @id: core.runtime.index
+    @axis: barrel-surface
+    @output: named-export-aggregation
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:core.runtime.index axis:barrel-surface output:named-export-aggregation }
+
+  ^prefix-utility{
+    !:: role:aggregate core-runtime modules
+    @:: role:preserve named-export contracts
+    ~:: role:stable import surface for host integrations
+  }
+
+  ^postfix-utility{
+    state~{ read:core-runtime module exports }
+    view!{ write:barrel namespace }
+    bind@{ bridge:src/runtime/index.js + host consumers }
+  }
+
+  ^operator-overload{
+    !{ role:aggregate core-runtime modules }
+    @{ role:preserve named-export contracts }
+    ~{ role:stable import surface for host integrations }
+  }
+
+  ^state-embed{
+    @reads: core-runtime module exports
+    @writes: barrel namespace
+    @bridge: src/runtime/index.js + host consumers
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_runtime_index_scan]{
+      input: module export graph
+      flow: collect->re-export->freeze
+      output: named-export-aggregation
+    }
+    ^macro[core_runtime_index_patch]{
+      input: module add/remove
+      flow: update->validate->emit
+      output: barrel namespace
+    }
+  }
+
+  ^invariants{
+    ^invariant[exports]{ re-exported symbols remain named and tree-shakeable }
+    ^invariant[surface]{ path:src/core/runtime/js/index.js remains stable }
+  }
+
+  ^potential{
+    ^potential[host-sdk]{ curated export subsets per host profile }
+  }
+
+  ^compose[neighbors]{ ingress:core-runtime modules egress:barrel namespace bridge:src/runtime/index.js+host consumers }
+}

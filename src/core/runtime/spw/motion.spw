@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./motion.js"
-  @path: ~"src/core/motion.js"
+  @source: ~"../js/motion.js"
+  @path: ~"src/core/runtime/js/motion.js"
 
   ^scan{
     @id: core.motion

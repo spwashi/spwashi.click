@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installPerformanceTuning } from '../../src/core/performance-tuning.js';
+import { installPerformanceTuning } from '../../src/core/runtime/js/performance-tuning.js';
 
 function createMetaNode(content) {
   return {

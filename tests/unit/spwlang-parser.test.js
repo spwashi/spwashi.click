@@ -6,7 +6,7 @@ import {
   isLikelySpwForm,
   parseSpwForm,
   registerSpwParserAdapter
-} from '../../src/core/spwlang-parser.js';
+} from '../../src/core/runtime/js/spwlang-parser.js';
 
 test('isLikelySpwForm detects sigil-brace forms', () => {
   assert.equal(isLikelySpwForm('^identity[spwashi]{ physics: spw }'), true);

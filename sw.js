@@ -22,7 +22,7 @@ const CORE_URLS = Object.freeze([
   '/src/styles/layout.css?v=__ASSET_VERSION__',
   '/src/styles/components.css?v=__ASSET_VERSION__',
   '/src/runtime/index.js?v=__ASSET_VERSION__',
-  '/src/core/boot.js?v=__ASSET_VERSION__'
+  '/src/core/runtime/js/boot.js?v=__ASSET_VERSION__'
 ]);
 
 async function cacheUrls(cacheName, urls) {

@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./ecology.js"
-  @path: ~"src/core/ecology.js"
+  @source: ~"../js/ecology.js"
+  @path: ~"src/core/runtime/js/ecology.js"
 
   ^scan{
     @id: core.ecology

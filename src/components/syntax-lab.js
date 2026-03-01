@@ -1,6 +1,6 @@
-import { noteComponentLifecycle } from '../core/ecology.js';
-import { parseSpwForm } from '../core/spwlang-parser.js';
-import { installSporadicSpaceSampler } from '../core/space-metrics.js';
+import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { parseSpwForm } from '../core/runtime/js/spwlang-parser.js';
+import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
 
 const BRACE_SET = Object.freeze(['<>', '()', '[]', '{}']);
 const DEFAULT_OPERATORS = Object.freeze(['?', '~', '@', '&', '*', '^', '!', '=', '%', '#', '.']);

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { CORE_SPECIES, createEcologyLedger } from '../../src/core/ecology.js';
+import { CORE_SPECIES, createEcologyLedger } from '../../src/core/runtime/js/ecology.js';
 
 test('createEcologyLedger seeds species and returns immutable snapshots', () => {
   const ecology = createEcologyLedger(CORE_SPECIES);

@@ -1,6 +1,6 @@
-import { noteComponentLifecycle } from '../core/ecology.js';
-import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
-import { installSporadicSpaceSampler } from '../core/space-metrics.js';
+import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/runtime/js/events.js';
+import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
 
 const PROFILE_FRAME_RATE = Object.freeze({
   seed: 12,

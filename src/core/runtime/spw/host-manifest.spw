@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./host-manifest.js"
-  @path: ~"src/core/host-manifest.js"
+  @source: ~"../js/host-manifest.js"
+  @path: ~"src/core/runtime/js/host-manifest.js"
 
   ^scan{
     @id: core.host-manifest

@@ -1,4 +1,4 @@
-import { installSporadicSpaceSampler } from '../../../src/core/space-metrics.js';
+import { installSporadicSpaceSampler } from '../../../src/core/runtime/js/space-metrics.js';
 
 const PHASE_SEQUENCE = Object.freeze(['seed', 'pulse', 'counterpoint', 'chorus']);
 

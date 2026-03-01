@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./space-metrics.js"
-  @path: ~"src/core/space-metrics.js"
+  @source: ~"../js/space-metrics.js"
+  @path: ~"src/core/runtime/js/space-metrics.js"
 
   ^scan{
     @id: core.space-metrics

@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./performance-tuning.js"
-  @path: ~"src/core/performance-tuning.js"
+  @source: ~"../js/performance-tuning.js"
+  @path: ~"src/core/runtime/js/performance-tuning.js"
 
   ^scan{
     @id: core.performance-tuning

@@ -4,7 +4,7 @@ Baseline pages render statically. Optional enhancements load from `seed/site/` a
 
 ## Loader Contract
 
-- Loader: `src/core/iterative-enhancement.js`
+- Loader: `src/core/runtime/js/iterative-enhancement.js`
 - Manifest path: `/seed/site/enhancements.manifest.json`
 - Entry module export: `installEnhancement(context)`
 - Release-aware cache busting is applied automatically to manifest fetches and enhancement module imports.

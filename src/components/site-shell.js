@@ -1,6 +1,6 @@
-import { ensureAriaCurrent } from '../core/a11y.js';
-import { noteComponentLifecycle } from '../core/ecology.js';
-import { EVENT_NAVIGATE, dispatchTypedEvent } from '../core/events.js';
+import { ensureAriaCurrent } from '../core/runtime/js/a11y.js';
+import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { EVENT_NAVIGATE, dispatchTypedEvent } from '../core/runtime/js/events.js';
 
 class SpwSiteShell extends HTMLElement {
   static observedAttributes = ['route'];

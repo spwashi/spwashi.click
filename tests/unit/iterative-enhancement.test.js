@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { loadEnhancementManifest } from '../../src/core/iterative-enhancement.js';
+import { loadEnhancementManifest } from '../../src/core/runtime/js/iterative-enhancement.js';
 
 test('loadEnhancementManifest falls back when fetch is unavailable', async () => {
   const manifest = await loadEnhancementManifest({ fetchImpl: null });

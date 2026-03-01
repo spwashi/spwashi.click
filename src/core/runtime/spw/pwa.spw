@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./pwa.js"
-  @path: ~"src/core/pwa.js"
+  @source: ~"../js/pwa.js"
+  @path: ~"src/core/runtime/js/pwa.js"
 
   ^scan{
     @id: core.pwa

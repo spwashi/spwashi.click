@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installStructureMode } from '../../src/core/structure-mode.js';
+import { installStructureMode } from '../../src/core/runtime/js/structure-mode.js';
 
 function createNode(initialAttributes = {}) {
   const attributes = new Map(Object.entries(initialAttributes));

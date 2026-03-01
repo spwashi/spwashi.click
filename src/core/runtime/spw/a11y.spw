@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./a11y.js"
-  @path: ~"src/core/a11y.js"
+  @source: ~"../js/a11y.js"
+  @path: ~"src/core/runtime/js/a11y.js"
 
   ^scan{
     @id: core.a11y

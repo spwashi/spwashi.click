@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installSporadicSpaceSampler, sampleElementSpace } from '../../src/core/space-metrics.js';
+import { installSporadicSpaceSampler, sampleElementSpace } from '../../src/core/runtime/js/space-metrics.js';
 
 test('sampleElementSpace returns deterministic normalized bands', () => {
   const node = {

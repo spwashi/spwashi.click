@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./release.js"
-  @path: ~"src/core/release.js"
+  @source: ~"../js/release.js"
+  @path: ~"src/core/runtime/js/release.js"
 
   ^scan{
     @id: core.release

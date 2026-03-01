@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./medium-flow.js"
-  @path: ~"src/core/medium-flow.js"
+  @source: ~"../js/medium-flow.js"
+  @path: ~"src/core/runtime/js/medium-flow.js"
 
   ^scan{
     @id: core.medium-flow

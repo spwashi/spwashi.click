@@ -25,7 +25,7 @@ test('all pages include shared boot module and viewport metadata', async () => {
     assert.match(html, /<meta name="spw:feature-index-spw" content="\/spw\.index\.spw"\s*\/>/);
     assert.match(html, /<meta name="spw:workspace-index" content="\/\.spw\/workspace\.spw"\s*\/>/);
     assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest\?v=__ASSET_VERSION__"\s*\/>/);
-    assert.match(html, /<script type="module" src="\/src\/core\/boot\.js\?v=__ASSET_VERSION__"><\/script>/);
+    assert.match(html, /<script type="module" src="\/src\/core\/runtime\/js\/boot\.js\?v=__ASSET_VERSION__"><\/script>/);
   }
 });
 

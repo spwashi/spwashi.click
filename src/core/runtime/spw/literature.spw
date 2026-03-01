@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./literature.js"
-  @path: ~"src/core/literature.js"
+  @source: ~"../js/literature.js"
+  @path: ~"src/core/runtime/js/literature.js"
 
   ^scan{
     @id: core.literature

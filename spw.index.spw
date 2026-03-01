@@ -20,61 +20,61 @@
 ^feature[click-stage]{
   route: "/"
   contract: "^feature[click-stage]{ input:click|enter|space|arrow-right output:phase+lumen+layers }"
-  files: [src/components/click-stage.js, src/core/store.js, src/core/motion.js]
+  files: [src/components/click-stage.js, src/core/runtime/js/store.js, src/core/runtime/js/motion.js]
 }
 
 ^feature[shader-field]{
   route: "/"
   contract: "^feature[shader-field]{ input:pointer+keyboard output:harmonics+intent-click profile-aware:true }"
-  files: [src/components/shader-field.js, src/core/space-metrics.js, src/styles/components.css]
+  files: [src/components/shader-field.js, src/core/runtime/js/space-metrics.js, src/styles/components.css]
 }
 
 ^feature[syntax-lab]{
   route: "/"
   contract: "^feature[syntax-lab]{ braces:layout-view operators:component-view nodes:facet-nav }"
-  files: [src/components/syntax-lab.js, src/core/spwlang-parser.js]
+  files: [src/components/syntax-lab.js, src/core/runtime/js/spwlang-parser.js]
 }
 
 ^feature[seed-atlas]{
   route: "/,/notes/"
   contract: "^feature[seed-atlas]{ source:seed-manifest behavior:thumb+keyboard+phase-lighting }"
-  files: [seed/site/enhancements/seed-atlas.js, src/core/iterative-enhancement.js]
+  files: [seed/site/enhancements/seed-atlas.js, src/core/runtime/js/iterative-enhancement.js]
 }
 
 ^feature[runtime-control]{
   route: "global"
   contract: "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }"
-  files: [src/core/runtime-control.js, src/core/spw-command-surface.js, src/core/boot.js]
+  files: [src/core/runtime/js/runtime-control.js, src/core/runtime/js/spw-command-surface.js, src/core/runtime/js/boot.js]
 }
 
 ^feature[structure-mode]{
   route: "global"
   contract: "^feature[structure-mode]{ toggle:data-llm-readable-structure projection:aria-description }"
-  files: [src/core/structure-mode.js, src/components/syntax-lab.js]
+  files: [src/core/runtime/js/structure-mode.js, src/components/syntax-lab.js]
 }
 
 ^feature[performance]{
   route: "global"
   contract: "^feature[performance]{ profiles:seed|field|maximal source:tealstripesvibes }"
-  files: [src/core/performance-tuning.js, src/styles/tokens.css]
+  files: [src/core/runtime/js/performance-tuning.js, src/styles/tokens.css]
 }
 
 ^feature[pwa]{
   route: "global"
   contract: "^feature[pwa]{ install:manifest+sw state:online|offline|ready release-cache:date-arc-vibe }"
-  files: [src/core/pwa.js, manifest.webmanifest, sw.js, scripts/build-static.js]
+  files: [src/core/runtime/js/pwa.js, manifest.webmanifest, sw.js, scripts/build-static.js]
 }
 
 ^feature[medium-flow]{
   route: "global"
   contract: "^feature[medium-flow]{ cadence:autoplay facets:layout-region controls:arrow+space+home }"
-  files: [src/core/medium-flow.js, src/core/runtime.js, src/styles/components.css]
+  files: [src/core/runtime/js/medium-flow.js, src/core/runtime/js/runtime.js, src/styles/components.css]
 }
 
 ^feature[modular-package]{
   route: "global"
   contract: "^feature[package]{ entry:src/runtime/index.js modes:standalone|embedded|assets-only assets:manifest+export-script }"
-  files: [src/core/runtime.js, src/core/runtime-config.js, src/runtime/index.js, assets.manifest.json, scripts/export-assets.js, docs/embed-package.md]
+  files: [src/core/runtime/js/runtime.js, src/core/runtime/js/runtime-config.js, src/runtime/index.js, assets.manifest.json, scripts/export-assets.js, docs/embed-package.md]
 }
 
 ^semantics[operators]{
@@ -89,28 +89,28 @@
 
 ^semantics[phases]{
   map: "seed(0-2), pulse(3-7), counterpoint(8-15), chorus(16+)"
-  source: [src/core/motion.js, src/components/click-stage.js]
+  source: [src/core/runtime/js/motion.js, src/components/click-stage.js]
 }
 
 ^semantics[runtime-command]{
   forms: "!top{} !region{} !component{} !vars{} !reset{} !rebind{} !catalog{}"
-  source: [src/core/spw-command-surface.js, src/core/runtime-control.js]
+  source: [src/core/runtime/js/spw-command-surface.js, src/core/runtime/js/runtime-control.js]
 }
 
 ^semantics[pwa-state]{
   map: "unsupported, registering, ready, update-ready, updating, error"
-  source: [src/core/pwa.js, src/core/events.js]
+  source: [src/core/runtime/js/pwa.js, src/core/runtime/js/events.js]
 }
 
 ^semantics[embed-modes]{
   map: "standalone, embedded, assets-only"
   controls: "spw:embed-mode spw:base-url spw:sw-enabled spw:auto-mount"
-  source: [src/core/runtime-config.js, src/core/runtime.js, src/runtime/index.js]
+  source: [src/core/runtime/js/runtime-config.js, src/core/runtime/js/runtime.js, src/runtime/index.js]
 }
 
 ^semantics[medium-flow]{
   map: "facet-cadence + auto-phase + language-console"
-  source: [src/core/medium-flow.js, src/styles/components.css]
+  source: [src/core/runtime/js/medium-flow.js, src/styles/components.css]
 }
 
 ^care[lsp]{

@@ -1,4 +1,4 @@
-import { noteComponentLifecycle } from '../core/ecology.js';
+import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
 
 function clampIntensity(value) {
   const parsed = Number.parseInt(value ?? '0', 10);

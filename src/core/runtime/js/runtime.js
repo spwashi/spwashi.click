@@ -29,11 +29,11 @@ import { createStore } from './store.js';
 import { installStructureMode } from './structure-mode.js';
 import { installMediumFlow } from './medium-flow.js';
 import { createRuntimeApiContract } from './runtime-contract.js';
-import { defineAllComponents } from '../components/register.js';
-import { HOME_MANIFEST, NOTES_MANIFEST, WORK_MANIFEST } from '../content/manifests.js';
-import { initHomePage } from '../pages/home.js';
-import { initNotesPage } from '../pages/notes.js';
-import { initWorkPage } from '../pages/work.js';
+import { defineAllComponents } from '../../../components/register.js';
+import { HOME_MANIFEST, NOTES_MANIFEST, WORK_MANIFEST } from '../../../content/manifests.js';
+import { initHomePage } from '../../../pages/home.js';
+import { initNotesPage } from '../../../pages/notes.js';
+import { initWorkPage } from '../../../pages/work.js';
 
 const PAGE_INITIALIZERS = Object.freeze({
   home: initHomePage,

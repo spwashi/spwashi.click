@@ -6,7 +6,7 @@ import {
   intensityFromPhase,
   phaseFromClickCount,
   unlockedLayersFromPhase
-} from '../../src/core/motion.js';
+} from '../../src/core/runtime/js/motion.js';
 
 test('phaseFromClickCount maps click boundaries deterministically', () => {
   assert.equal(phaseFromClickCount(0), 'seed');

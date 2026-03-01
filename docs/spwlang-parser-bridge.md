@@ -4,7 +4,7 @@ This site treats key copy strings as executable forms.
 
 ## Runtime Path
 
-- Core bridge: `src/core/spwlang-parser.js`
+- Core bridge: `src/core/runtime/js/spwlang-parser.js`
 - Optional adapter module: `seed/site/enhancements/workbench-parser-adapter.js`
 
 Boot sequence attempts adapter load first. If unavailable, fallback parser handles the supported sigil-form subset.

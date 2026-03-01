@@ -1,4 +1,4 @@
-import { CORE_SPECIES } from '../core/ecology.js';
+import { CORE_SPECIES } from '../core/runtime/js/ecology.js';
 import { defineChapterPanel } from './chapter-panel.js';
 import { defineClickStage } from './click-stage.js';
 import { defineEcologyMap } from './ecology-map.js';

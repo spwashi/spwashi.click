@@ -1,5 +1,5 @@
 const FORM_PATTERN = /^([~!%^@#?&*.])([a-z0-9_-]+)?(?:\[([a-z0-9_.:+-]+)\])?\{([\s\S]*)\}$/;
-const PARSE_METHODS = Object.freeze(['parseSpwForm', 'parseExpression', 'parse']);
+const PARSE_METHODS = Object.freeze(['parseSpwForm', 'parseExpression', 'parse', 'parseWithLog']);
 
 function fallbackParse(input) {
   const trimmed = String(input ?? '').trim();
@@ -69,11 +69,15 @@ function resolveFromHost(host) {
 
 function resolveRuntimeParser() {
   const hosts = [
+    globalThis.__SPW_WORKBENCH_RUNTIME__,
+    globalThis.spwWorkbenchRuntime,
     globalThis.__spwWorkbenchParser,
     globalThis.spwWorkbenchParser,
     globalThis.__SPW_WORKBENCH__,
     globalThis.spwWorkbench,
-    globalThis.SPW_WORKBENCH
+    globalThis.SPW_WORKBENCH,
+    globalThis.__SPW_RUNTIME__,
+    globalThis.spwRuntime
   ];
 
   for (const host of hosts) {
@@ -93,7 +97,10 @@ export function parseSpwForm(input) {
   }
 
   try {
-    const result = resolved.parseFn.call(resolved.parseTarget, input);
+    const result =
+      resolved.method === 'parseWithLog'
+        ? resolved.parseFn.call(resolved.parseTarget, input, { format: () => '' })
+        : resolved.parseFn.call(resolved.parseTarget, input);
     if (result && typeof result.then === 'function') {
       return fallbackParse(input);
     }

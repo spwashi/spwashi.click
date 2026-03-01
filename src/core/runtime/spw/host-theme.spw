@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./host-theme.js"
-  @path: ~"src/core/host-theme.js"
+  @source: ~"../js/host-theme.js"
+  @path: ~"src/core/runtime/js/host-theme.js"
 
   ^scan{
     @id: core.host-theme

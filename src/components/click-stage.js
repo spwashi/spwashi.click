@@ -1,7 +1,7 @@
-import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
-import { noteComponentLifecycle } from '../core/ecology.js';
-import { intensityFromPhase } from '../core/motion.js';
-import { installSporadicSpaceSampler } from '../core/space-metrics.js';
+import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/runtime/js/events.js';
+import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { intensityFromPhase } from '../core/runtime/js/motion.js';
+import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
 
 const PHASE_COPY = Object.freeze({
   seed: '^phase[seed]{ model: geometry-init learn: click=>state }',

@@ -4,10 +4,10 @@ This project treats source code as readable prose with executable invariants.
 
 ## Reading Order
 
-1. `src/core/boot.js`
-2. `src/core/store.js`
-3. `src/core/motion.js`
-4. `src/core/ecology.js`
+1. `src/core/runtime/js/boot.js`
+2. `src/core/runtime/js/store.js`
+3. `src/core/runtime/js/motion.js`
+4. `src/core/runtime/js/ecology.js`
 5. `src/components/`
 6. `src/pages/`
 
@@ -28,7 +28,7 @@ The contract is enforced by `scripts/lint.js`.
 
 ## Marginalia Ledger
 
-Runtime annotations are written to an in-memory marginalia ledger (`src/core/literature.js`) so transitions can be inspected as narrative, not just events.
+Runtime annotations are written to an in-memory marginalia ledger (`src/core/runtime/js/literature.js`) so transitions can be inspected as narrative, not just events.
 
 - `window.__SPW_APP__.marginalia.read()` exposes the latest lines.
 - `data-marginalia-lines` on `<html>` reflects current line count.

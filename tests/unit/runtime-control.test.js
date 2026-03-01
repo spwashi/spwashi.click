@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installRuntimeControl } from '../../src/core/runtime-control.js';
+import { installRuntimeControl } from '../../src/core/runtime/js/runtime-control.js';
 
 function createStoreStub() {
   let state = {

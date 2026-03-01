@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./router-lite.js"
-  @path: ~"src/core/router-lite.js"
+  @source: ~"../js/router-lite.js"
+  @path: ~"src/core/runtime/js/router-lite.js"
 
   ^scan{
     @id: core.router-lite

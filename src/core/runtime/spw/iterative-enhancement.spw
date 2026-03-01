@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./iterative-enhancement.js"
-  @path: ~"src/core/iterative-enhancement.js"
+  @source: ~"../js/iterative-enhancement.js"
+  @path: ~"src/core/runtime/js/iterative-enhancement.js"
 
   ^scan{
     @id: core.iterative-enhancement

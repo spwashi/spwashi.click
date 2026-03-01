@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./runtime-contract.js"
-  @path: ~"src/core/runtime-contract.js"
+  @source: ~"../js/runtime-contract.js"
+  @path: ~"src/core/runtime/js/runtime-contract.js"
 
   ^scan{
     @id: core.runtime-contract

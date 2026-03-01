@@ -7,8 +7,8 @@ Source-first contract for agents that read this repository to determine what alr
 1. `spw.index.json` (machine-readable inventory)
 2. `spw.index.spw` (Spw-native feature inventory)
 3. `.spw/workspace.spw` (kernel/layers/relationship framing)
-4. `src/core/boot.js` and `src/core/runtime-control.js` (actual runtime orchestration and control surfaces)
-5. `manifest.webmanifest`, `sw.js`, and `src/core/pwa.js` (installability and release-cache behavior)
+4. `src/core/runtime/js/boot.js` and `src/core/runtime/js/runtime-control.js` (actual runtime orchestration and control surfaces)
+5. `manifest.webmanifest`, `sw.js`, and `src/core/runtime/js/pwa.js` (installability and release-cache behavior)
 6. `src/runtime/index.js` and `assets.manifest.json` (embedded/runtime-package and asset handoff contracts)
 
 ## Workspace Control Plane

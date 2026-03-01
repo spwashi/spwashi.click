@@ -231,6 +231,15 @@ function adaptResult(input, rawResult, parserName) {
     }
 
     const ok = Boolean(rawResult.success);
+    if (!ok && !reason && Array.isArray(rawResult.errors) && rawResult.errors.length > 0) {
+      const firstError = rawResult.errors[0];
+      if (isRecord(firstError?.data) && typeof firstError.data.message === 'string') {
+        reason = firstError.data.message;
+      } else if (typeof firstError?.message === 'string') {
+        reason = firstError.message;
+      }
+    }
+
     return {
       ok,
       parser: parserName,
@@ -323,10 +332,22 @@ export async function installWorkbenchParserAdapter({
       ['parseSpwForm', adapterModule.parseSpwForm],
       ['parseExpression', adapterModule.parseExpression],
       ['parse', adapterModule.parse],
+      ['parser.parseSpwForm', adapterModule.parser?.parseSpwForm],
+      ['parser.parseExpression', adapterModule.parser?.parseExpression],
+      ['parser.parse', adapterModule.parser?.parse],
+      ['seed.parser.parseSpwForm', adapterModule.seed?.parser?.parseSpwForm],
+      ['seed.parser.parseExpression', adapterModule.seed?.parser?.parseExpression],
+      ['seed.parser.parse', adapterModule.seed?.parser?.parse],
+      ['parseWithLog', adapterModule.parseWithLog],
       ['default', adapterModule.default]
     ];
-    const [adapterExport, parseFn] =
+    let [adapterExport, parseFn] =
       adapterCandidates.find(([_name, value]) => typeof value === 'function') ?? [];
+
+    if (adapterExport === 'parseWithLog') {
+      const parseWithLog = parseFn;
+      parseFn = (input) => parseWithLog(input, { format: () => '' });
+    }
 
     if (typeof parseFn !== 'function') {
       return {

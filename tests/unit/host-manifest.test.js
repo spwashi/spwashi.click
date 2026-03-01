@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createFallbackHostManifest, loadHostManifest } from '../../src/core/host-manifest.js';
+import { createFallbackHostManifest, loadHostManifest } from '../../src/core/runtime/js/host-manifest.js';
 
 test('createFallbackHostManifest yields deterministic defaults', () => {
   const manifest = createFallbackHostManifest(

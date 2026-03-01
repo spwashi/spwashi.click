@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./structure-mode.js"
-  @path: ~"src/core/structure-mode.js"
+  @source: ~"../js/structure-mode.js"
+  @path: ~"src/core/runtime/js/structure-mode.js"
 
   ^scan{
     @id: core.structure-mode

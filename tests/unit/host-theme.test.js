@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installHostThemeCombinatorics } from '../../src/core/host-theme.js';
+import { installHostThemeCombinatorics } from '../../src/core/runtime/js/host-theme.js';
 
 function createStoreStub() {
   let state = {

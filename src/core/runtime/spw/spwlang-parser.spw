@@ -1,6 +1,6 @@
 ~#module{
-  @source: ~"./spwlang-parser.js"
-  @path: ~"src/core/spwlang-parser.js"
+  @source: ~"../js/spwlang-parser.js"
+  @path: ~"src/core/runtime/js/spwlang-parser.js"
 
   ^scan{
     @id: core.spwlang-parser

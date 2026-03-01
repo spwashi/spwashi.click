@@ -1,4 +1,4 @@
-import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
+import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../../../content/feature-catalog.js';
 import { EVENT_RUNTIME_REBIND, dispatchTypedEvent } from './events.js';
 import { createRuntimeApiContract } from './runtime-contract.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
