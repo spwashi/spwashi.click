@@ -7,6 +7,11 @@
  * Boot calls setup once; component styles respond to data-input-modality and aria attributes.
  */
 
+// Cache for nav links to avoid repeated DOM queries.
+// Note: querySelectorAll returns a static NodeList, so cached results won't reflect
+// dynamically added/removed links. This is acceptable because nav links are static in this site.
+const navLinksCache = new WeakMap();
+
 export function installAccessibilityEnhancements(doc = globalThis.document) {
   if (!doc) {
     return () => {};
@@ -38,9 +43,6 @@ export function installAccessibilityEnhancements(doc = globalThis.document) {
     doc.removeEventListener('touchstart', onPointer);
   };
 }
-
-// Cache for nav links to avoid repeated DOM queries
-const navLinksCache = new WeakMap();
 
 export function ensureAriaCurrent(rootElement, activeRoute) {
   if (!rootElement) {
