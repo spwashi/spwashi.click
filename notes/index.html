@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-route="notes">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Spwashi notes index; structured abstractions; spwlang annotations."
+    />
+    <meta name="spw:release-date" content="__RELEASE_DATE__" />
+    <meta name="spw:release-id" content="__RELEASE_ID__" />
+    <meta name="spw:release-arc" content="__RELEASE_ARC__" />
+    <meta name="spw:release-vibe" content="__RELEASE_VIBE__" />
+    <meta name="spw:asset-version" content="__ASSET_VERSION__" />
+    <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
+    <title>spwashi.click / notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:opsz,wght@7..72,400;7..72,600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/tokens.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/base.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/layout.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/components.css?v=__ASSET_VERSION__" />
+  </head>
+  <body data-page="notes">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <spw-site-shell route="notes" aria-label="Site shell" data-structure-label="Site shell with route-aware header, main content, and footer">
+      <header class="site-header" role="banner">
+        <a class="site-brand" href="/" data-route="home">
+          <span class="site-brand__mark">spwashi.click</span>
+          <span class="site-brand__meta">mathematical jazz</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="/" data-route="home">Home</a>
+          <a href="/work/" data-route="work">Work</a>
+          <a href="/notes/" data-route="notes">Notes</a>
+        </nav>
+      </header>
+
+      <main id="main-content" class="site-main" role="main">
+        <section class="page-section" aria-labelledby="notes-title" data-structure-label="Notes route intro with thematic placeholder writing context">
+          <p class="page-section__eyebrow">^index[notes]</p>
+          <h1 id="notes-title" data-slot="page_title_slot">Notes</h1>
+          <p data-slot="page_intro_slot">^notes{ tags: replace }</p>
+        </section>
+
+        <section class="page-section" aria-labelledby="notes-stream-title" data-structure-label="Notes stream list with title, date, and excerpt structure">
+          <h2 id="notes-stream-title" class="visually-hidden">Notes list</h2>
+          <div class="notes-stream" data-role="notes-list">
+            <article class="note-card" id="note-state-machines">
+              <h2 class="note-card__title">^note{ id: state_composition }</h2>
+              <p class="note-card__date">SLOT: YYYY-MM-DD</p>
+              <p class="note-card__excerpt">~excerpt{ transition-logic + audience-expectation }</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="page-section surface-panel" aria-labelledby="notes-seed-atlas-title" data-enhancement-zone="seed-atlas" data-structure-label="Optional lore atlas enhancement zone for visual learning prompts">
+          <p class="page-section__eyebrow">^seed[imagery]</p>
+          <h2 id="notes-seed-atlas-title">Lore Atlas</h2>
+          <div class="seed-atlas" data-role="seed-atlas" data-atlas-state="dormant" aria-live="polite">
+            <p class="seed-atlas__fallback">
+              ^enhancement{ optional: true source: seed-manifest }
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer" role="contentinfo">
+        <p><a href="mailto:hello@spwashi.click">hello@spwashi.click</a></p>
+        <p>!texture-cache{ origin: <a href="https://tealstripesvibes.com" rel="external noopener">tealstripesvibes.com</a> mode: tuner }</p>
+        <p>^system{ mode: web-components profile: spwashi syntax: spwlang }</p>
+        <p>
+          <button type="button" class="performance-toggle" data-role="performance-toggle" aria-label="Cycle performance profile">
+            ^perf{ profile: field }
+          </button>
+        </p>
+        <p>
+          <button type="button" class="structure-toggle" data-role="structure-toggle" aria-pressed="false">
+            Structure Labels: Off
+          </button>
+        </p>
+      </footer>
+    </spw-site-shell>
+
+    <script type="module" src="/src/core/boot.js?v=__ASSET_VERSION__"></script>
+  </body>
+</html>

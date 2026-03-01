@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "profile": "lore-land-seed",
+  "enhancements": [
+    {
+      "id": "seed-atlas",
+      "enabled": true,
+      "routes": ["home", "notes"],
+      "module": "/seed/site/enhancements/seed-atlas.js",
+      "target": "[data-role='seed-atlas']",
+      "captionPrefix": "Lore Land seed",
+      "images": [
+        "/seed/images/2026-02-28/spwashi_wonder_b830a224-26a3-4731-8312-aba315dec302.png",
+        "/seed/images/2026-02-28/spwashi_potential_2386107b-4a1a-4b91-8a8f-e2dce98c071a.png",
+        "/seed/images/2026-02-28/spwashi_perspective_bdd8a84e-6a29-41c4-8a94-ab76b1cb04a5.png",
+        "/seed/images/2026-02-28/spwashi_definition_3413d640-a9de-4a14-ac50-85c0ce430804.png",
+        "/seed/images/2026-02-28/spwashi_scene_3773c612-b7a3-4467-8647-4f7fd3da0fd7.png",
+        "/seed/images/2026-02-28/spwashi_subject_9f855f96-eb49-4e62-a20f-dad1f38ae1c4.png",
+        "/seed/images/2026-02-28/spwashi_value_24dbce91-567c-481f-95c4-27e79f6d54a6.png",
+        "/seed/images/2026-02-28/spwashi_action_5b3d49b3-28ed-4d98-af00-96e88eceee74.png",
+        "/seed/images/2026-02-28/spwashi_integration_393a363e-55e4-4147-9f0c-f1e4f68c817c.png",
+        "/seed/images/2026-02-28/spwashi_ascension_cf1c6ee1-656c-45d0-ac83-cd4b5fde1be9.png"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+@layer reset, tokens, base, layout, components, utilities;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: var(--color-bg);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: var(--font-body);
+    line-height: 1.6;
+    position: relative;
+    isolation: isolate;
+    overflow-x: clip;
+    background:
+      radial-gradient(
+        circle at calc(12% + var(--fx-drift-x) * 0.2) calc(8% + var(--fx-drift-y) * 0.2),
+        color-mix(in srgb, var(--color-accent) calc(12% + var(--fx-light-depth) * 18%), transparent),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at calc(86% - var(--fx-drift-x) * 0.15) calc(24% - var(--fx-drift-y) * 0.12),
+        color-mix(in srgb, var(--color-brass) calc(14% + var(--fx-light-depth) * 12%), transparent),
+        transparent 42%
+      ),
+      repeating-linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--color-ink) calc(var(--fx-texture-gain) * 10%), transparent) 0,
+        color-mix(in srgb, var(--color-ink) calc(var(--fx-texture-gain) * 10%), transparent) 8px,
+        color-mix(in srgb, var(--color-surface) calc(10% + var(--fx-texture-gain) * 10%), transparent) 8px,
+        color-mix(in srgb, var(--color-surface) calc(10% + var(--fx-texture-gain) * 10%), transparent) 16px
+      ),
+      var(--color-bg);
+  }
+
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    inset: -20%;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body::before {
+    opacity: var(--fx-texture-gain);
+    background:
+      repeating-radial-gradient(
+        circle at 20% 22%,
+        rgba(255, 255, 255, 0.14) 0 2px,
+        transparent 2px 10px
+      ),
+      repeating-linear-gradient(
+        45deg,
+        rgba(31, 42, 47, 0.06) 0 1px,
+        transparent 1px 5px
+      );
+    mix-blend-mode: multiply;
+    filter: contrast(1.04) saturate(calc(0.9 + var(--fx-light-depth) * 0.5));
+    transform: translate3d(var(--fx-drift-x), var(--fx-drift-y), 0);
+  }
+
+  body::after {
+    opacity: calc(0.2 + var(--fx-light-depth) * 0.24);
+    background:
+      conic-gradient(
+        from var(--fx-lumen-angle) at 50% 50%,
+        color-mix(in srgb, var(--color-accent) 45%, transparent),
+        transparent 25%,
+        color-mix(in srgb, var(--color-brass) 38%, transparent),
+        transparent 66%,
+        color-mix(in srgb, var(--color-accent-soft) 36%, transparent)
+      );
+    filter: blur(calc(var(--fx-blur-px) * 1px));
+    mix-blend-mode: screen;
+    transform: translate3d(calc(var(--fx-drift-x) * -0.55), calc(var(--fx-drift-y) * 0.45), 0);
+  }
+
+  html[data-performance-profile='seed'] body::after {
+    opacity: 0.12;
+    filter: blur(4px);
+  }
+
+  html[data-performance-profile='seed'] body::before {
+    opacity: 0.12;
+    mix-blend-mode: normal;
+  }
+
+  ::selection {
+    background: rgba(0, 184, 217, 0.25);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    line-height: 1.1;
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-ink);
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    transition: color var(--duration-fast) var(--ease-jazz);
+  }
+
+  a:hover {
+    color: color-mix(in srgb, var(--color-ink) 80%, var(--color-accent));
+  }
+
+  [data-input-modality='keyboard'] a:focus-visible,
+  [data-input-modality='keyboard'] button:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  .skip-link {
+    position: absolute;
+    top: -3rem;
+    left: var(--spacing-4);
+    z-index: 100;
+    padding: var(--spacing-2) var(--spacing-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  .skip-link:focus {
+    top: var(--spacing-3);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}

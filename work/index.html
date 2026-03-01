@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-route="work">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Spwashi collection index; structured records; learnable abstraction."
+    />
+    <meta name="spw:release-date" content="__RELEASE_DATE__" />
+    <meta name="spw:release-id" content="__RELEASE_ID__" />
+    <meta name="spw:release-arc" content="__RELEASE_ARC__" />
+    <meta name="spw:release-vibe" content="__RELEASE_VIBE__" />
+    <meta name="spw:asset-version" content="__ASSET_VERSION__" />
+    <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
+    <title>spwashi.click / collections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:opsz,wght@7..72,400;7..72,600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/tokens.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/base.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/layout.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/components.css?v=__ASSET_VERSION__" />
+  </head>
+  <body data-page="work">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <spw-site-shell route="work" aria-label="Site shell" data-structure-label="Site shell with route-aware header, main content, and footer">
+      <header class="site-header" role="banner">
+        <a class="site-brand" href="/" data-route="home">
+          <span class="site-brand__mark">spwashi.click</span>
+          <span class="site-brand__meta">mathematical jazz</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="/" data-route="home">Home</a>
+          <a href="/work/" data-route="work">Work</a>
+          <a href="/notes/" data-route="notes">Notes</a>
+        </nav>
+      </header>
+
+      <main id="main-content" class="site-main" role="main">
+        <section class="page-section" aria-labelledby="work-title" data-structure-label="Work route intro and curation context">
+          <p class="page-section__eyebrow">^index[collections]</p>
+          <h1 id="work-title" data-slot="page_title_slot">Collections</h1>
+          <p data-slot="page_intro_slot">^curation{ rule: replace }</p>
+        </section>
+
+        <section class="page-section" aria-labelledby="project-grid-title" data-structure-label="Project grid containing structured case-study placeholders">
+          <h2 id="project-grid-title" class="visually-hidden">Project cards</h2>
+          <div class="project-grid" data-role="project-grid">
+            <article class="project-card" id="project-one" data-project-id="project-one">
+              <h2 class="project-card__title">^project{ id: capsule_01 }</h2>
+              <p class="project-card__role">^role{ creative-direction }</p>
+              <p class="project-card__summary">~summary{ visual-language-established }</p>
+              <p class="project-card__metrics">%metric{ engagement }</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer" role="contentinfo">
+        <p><a href="mailto:hello@spwashi.click">hello@spwashi.click</a></p>
+        <p>!texture-cache{ origin: <a href="https://tealstripesvibes.com" rel="external noopener">tealstripesvibes.com</a> mode: tuner }</p>
+        <p>^system{ mode: web-components profile: spwashi syntax: spwlang }</p>
+        <p>
+          <button type="button" class="performance-toggle" data-role="performance-toggle" aria-label="Cycle performance profile">
+            ^perf{ profile: field }
+          </button>
+        </p>
+        <p>
+          <button type="button" class="structure-toggle" data-role="structure-toggle" aria-pressed="false">
+            Structure Labels: Off
+          </button>
+        </p>
+      </footer>
+    </spw-site-shell>
+
+    <script type="module" src="/src/core/boot.js?v=__ASSET_VERSION__"></script>
+  </body>
+</html>

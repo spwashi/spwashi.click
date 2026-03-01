@@ -1,0 +1,185 @@
+/**
+ * Intent:
+ * Host the signature click interaction and project phase/layer state into visible SVG and text artifacts.
+ * Invariants:
+ * UI reflects store state exclusively and click intent is emitted as an event, not by direct store mutation.
+ * How this composes with neighbors:
+ * Boot listens for click intent events; chapter panels and shell react to resulting phase transitions.
+ */
+
+import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
+import { noteComponentLifecycle } from '../core/ecology.js';
+import { intensityFromPhase } from '../core/motion.js';
+
+const PHASE_COPY = Object.freeze({
+  seed: '^phase[seed]{ model: geometry-init learn: click=>state }',
+  pulse: '^phase[pulse]{ model: motion-entry learn: state=>tempo }',
+  counterpoint: '^phase[counterpoint]{ model: fragment-weave learn: relation=>meaning }',
+  chorus: '^phase[chorus]{ model: full-combinatorics learn: system=>presence }'
+});
+
+class SpwClickStage extends HTMLElement {
+  static observedAttributes = ['phase', 'clicks'];
+
+  connectedCallback() {
+    this.dataset.component = 'click-stage';
+    this.setAttribute('role', 'group');
+    this.setAttribute('aria-label', this.getAttribute('aria-label') ?? 'Interactive click stage');
+    noteComponentLifecycle('spw-click-stage', 'connected', {
+      phase: this.getAttribute('phase') ?? 'seed'
+    });
+
+    this.ensureScaffolding();
+    this.bindIntents();
+    this.attachStoreSubscription();
+    this.renderFromState(window.__SPW_APP__?.store?.getState());
+  }
+
+  disconnectedCallback() {
+    noteComponentLifecycle('spw-click-stage', 'disconnected', {
+      phase: this.getAttribute('phase') ?? 'seed'
+    });
+    if (this.triggerButton && this.onClickIntent) {
+      this.triggerButton.removeEventListener('click', this.onClickIntent);
+    }
+
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
+  }
+
+  attributeChangedCallback(name) {
+    if ((name === 'phase' || name === 'clicks') && this.isConnected) {
+      this.renderFromAttributes();
+    }
+  }
+
+  ensureScaffolding() {
+    if (!this.querySelector('[data-role="click-trigger"]')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'click-stage__trigger';
+      button.dataset.role = 'click-trigger';
+      button.setAttribute('aria-controls', 'click-stage-status');
+      button.textContent = 'Click to build the scene';
+      this.prepend(button);
+    }
+
+    if (!this.querySelector('[data-role="status"]')) {
+      const status = document.createElement('p');
+      status.id = 'click-stage-status';
+      status.className = 'click-stage__status';
+      status.dataset.role = 'status';
+      status.setAttribute('aria-live', 'polite');
+      this.append(status);
+    }
+
+    if (!this.querySelector('[data-role="svg-score"]')) {
+      const score = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      score.setAttribute('viewBox', '0 0 320 120');
+      score.setAttribute('class', 'click-stage__score');
+      score.setAttribute('aria-hidden', 'true');
+      score.dataset.role = 'svg-score';
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M 10 70 C 60 20, 120 95, 170 40 S 260 20, 310 65');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '3');
+      path.setAttribute('data-layer', 'motion');
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', '70');
+      circle.setAttribute('cy', '60');
+      circle.setAttribute('r', '18');
+      circle.setAttribute('data-layer', 'geometry');
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', '210');
+      rect.setAttribute('y', '35');
+      rect.setAttribute('width', '70');
+      rect.setAttribute('height', '50');
+      rect.setAttribute('rx', '8');
+      rect.setAttribute('data-layer', 'highlights');
+
+      score.append(path, circle, rect);
+      this.append(score);
+    }
+
+    if (!this.querySelector('spw-rhythm-grid')) {
+      const rhythmGrid = document.createElement('spw-rhythm-grid');
+      rhythmGrid.setAttribute('intensity', '0');
+      this.append(rhythmGrid);
+    }
+  }
+
+  bindIntents() {
+    this.triggerButton = this.querySelector('[data-role="click-trigger"]');
+    this.statusNode = this.querySelector('[data-role="status"]');
+
+    this.onClickIntent = () => {
+      dispatchTypedEvent(this, EVENT_INTENT_CLICK, { source: 'click-stage' });
+      noteComponentLifecycle('spw-click-stage', 'intent', { source: 'click-stage' });
+    };
+
+    this.triggerButton.addEventListener('click', this.onClickIntent);
+  }
+
+  attachStoreSubscription() {
+    const app = window.__SPW_APP__;
+    if (!app?.store) {
+      return;
+    }
+
+    this.unsubscribe = app.store.subscribe((nextState) => {
+      this.renderFromState(nextState);
+    });
+  }
+
+  renderFromAttributes() {
+    const phase = this.getAttribute('phase') ?? 'seed';
+    const clickCount = Number.parseInt(this.getAttribute('clicks') ?? '0', 10);
+
+    this.dataset.phase = phase;
+    this.dataset.clicks = String(Number.isFinite(clickCount) ? clickCount : 0);
+  }
+
+  renderFromState(state) {
+    if (!state) {
+      return;
+    }
+
+    this.setAttribute('phase', state.phase);
+    this.setAttribute('clicks', String(state.clickCount));
+    this.dataset.phase = state.phase;
+    this.dataset.clicks = String(state.clickCount);
+
+    if (this.statusNode) {
+      this.statusNode.textContent = `${PHASE_COPY[state.phase]} Clicks: ${state.clickCount}.`;
+    }
+
+    const rhythmGrid = this.querySelector('spw-rhythm-grid');
+    if (rhythmGrid) {
+      rhythmGrid.setAttribute('intensity', String(intensityFromPhase(state.phase)));
+    }
+
+    const layerNodes = this.querySelectorAll('[data-layer]');
+    for (const layerNode of layerNodes) {
+      const layerName = layerNode.getAttribute('data-layer');
+      const layerUnlocked = state.unlockedLayers.includes(layerName);
+      layerNode.setAttribute('data-unlocked', layerUnlocked ? 'true' : 'false');
+    }
+
+    noteComponentLifecycle('spw-click-stage', 'rendered', {
+      phase: state.phase,
+      clickCount: state.clickCount
+    });
+  }
+}
+
+export function defineClickStage() {
+  if (!customElements.get('spw-click-stage')) {
+    customElements.define('spw-click-stage', SpwClickStage);
+  }
+}
