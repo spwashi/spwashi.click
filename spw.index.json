@@ -11,6 +11,9 @@
     "workspace": ".spw/workspace.spw",
     "runtime_boot": "src/core/boot.js",
     "runtime_control": "src/core/runtime-control.js",
+    "pwa_runtime": "src/core/pwa.js",
+    "pwa_manifest": "manifest.webmanifest",
+    "service_worker": "sw.js",
     "feature_copy": "src/content/manifests.js"
   },
   "semantics": {
@@ -81,6 +84,20 @@
         "src/core/spw-command-surface.js",
         "src/core/runtime-control.js"
       ]
+    },
+    "pwa_state": {
+      "states": [
+        "unsupported",
+        "registering",
+        "ready",
+        "update-ready",
+        "updating",
+        "error"
+      ],
+      "source": [
+        "src/core/pwa.js",
+        "src/core/events.js"
+      ]
     }
   },
   "contracts": {
@@ -100,7 +117,8 @@
       "spw:app:ready",
       "spw:ecology:changed",
       "spw:enhancement:loaded",
-      "spw:enhancement:failed"
+      "spw:enhancement:failed",
+      "spw:pwa:state-changed"
     ],
     "runtime_methods": [
       "getSnapshot",
@@ -124,6 +142,16 @@
         "src/components/click-stage.js",
         "src/core/store.js",
         "src/core/motion.js",
+        "src/styles/components.css"
+      ]
+    },
+    {
+      "id": "shader-field",
+      "route": "/",
+      "spw": "^feature[shader-field]{ input:pointer+keyboard output:harmonics+intent-click profile-aware:true }",
+      "files": [
+        "src/components/shader-field.js",
+        "src/core/space-metrics.js",
         "src/styles/components.css"
       ]
     },
@@ -177,6 +205,17 @@
         "src/styles/tokens.css",
         "src/styles/components.css"
       ]
+    },
+    {
+      "id": "pwa-support",
+      "route": "global",
+      "spw": "^feature[pwa]{ install:manifest+sw state:online|offline|ready release-cache:date-arc-vibe }",
+      "files": [
+        "src/core/pwa.js",
+        "manifest.webmanifest",
+        "sw.js",
+        "scripts/build-static.js"
+      ]
     }
   ],
   "tooling_care": {
@@ -214,6 +253,9 @@
       ".spw/workspace.spw",
       "src/core/boot.js",
       "src/core/runtime-control.js",
+      "src/core/pwa.js",
+      "manifest.webmanifest",
+      "sw.js",
       "src/content/manifests.js",
       "docs/component-ecology.md"
     ],

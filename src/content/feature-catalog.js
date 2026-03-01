@@ -12,7 +12,9 @@ export const SPW_FEATURE_CATALOG = Object.freeze({
   entrypoints: Object.freeze({
     json: '/spw.index.json',
     spw: '/spw.index.spw',
-    workspace: '/.spw/workspace.spw'
+    workspace: '/.spw/workspace.spw',
+    manifest: '/manifest.webmanifest',
+    serviceWorker: '/sw.js'
   }),
   features: Object.freeze([
     Object.freeze({
@@ -20,6 +22,16 @@ export const SPW_FEATURE_CATALOG = Object.freeze({
       route: 'home',
       spw: '^feature[click-stage]{ input:click|enter|space|arrow-right output:phase+lumen+layers }',
       files: Object.freeze(['src/components/click-stage.js', 'src/core/store.js', 'src/core/motion.js'])
+    }),
+    Object.freeze({
+      id: 'shader-field',
+      route: 'home',
+      spw: '^feature[shader-field]{ input:pointer+keyboard output:harmonics+intent-click profile-aware:true }',
+      files: Object.freeze([
+        'src/components/shader-field.js',
+        'src/core/space-metrics.js',
+        'src/styles/components.css'
+      ])
     }),
     Object.freeze({
       id: 'syntax-lab',
@@ -48,6 +60,17 @@ export const SPW_FEATURE_CATALOG = Object.freeze({
       route: 'global',
       spw: '^feature[structure-mode]{ toggle:data-llm-readable-structure projection:aria-description }',
       files: Object.freeze(['src/core/structure-mode.js', 'src/components/syntax-lab.js'])
+    }),
+    Object.freeze({
+      id: 'pwa-support',
+      route: 'global',
+      spw: '^feature[pwa]{ install:manifest+sw state:online|offline|ready release-cache:date-arc-vibe }',
+      files: Object.freeze([
+        'src/core/pwa.js',
+        'sw.js',
+        'manifest.webmanifest',
+        'scripts/build-static.js'
+      ])
     })
   ])
 });

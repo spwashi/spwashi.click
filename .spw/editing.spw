@@ -41,7 +41,7 @@
 }
 
 ^category[runtime]{
-  subroots: [@runtime, @runtime_spw_command, @seed, @workbench]
+  subroots: [@runtime, @runtime_spw_command, @runtime_pwa, @manifest, @service_worker, @seed, @workbench]
   heuristics: {
     prioritize_projection_surfaces: true
     expose_runtime_methods: true

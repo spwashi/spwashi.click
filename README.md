@@ -16,6 +16,7 @@ Static multi-page website built with vanilla ES modules, Web Components, and CSS
   - `spw-click-stage`
   - `spw-chapter-panel`
   - `spw-rhythm-grid` (SVG-driven)
+  - `spw-shader-field` (canvas shader-style interaction surface)
   - `spw-ecology-map`
 - Content manifests: `src/content/manifests.js`
 - Styles: token-first cascade layers in `src/styles/`
@@ -44,6 +45,7 @@ git submodule update --init --recursive
 - CI workflow validates lint and tests on push/PR.
 - Pages workflow builds static artifacts and deploys `dist/` to GitHub Pages.
 - `CNAME` is set to `spwashi.click`.
+- PWA assets are root-scoped: `manifest.webmanifest` and `sw.js`.
 
 ## Code as Literature Convention
 

@@ -20,6 +20,9 @@
   @src: ~"../src"
   @core: ~"../src/core"
   @command_surface: ~"../src/core/spw-command-surface.js"
+  @pwa_runtime: ~"../src/core/pwa.js"
+  @manifest: ~"../manifest.webmanifest"
+  @service_worker: ~"../sw.js"
   @components: ~"../src/components"
   @content: ~"../src/content"
   @styles: ~"../src/styles"
@@ -42,6 +45,9 @@
   runtime_boot: @core/boot.js
   runtime_control: @core/runtime-control.js
   runtime_spw_command_surface: @command_surface
+  runtime_pwa: @pwa_runtime
+  pwa_manifest: @manifest
+  pwa_service_worker: @service_worker
   parser_bridge: @core/spwlang-parser.js
 }
 

@@ -23,6 +23,7 @@ import { runIterativeEnhancements } from './iterative-enhancement.js';
 import { createMarginaliaLedger } from './literature.js';
 import { detectReducedMotionPreference, watchReducedMotionPreference } from './motion.js';
 import { installAtmosphereDrift, installPerformanceTuning } from './performance-tuning.js';
+import { installPwaSupport } from './pwa.js';
 import { readReleaseMeta } from './release.js';
 import { routeFromHref, routeFromPathname } from './router-lite.js';
 import { installRuntimeControl } from './runtime-control.js';
@@ -170,6 +171,7 @@ function createApp() {
     performanceController,
     enhancementRuntime: null,
     runtimeControlCleanup: null,
+    pwaController: null,
     destroy() {
       if (this.enhancementRuntime) {
         this.enhancementRuntime.cleanup();
@@ -178,6 +180,11 @@ function createApp() {
       if (this.runtimeControlCleanup) {
         this.runtimeControlCleanup();
         this.runtimeControlCleanup = null;
+      }
+
+      if (this.pwaController) {
+        this.pwaController.destroy();
+        this.pwaController = null;
       }
 
       for (const cleanup of cleanups) {
@@ -245,6 +252,16 @@ async function bootstrap() {
   });
   app.marginalia.write('texture', 'Texture tuner status', textureTuner);
   syncLiteratureAttributes(app.marginalia);
+
+  app.pwaController = installPwaSupport({
+    document,
+    window,
+    releaseMeta: app.releaseMeta,
+    onStateChange(nextState) {
+      app.marginalia.write('pwa', 'PWA state changed', nextState);
+      syncLiteratureAttributes(app.marginalia);
+    }
+  });
 
   defineAllComponents(app.ecology);
   initializePage(app.route, app);

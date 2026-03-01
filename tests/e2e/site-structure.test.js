@@ -20,6 +20,7 @@ test('all pages include shared boot module and viewport metadata', async () => {
     assert.match(html, /<meta name="spw:feature-index" content="\/spw\.index\.json"\s*\/>/);
     assert.match(html, /<meta name="spw:feature-index-spw" content="\/spw\.index\.spw"\s*\/>/);
     assert.match(html, /<meta name="spw:workspace-index" content="\/\.spw\/workspace\.spw"\s*\/>/);
+    assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest\?v=__ASSET_VERSION__"\s*\/>/);
     assert.match(html, /<script type="module" src="\/src\/core\/boot\.js\?v=__ASSET_VERSION__"><\/script>/);
   }
 });
@@ -50,6 +51,8 @@ test('home route includes signature click stage with SVG and layered data states
   assert.match(home, /data-layer="highlights"/);
   assert.match(home, /data-layer="fragments"/);
   assert.match(home, /<spw-ecology-map data-state="observing"><\/spw-ecology-map>/);
+  assert.match(home, /<spw-shader-field data-state="interactive" aria-label="Shader field interaction surface">/);
+  assert.match(home, /data-layout-region="shader-field"/);
   assert.match(home, /<spw-syntax-lab data-state="exploratory"><\/spw-syntax-lab>/);
   assert.match(home, /data-enhancement-zone="seed-atlas"/);
   assert.match(home, /data-structure-label="Primary interaction component with trigger, status narration, SVG score, and rhythm grid"/);
@@ -66,4 +69,15 @@ test('styles include responsive and reduced-motion constraints', async () => {
   assert.match(componentCss, /spw-click-stage\[data-phase='chorus'\]/);
   assert.match(componentCss, /\.syntax-lab__radial/);
   assert.match(componentCss, /\.syntax-lab__brace-button\[data-active='true'\]/);
+});
+
+test('pwa assets exist with release-aware placeholders and install handlers', async () => {
+  const manifest = await readFile(new URL('../../manifest.webmanifest', import.meta.url), 'utf8');
+  const serviceWorker = await readFile(new URL('../../sw.js', import.meta.url), 'utf8');
+
+  assert.match(manifest, /"start_url": "\/\?source=pwa"/);
+  assert.match(manifest, /__ASSET_VERSION__/);
+  assert.match(serviceWorker, /const RELEASE_TAG = '__ASSET_VERSION__'/);
+  assert.match(serviceWorker, /self\.addEventListener\('install'/);
+  assert.match(serviceWorker, /self\.addEventListener\('fetch'/);
 });

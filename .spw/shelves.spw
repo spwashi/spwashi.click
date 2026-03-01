@@ -20,6 +20,9 @@
   @workbench: ~"../seed/extern/spw-workbench"
   @runtime: ~"../src/core/runtime-control.js"
   @runtime_spw_command: ~"../src/core/spw-command-surface.js"
+  @runtime_pwa: ~"../src/core/pwa.js"
+  @manifest: ~"../manifest.webmanifest"
+  @service_worker: ~"../sw.js"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
 }
@@ -28,7 +31,7 @@
   macro: [@core, @components, @content, @styles]
   measurement: [@tests, @scripts]
   prose: [@docs, @crawler_json, @crawler_spw]
-  runtime: [@runtime, @runtime_spw_command, @seed]
+  runtime: [@runtime, @runtime_spw_command, @runtime_pwa, @manifest, @service_worker, @seed]
   north_star: @workbench
 }
 

@@ -175,6 +175,10 @@
     grid-column: 1 / span 6;
   }
 
+  body[data-page='home'] .site-main > [data-layout-region='shader-field'] {
+    grid-column: 1 / -1;
+  }
+
   body[data-page='home'] .site-main > [data-layout-region='syntax-lab'] {
     grid-column: 7 / -1;
   }

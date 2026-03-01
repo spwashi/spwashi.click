@@ -46,9 +46,15 @@ export const CORE_SPECIES = Object.freeze([
     emits: Object.freeze([])
   }),
   Object.freeze({
+    tagName: 'spw-shader-field',
+    role: 'shader',
+    dependsOn: Object.freeze(['spw-click-stage']),
+    emits: Object.freeze(['spw:intent:click'])
+  }),
+  Object.freeze({
     tagName: 'spw-syntax-lab',
     role: 'explorer',
-    dependsOn: Object.freeze(['spw-click-stage']),
+    dependsOn: Object.freeze(['spw-click-stage', 'spw-shader-field']),
     emits: Object.freeze([])
   })
 ]);

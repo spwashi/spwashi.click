@@ -1,0 +1,40 @@
+{
+  "name": "spwashi.click",
+  "short_name": "spwashi",
+  "description": "Spw language-ui site with interactive stateful scenes and executable copy.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4ead8",
+  "theme_color": "#f4ead8",
+  "lang": "en-US",
+  "categories": ["lifestyle", "art", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg?v=__ASSET_VERSION__",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Home",
+      "url": "/",
+      "description": "Open the home route."
+    },
+    {
+      "name": "Work",
+      "url": "/work/",
+      "description": "Open the collections route."
+    },
+    {
+      "name": "Notes",
+      "url": "/notes/",
+      "description": "Open the notes route."
+    }
+  ]
+}
+

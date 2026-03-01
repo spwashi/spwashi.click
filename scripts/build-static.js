@@ -13,6 +13,9 @@ const REQUIRED_COPY_TARGETS = [
   'CNAME',
   'robots.txt',
   'sitemap.xml',
+  'manifest.webmanifest',
+  'sw.js',
+  'favicon.svg',
   'spw.index.json',
   'spw.index.spw',
   'release.manifest.json',
@@ -22,6 +25,7 @@ const REQUIRED_COPY_TARGETS = [
 ];
 const OPTIONAL_COPY_TARGETS = ['seed/site', 'seed/images', '.spw'];
 const DIST_HTML_FILES = ['index.html', '404.html', 'work/index.html', 'notes/index.html'];
+const DIST_TEMPLATE_FILES = ['manifest.webmanifest', 'sw.js'];
 
 async function copyTarget(target) {
   const sourcePath = path.join(ROOT_DIR, target);
@@ -91,6 +95,21 @@ async function stampHtmlReleasePlaceholders(releaseMeta) {
   }
 }
 
+async function stampTemplateReleasePlaceholders(releaseMeta) {
+  for (const relativePath of DIST_TEMPLATE_FILES) {
+    const absolutePath = path.join(DIST_DIR, relativePath);
+    const existingContent = await readFile(absolutePath, 'utf8');
+    const stampedContent = existingContent
+      .replaceAll('__RELEASE_DATE__', releaseMeta.releaseDate)
+      .replaceAll('__RELEASE_ID__', releaseMeta.releaseId)
+      .replaceAll('__RELEASE_ARC__', releaseMeta.releaseArc)
+      .replaceAll('__RELEASE_VIBE__', releaseMeta.releaseVibe)
+      .replaceAll('__ASSET_VERSION__', releaseMeta.assetVersion);
+
+    await writeFile(absolutePath, stampedContent, 'utf8');
+  }
+}
+
 async function runBuild() {
   const releaseMeta = await loadReleaseMeta();
 
@@ -109,6 +128,7 @@ async function runBuild() {
   }
 
   await stampHtmlReleasePlaceholders(releaseMeta);
+  await stampTemplateReleasePlaceholders(releaseMeta);
   await writeFile(path.join(DIST_DIR, '.nojekyll'), '', 'utf8');
   console.log(`Build complete: ${DIST_DIR}`);
   console.log(

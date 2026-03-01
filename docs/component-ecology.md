@@ -9,6 +9,7 @@ The component layer is modeled as a small ecology with explicit roles.
 - `spw-rhythm-grid`: metronome and intensity visualizer
 - `spw-chapter-panel`: narrative gatekeeper
 - `spw-ecology-map`: observer and reporter
+- `spw-shader-field`: harmonic field renderer and interaction injector
 - `spw-syntax-lab`: symbolic navigator and layout/component mode projector
 
 ## Ecology Ledger

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   EVENT_INTENT_CLICK,
   EVENT_NAVIGATE,
+  EVENT_PWA_STATE_CHANGED,
   KNOWN_EVENT_NAMES,
   createTypedEvent,
   dispatchTypedEvent,
@@ -14,6 +15,7 @@ import {
 test('known event names include core contracts', () => {
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_INTENT_CLICK));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_NAVIGATE));
+  assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_PWA_STATE_CHANGED));
   assert.equal(isKnownEventName('spw:missing'), false);
   assert.equal(isKnownEventName(EVENT_INTENT_CLICK), true);
 });

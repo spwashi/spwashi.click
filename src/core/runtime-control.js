@@ -79,6 +79,8 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       performanceProfile: app.performanceController.getProfile(),
       llmReadableStructure: app.structureController.enabled,
       textureTunerState: root.dataset.textureTunerState ?? 'unknown',
+      pwaState: root.dataset.pwaState ?? 'unknown',
+      networkState: root.dataset.networkState ?? 'unknown',
       catalogVersion: SPW_FEATURE_CATALOG.version
     };
   }

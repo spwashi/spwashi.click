@@ -46,7 +46,7 @@ export const HOME_MANIFEST = Object.freeze({
     }),
     Object.freeze({
       title_slot: '^demo[texture_tuner]{ id:performance_03 }',
-      summary_slot: '~summary[release]{ source:tealstripesvibes.com strategy:arc+vibe refresh:fresh-paint }',
+      summary_slot: '~summary[pwa]{ shader-field+sw cache:release-arc-vibe source:tealstripesvibes.com }',
       href: '/work/#project-three'
     })
   ]),
@@ -97,7 +97,7 @@ export const WORK_MANIFEST = Object.freeze({
       id: 'project-three',
       title_slot: '^project[performance_03]{ type:texture-loop }',
       role_slot: '^role[performer]{ scope:interaction-style-fusion }',
-      summary_slot: '~summary[release]{ asset-version:date-based cadence:arc+vibe cache:tealstripesvibes }',
+      summary_slot: '~summary[pwa]{ shader:canvas-harmonics service-worker:release-cache cadence:arc+vibe }',
       metrics_slot: '%metric[response]{ refresh:regular quality:stable }'
     })
   ])

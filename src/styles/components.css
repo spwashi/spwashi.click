@@ -874,6 +874,83 @@
     }
   }
 
+  spw-shader-field {
+    --shader-hud-gap: var(--spacing-3);
+    display: grid;
+    gap: var(--shader-hud-gap);
+    container-type: inline-size;
+    container-name: shader-field;
+  }
+
+  .shader-field__surface {
+    position: relative;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 34%, var(--color-border));
+    border-radius: var(--radius-md);
+    overflow: clip;
+    min-height: clamp(12rem, 32vw, 24rem);
+    background:
+      radial-gradient(
+        circle at calc(50% + var(--fx-drift-x) * 0.1) calc(48% + var(--fx-drift-y) * 0.08),
+        color-mix(in srgb, var(--color-accent) 14%, transparent),
+        transparent 62%
+      ),
+      color-mix(in srgb, var(--color-surface) 84%, #090f12 16%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 12px 40px rgba(13, 23, 27, 0.24);
+  }
+
+  .shader-field__surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.03) 0,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    mix-blend-mode: soft-light;
+    opacity: calc(0.22 + var(--fx-texture-gain) * 0.28);
+  }
+
+  .shader-field__canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .shader-field__hud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .shader-field__status {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+  }
+
+  .shader-field__inject {
+    border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+    background: color-mix(in srgb, var(--color-surface) 82%, white 18%);
+    border-radius: 999px;
+    min-height: 42px;
+    padding: 0.32rem 0.72rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
   .structure-toggle {
     border: 1px solid var(--color-border);
     background: transparent;
@@ -942,10 +1019,19 @@
     filter: none;
   }
 
+  html[data-performance-profile='seed'] .shader-field__surface::before {
+    opacity: 0.12;
+  }
+
+  html[data-performance-profile='seed'] .shader-field__surface {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
   html[data-spw-component-view='wire'] spw-click-stage,
   html[data-spw-component-view='wire'] .seed-atlas,
   html[data-spw-component-view='wire'] .syntax-lab__panel,
-  html[data-spw-component-view='wire'] spw-chapter-panel {
+  html[data-spw-component-view='wire'] spw-chapter-panel,
+  html[data-spw-component-view='wire'] .shader-field__surface {
     background: color-mix(in srgb, var(--color-surface) 94%, white 6%);
     box-shadow: none;
     border-style: dashed;
@@ -968,6 +1054,7 @@
   html[data-spw-component-view='quiet'] .syntax-lab__panel::after,
   html[data-spw-component-view='quiet'] .seed-atlas::before,
   html[data-spw-component-view='quiet'] .seed-atlas::after,
+  html[data-spw-component-view='quiet'] .shader-field__surface::before,
   html[data-spw-component-view='quiet'] .syntax-lab__facet-graph {
     display: none;
   }
@@ -1025,6 +1112,11 @@
     .syntax-lab__nav-node {
       left: calc(50% + 4.3rem * cos(calc(var(--slot) * 60deg)) - (var(--node-size) / 2));
       top: calc(50% + 4.3rem * sin(calc(var(--slot) * 60deg)) - 1.2rem);
+    }
+
+    .shader-field__hud {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
