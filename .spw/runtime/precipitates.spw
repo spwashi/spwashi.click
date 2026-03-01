@@ -1,0 +1,26 @@
+# Runtime Precipitates
+#
+# Stage artifacts and projection surfaces.
+
+#>spwashi_runtime_precipitates
+#:manifest #!pipeline
+
+^"precipitates"{
+  parse: {
+    source: "src/core/runtime/js/spwlang-parser.js"
+    output: "canonical parse contract"
+  }
+  command: {
+    source: "src/core/runtime/js/spw-command-surface.js"
+    output: "runtime command instruction"
+  }
+  control: {
+    source: "src/core/runtime/js/runtime-control.js"
+    output: "api method invocation"
+  }
+}
+
+^"projection"{
+  runtime_contract: ~"../../src/core/runtime/js/runtime-contract.js"
+  runtime_entry: ~"../../src/runtime/index.js"
+}

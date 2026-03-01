@@ -6,36 +6,61 @@
 #:index #!workspace
 
 ^"intent"{
-  ~#goal: "Expose stable roots, routing, and care surfaces for source-reading agents."
-  ~#mode: "llm-crawler + editor-lsp + runtime-projection"
+  ~#goal: "Expose stable roots, routing, and plugin-aware surfaces for source-reading agents."
+  ~#mode: "feature-inventory + plugin-architecture + runtime-projection"
 }
 
 ^"roots"{
   @spw: ~"."
   @repo: ~".."
+
   @workspace: ~"./workspace.spw"
   @shelves: ~"./shelves.spw"
   @topology: ~"./topology.spw"
   @editing: ~"./editing.spw"
+
+  @surfaces: ~"./surfaces/index.spw"
+  @publish: ~"./surfaces/publish.spw"
+  @domains: ~"./surfaces/domains.spw"
+  @plugin_protocol: ~"./surfaces/plugin-protocol.spw"
+
+  @state_observable: ~"./state/observable.spw"
+  @state_locks: ~"./state/locks.spw"
+
+  @substrate_structural: ~"./substrates/structural.spw"
+  @runtime_precipitates: ~"./runtime/precipitates.spw"
+
+  @patterns: ~"./patterns/index.spw"
+  @conventions: ~"./conventions/index.spw"
+  @conventions_naming: ~"./conventions/naming.spw"
+  @conventions_selection: ~"./conventions/selection.spw"
+
   @src: ~"../src"
-  @core: ~"../src/core"
+  @core_runtime: ~"../src/core/runtime"
+  @runtime_js: ~"../src/core/runtime/js"
+  @runtime_spw: ~"../src/core/runtime/spw"
+
   @runtime_module: ~"../src/runtime/index.js"
-  @runtime_config: ~"../src/core/runtime-config.js"
-  @medium_flow: ~"../src/core/medium-flow.js"
-  @command_surface: ~"../src/core/spw-command-surface.js"
-  @pwa_runtime: ~"../src/core/pwa.js"
-  @manifest: ~"../manifest.webmanifest"
-  @service_worker: ~"../sw.js"
-  @assets_manifest: ~"../assets.manifest.json"
+  @runtime_boot: ~"../src/core/runtime/js/boot.js"
+  @runtime_core: ~"../src/core/runtime/js/runtime.js"
+  @runtime_config: ~"../src/core/runtime/js/runtime-config.js"
+  @runtime_control: ~"../src/core/runtime/js/runtime-control.js"
+  @runtime_command_surface: ~"../src/core/runtime/js/spw-command-surface.js"
+  @runtime_parser: ~"../src/core/runtime/js/spwlang-parser.js"
+  @runtime_plugins: ~"../seed/site/enhancements"
+
   @components: ~"../src/components"
   @content: ~"../src/content"
   @styles: ~"../src/styles"
   @docs: ~"../docs"
-  @seed: ~"../seed"
   @tests: ~"../tests"
   @scripts: ~"../scripts"
-  @export_script: ~"../scripts/export-assets.js"
+  @seed: ~"../seed"
   @workbench: ~"../seed/extern/spw-workbench"
+
+  @manifest: ~"../manifest.webmanifest"
+  @service_worker: ~"../sw.js"
+  @assets_manifest: ~"../assets.manifest.json"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
 }
@@ -45,24 +70,33 @@
   shelves: @shelves
   topology: @topology
   editing: @editing
+
+  surfaces: @surfaces
+  publish: @publish
+  domains: @domains
+  plugin_protocol: @plugin_protocol
+
+  state_observable: @state_observable
+  state_locks: @state_locks
+  substrate_structural: @substrate_structural
+  runtime_precipitates: @runtime_precipitates
+
+  patterns: @patterns
+  conventions: @conventions
+
+  runtime_boot: @runtime_boot
+  runtime_core: @runtime_core
+  runtime_config: @runtime_config
+  runtime_control: @runtime_control
+  runtime_command_surface: @runtime_command_surface
+  runtime_parser: @runtime_parser
+
   crawler_json: @crawler_json
   crawler_spw: @crawler_spw
-  runtime_boot: @core/boot.js
-  runtime_module: @runtime_module
-  runtime_config: @runtime_config
-  runtime_medium_flow: @medium_flow
-  runtime_control: @core/runtime-control.js
-  runtime_spw_command_surface: @command_surface
-  runtime_pwa: @pwa_runtime
-  pwa_manifest: @manifest
-  pwa_service_worker: @service_worker
-  assets_manifest: @assets_manifest
-  assets_export_script: @export_script
-  parser_bridge: @core/spwlang-parser.js
 }
 
 ^"invariant"{
-  "This index is low-churn and pointer-first.",
-  "Behavior claims should point to concrete source files.",
-  "Feature semantics should be mirrored in spw.index.json and spw.index.spw.",
+  "Index remains pointer-first and low-churn.",
+  "Plugin protocol and runtime parser surfaces are explicit.",
+  "Feature semantics are mirrored in both spw.index.json and spw.index.spw.",
 }

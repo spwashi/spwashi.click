@@ -8,23 +8,43 @@
 ^"roots"{
   @repo: ~".."
   @spw: ~"."
+
   @index: ~"./index.spw"
   @workspace: ~"./workspace.spw"
   @shelves: ~"./shelves.spw"
   @topology: ~"./topology.spw"
   @editing: ~"./editing.spw"
+
+  @surfaces: ~"./surfaces/index.spw"
+  @publish: ~"./surfaces/publish.spw"
+  @domains: ~"./surfaces/domains.spw"
+  @plugin_protocol: ~"./surfaces/plugin-protocol.spw"
+  @state_observable: ~"./state/observable.spw"
+  @state_locks: ~"./state/locks.spw"
+  @substrate_structural: ~"./substrates/structural.spw"
+  @runtime_precipitates: ~"./runtime/precipitates.spw"
+  @patterns: ~"./patterns/index.spw"
+  @conventions: ~"./conventions/index.spw"
+
   @runtime_module: ~"../src/runtime/index.js"
-  @runtime_config: ~"../src/core/runtime-config.js"
-  @medium_flow: ~"../src/core/medium-flow.js"
-  @command_surface: ~"../src/core/spw-command-surface.js"
-  @pwa_runtime: ~"../src/core/pwa.js"
+  @runtime_boot: ~"../src/core/runtime/js/boot.js"
+  @runtime_core: ~"../src/core/runtime/js/runtime.js"
+  @runtime_config: ~"../src/core/runtime/js/runtime-config.js"
+  @runtime_control: ~"../src/core/runtime/js/runtime-control.js"
+  @runtime_parser: ~"../src/core/runtime/js/spwlang-parser.js"
+  @runtime_parser_sidecar: ~"../src/core/runtime/spw/spwlang-parser.spw"
+  @command_surface: ~"../src/core/runtime/js/spw-command-surface.js"
+  @pwa_runtime: ~"../src/core/runtime/js/pwa.js"
+
   @manifest: ~"../manifest.webmanifest"
   @service_worker: ~"../sw.js"
   @assets_manifest: ~"../assets.manifest.json"
   @assets_export_script: ~"../scripts/export-assets.js"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
+
   @workbench: ~"../seed/extern/spw-workbench"
+  @workbench_plugin_protocol: ~"../seed/extern/spw-workbench/.spw/surfaces/plugin-protocol.spw"
 }
 
 ^"kernel"{
@@ -43,8 +63,27 @@
   }
   pragmatics: {
     #:layer #!use_time
-    owns: "runtime control, editor integration, crawler traversal, release arcs"
-    surfaces: [@runtime_module, @runtime_config, @medium_flow, @repo/src/core/runtime-control.js, @command_surface, @pwa_runtime, @manifest, @service_worker, @assets_manifest, @assets_export_script, @topology, @editing]
+    owns: "runtime control, parser bridge, plugin protocol, crawler traversal, release arcs"
+    surfaces: [
+      @runtime_module,
+      @runtime_boot,
+      @runtime_core,
+      @runtime_config,
+      @runtime_control,
+      @runtime_parser,
+      @runtime_parser_sidecar,
+      @command_surface,
+      @pwa_runtime,
+      @plugin_protocol,
+      @surfaces,
+      @state_observable,
+      @substrate_structural,
+      @runtime_precipitates,
+      @manifest,
+      @service_worker,
+      @assets_manifest,
+      @assets_export_script
+    ]
     invariant: "Pragmatic behavior projects into terminals, editors, and static site surfaces."
   }
 }
@@ -52,7 +91,7 @@
 ^"relationships"{
   relation: "grammar -> semantics -> pragmatics"
   physics: "spw frames behavior as constrained projection, not decorative copy"
-  care: "source readability, deterministic contracts, editor parity"
+  care: "source readability, deterministic contracts, plugin-safe extension"
 }
 
 ^"dispatch"{
@@ -60,11 +99,28 @@
   shelves: @shelves
   topology: @topology
   editing: @editing
-  command_surface: @command_surface
+
+  surfaces: @surfaces
+  publish: @publish
+  domains: @domains
+  plugin_protocol: @plugin_protocol
+
+  state_observable: @state_observable
+  state_locks: @state_locks
+  substrate_structural: @substrate_structural
+  runtime_precipitates: @runtime_precipitates
+  patterns: @patterns
+  conventions: @conventions
+
   runtime_module: @runtime_module
+  runtime_boot: @runtime_boot
+  runtime_core: @runtime_core
+  runtime_control: @runtime_control
   runtime_config: @runtime_config
-  medium_flow: @medium_flow
+  runtime_parser: @runtime_parser
+  command_surface: @command_surface
   pwa_runtime: @pwa_runtime
+
   pwa_manifest: @manifest
   pwa_service_worker: @service_worker
   assets_manifest: @assets_manifest

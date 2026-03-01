@@ -9,13 +9,33 @@
   ~#goal: "Route files into stable subroots for crawlers, editor lenses, and runtime diagnosis."
 }
 
-^subroot[core]{
-  path: @core
-  subtree: [@core, @components]
+^subroot[core_runtime]{
+  path: @runtime_js
+  subtree: [@runtime_js, @runtime_spw, @components]
   subagent: explorer
-  cache_tree: @spw/cache/core
-  cache_key_prefix: core
-  topology_refs: [@core/boot.js, @core/runtime.js, @core/runtime-config.js, @core/medium-flow.js, @core/store.js, @core/events.js, @core/spw-command-surface.js, @core/pwa.js, @repo/sw.js, @repo/assets.manifest.json, @scripts/export-assets.js]
+  cache_tree: @spw/cache/core_runtime
+  cache_key_prefix: core_runtime
+  topology_refs: [
+    @runtime_boot,
+    @runtime_core,
+    @runtime_config,
+    @runtime_control,
+    @runtime_parser,
+    @runtime_spw_command,
+    @runtime_pwa,
+    @repo/sw.js,
+    @repo/assets.manifest.json,
+    @scripts/export-assets.js
+  ]
+}
+
+^subroot[spw_control_plane]{
+  path: @spw
+  subtree: [@spw/surfaces, @spw/state, @spw/substrates, @spw/runtime, @spw/patterns, @spw/conventions]
+  subagent: explorer
+  cache_tree: @spw/cache/control_plane
+  cache_key_prefix: control_plane
+  topology_refs: [@spw/index.spw, @spw/workspace.spw, @spw/surfaces/plugin-protocol.spw, @spw/substrates/structural.spw]
 }
 
 ^subroot[content]{
@@ -24,7 +44,7 @@
   subagent: explorer
   cache_tree: @spw/cache/content
   cache_key_prefix: content
-  topology_refs: [@content/manifests.js]
+  topology_refs: [@content/manifests.js, @content/feature-catalog.js]
 }
 
 ^subroot[docs]{
@@ -33,7 +53,7 @@
   subagent: worker
   cache_tree: @spw/cache/docs
   cache_key_prefix: docs
-  topology_refs: [@docs/software-literature.md, @docs/component-ecology.md]
+  topology_refs: [@docs/software-literature.md, @docs/component-ecology.md, @docs/spwlang-parser-bridge.md]
 }
 
 ^subroot[seed]{
@@ -42,7 +62,7 @@
   subagent: worker
   cache_tree: @spw/cache/seed
   cache_key_prefix: seed
-  topology_refs: [@seed/site/enhancements/seed-atlas.js, @workbench/README.md]
+  topology_refs: [@seed/site/enhancements/workbench-parser-adapter.js, @seed/site/enhancements/seed-atlas.js, @workbench/.spw/surfaces/plugin-protocol.spw]
 }
 
 ^subroot[measure]{
@@ -51,11 +71,11 @@
   subagent: worker
   cache_tree: @spw/cache/measure
   cache_key_prefix: measure
-  topology_refs: [@tests/unit/store.test.js, @scripts/build-static.js]
+  topology_refs: [@tests/unit/spwlang-parser.test.js, @tests/unit/runtime-control.test.js, @scripts/build-static.js]
 }
 
 ^"invariant"{
   "Each subroot owns one cache-key prefix.",
   "Topology refs should point to concrete implementation surfaces.",
-  "North-star references should remain inside @workbench and never be copied ad hoc.",
+  "North-star references remain inside @workbench and are consumed by reference, not copy.",
 }

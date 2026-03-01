@@ -1,0 +1,45 @@
+# Plugin Protocol
+#
+# Extension protocol for runtime and parser plugins.
+
+#>spwashi_surfaces_plugin_protocol
+#:protocol #!extensibility
+
+^"registration"{
+  template: {
+    name: "kebab-case id"
+    version: "semver"
+    role: "parser | runtime | projection"
+    entry: "path to js module"
+    exports: ["install", "dispose", "parseSpwForm?"]
+    hooks: ["before_select", "after_select", "before_transform", "after_transform", "before_emit", "after_emit", "on_error"]
+    requires: ["optional dependency plugin ids"]
+  }
+}
+
+^"runtime_plugins"{
+  path: "seed/site/enhancements/*.js"
+  contract: "module exports install(appContext) and optional dispose()"
+  isolation: "plugin gets scoped context; no implicit global writes"
+}
+
+^"parser_plugins"{
+  path: "seed/site/enhancements/workbench-parser-adapter.js"
+  contract: "must expose parseSpwForm|parseExpression|parse|parseWithLog"
+  precedence: "workbench parser plugin first, fallback parser second"
+}
+
+^"lifecycle"{
+  order: "discover -> validate -> install -> run -> dispose"
+  validation: {
+    export_shape: "required exports exist"
+    compatibility: "runtime api window + host manifest gates"
+    parser_shape: "sync return, no promise for parseSpwForm"
+  }
+}
+
+^"invariants"{
+  "Plugins are additive; core runtime remains deterministic without plugins.",
+  "Plugin failure must degrade to safe fallback behavior.",
+  "Parser plugin output is normalized to canonical {sigil,symbol,selector,body}.",
+}

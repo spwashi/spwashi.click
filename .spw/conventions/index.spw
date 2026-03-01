@@ -1,0 +1,16 @@
+# Conventions Index
+#
+# Naming and selection conventions for this workspace.
+
+#>spwashi_conventions_index
+#:registry #!conventions
+
+^"entries"{
+  naming: ~"./naming.spw"
+  selection: ~"./selection.spw"
+}
+
+^"policy"{
+  pathing: "prefer stable pointer paths over inferred traversal"
+  plugins: "declare role + export contract explicitly"
+}

@@ -11,21 +11,32 @@
 }
 
 ^category[macro]{
-  subroots: [@core, @components, @content, @styles]
+  subroots: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @styles]
   heuristics: {
     prefer_symbol_refs: true
     preserve_event_contracts: true
+    preserve_runtime_interfaces: true
     prefer_data_attributes: true
     auto_quote: false
   }
 }
 
+^category[control_plane]{
+  subroots: [@spw/surfaces, @spw/state, @spw/substrates, @spw/runtime, @spw/patterns, @spw/conventions]
+  heuristics: {
+    preserve_protocol_shapes: true
+    require_surface_dispatch_updates: true
+    require_plugin_hook_docs: true
+    auto_quote: selective
+  }
+}
+
 ^category[measurement]{
-  subroots: [@tests, @scripts]
+  subroots: [@tests, @scripts, @state_observable]
   heuristics: {
     prefer_structured_assertions: true
     enforce_exit_criteria: true
-    include_perf_budget_checks: true
+    include_runtime-bridge-checks: true
     auto_quote: false
   }
 }
@@ -41,11 +52,30 @@
 }
 
 ^category[runtime]{
-  subroots: [@runtime_module, @runtime_config, @runtime_medium, @runtime, @runtime_spw_command, @runtime_pwa, @manifest, @service_worker, @assets_manifest, @export_script, @seed, @workbench]
+  subroots: [
+    @runtime_module,
+    @runtime_boot,
+    @runtime_core,
+    @runtime_config,
+    @runtime_control,
+    @runtime_parser,
+    @runtime_spw_command,
+    @runtime_pwa,
+    @surfaces,
+    @substrate_structural,
+    @runtime_precipitates,
+    @manifest,
+    @service_worker,
+    @assets_manifest,
+    @export_script,
+    @seed,
+    @workbench
+  ]
   heuristics: {
     prioritize_projection_surfaces: true
     expose_runtime_methods: true
     prefer_spw_command_examples: true
+    preserve_parser_bridge_contract: true
     surface_editor_integration_points: true
     auto_quote: false
   }

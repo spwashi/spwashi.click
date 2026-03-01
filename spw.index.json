@@ -13,6 +13,8 @@
       "entrypoints": [
         "spw.index.json",
         "spw.index.spw",
+        ".spw/index.spw",
+        ".spw/surfaces/plugin-protocol.spw",
         ".spw/workspace.spw"
       ],
       "policy": "Downstream repos reference contracts and semantics from this repo without sharing git history."
@@ -20,7 +22,10 @@
   },
   "entrypoints": {
     "spw": "spw.index.spw",
+    "workspace_index": ".spw/index.spw",
     "workspace": ".spw/workspace.spw",
+    "plugin_protocol": ".spw/surfaces/plugin-protocol.spw",
+    "surfaces_index": ".spw/surfaces/index.spw",
     "runtime_module": "src/runtime/index.js",
     "runtime_boot": "src/core/runtime/js/boot.js",
     "runtime_control": "src/core/runtime/js/runtime-control.js",
@@ -308,12 +313,27 @@
       "seed/extern/spw-workbench/docs/design/md/history.md",
       "seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md",
       "seed/extern/spw-workbench/docs/audits/md/vim-keybindings-inconsistencies-audit.md"
-    ]
+    ],
+    "plugin_architecture": {
+      "control_plane": [
+        ".spw/surfaces/index.spw",
+        ".spw/surfaces/plugin-protocol.spw",
+        ".spw/substrates/structural.spw",
+        ".spw/runtime/precipitates.spw"
+      ],
+      "runtime_bridge": [
+        "src/core/runtime/js/spwlang-parser.js",
+        "seed/site/enhancements/workbench-parser-adapter.js"
+      ]
+    }
   },
   "crawl_protocol": {
     "order": [
       "spw.index.json",
       "spw.index.spw",
+      ".spw/index.spw",
+      ".spw/surfaces/index.spw",
+      ".spw/surfaces/plugin-protocol.spw",
       ".spw/workspace.spw",
       "src/core/runtime/js/boot.js",
       "src/core/runtime/js/runtime-control.js",

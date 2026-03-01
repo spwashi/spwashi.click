@@ -1,0 +1,29 @@
+# Observable State
+#
+# Runtime and tooling metrics for this repository.
+
+#>spwashi_state_observable
+#:manifest #!metrics
+
+^"runtime"{
+  .. %[parser_bridge_installed]  null
+  .. %[plugin_count]             null
+  .. %[phase]                    null
+  .. %[profile]                  null
+}
+
+^"crawler"{
+  .. %[index_version]            null
+  .. %[feature_count]            null
+}
+
+^"quality"{
+  .. %[unit_pass_rate]           null
+  .. %[e2e_pass_rate]            null
+}
+
+^"_meta"{
+  schema: "spw.observable.v1"
+  refresh_policy: "on-save"
+  source: ["tests/unit", "tests/e2e", "src/core/runtime/js"]
+}

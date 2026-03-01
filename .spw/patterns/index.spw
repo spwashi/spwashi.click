@@ -1,0 +1,21 @@
+# Patterns Index
+#
+# Reusable architecture patterns for this workspace.
+
+#>spwashi_patterns_index
+#:registry #!patterns
+
+^pattern[parser-bridge]{
+  goal: "normalize parser output across adapters"
+  sources: ["src/core/runtime/js/spwlang-parser.js", "seed/site/enhancements/workbench-parser-adapter.js"]
+}
+
+^pattern[runtime-command-surface]{
+  goal: "spw form -> runtime api command"
+  sources: ["src/core/runtime/js/spw-command-surface.js", "src/core/runtime/js/runtime-control.js"]
+}
+
+^pattern[plugin-surface]{
+  goal: "plugin registration and lifecycle discipline"
+  sources: [".spw/surfaces/plugin-protocol.spw", "seed/extern/spw-workbench/.spw/surfaces/plugin-protocol.spw"]
+}

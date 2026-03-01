@@ -1,0 +1,25 @@
+# Publish Surface
+#
+# Projection contract from workspace frames to public outputs.
+
+#>spwashi_surfaces_publish
+#:surface #!publish
+
+^"inputs"{
+  workspace: ~"../workspace.spw"
+  crawler_json: ~"../../spw.index.json"
+  crawler_spw: ~"../../spw.index.spw"
+  assets_manifest: ~"../../assets.manifest.json"
+}
+
+^"projection"{
+  html_pages: ["index.html", "work/index.html", "notes/index.html", "404.html"]
+  contracts: ["spw.index.json", "spw.index.spw", ".spw/workspace.spw"]
+  runtime_assets: ["manifest.webmanifest", "sw.js", "assets.manifest.json"]
+}
+
+^"emit"{
+  mode: "static"
+  overwrite: "require-explicit-build"
+  policy: "no-hidden-runtime-side-effects"
+}

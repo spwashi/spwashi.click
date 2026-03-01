@@ -1,0 +1,16 @@
+# Selection Convention
+
+#>spwashi_convention_selection
+#:convention #!selection
+
+^"rules"{
+  selector_scope: "prefer explicit route/component scope"
+  plugin_discovery: "scan declared path only"
+  runtime_targeting: "prefer id and data-role selectors over tag-only selectors"
+}
+
+^"examples"{
+  top_level: "!top{ route:work profile:maximal }"
+  region: "!region{ selector:.chapter-panel attr.data-state:active }"
+  component: "!component{ selector:spw-syntax-lab style.--facet-glow:1.2 }"
+}

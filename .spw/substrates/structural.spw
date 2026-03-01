@@ -1,0 +1,25 @@
+# Structural Substrate
+#
+# Main deterministic pipeline substrate for this repository.
+
+#>spwashi_substrate_structural
+#:architecture #!pipeline
+
+^"stages"[
+  desugar: { input: "source", output: "source" }
+  parse: { input: "source", output: "ast" }
+  normalize: { input: "ast", output: "canonical-ast" }
+  interpret: { input: "canonical-ast", output: "runtime-actions" }
+]
+
+^"bindings"{
+  parser_bridge: ~"../../src/core/runtime/js/spwlang-parser.js"
+  command_surface: ~"../../src/core/runtime/js/spw-command-surface.js"
+  runtime_control: ~"../../src/core/runtime/js/runtime-control.js"
+}
+
+^"invariants"{
+  deterministic: true
+  side_effects: "explicit"
+  fallback: "safe when parser plugin is unavailable"
+}

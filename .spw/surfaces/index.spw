@@ -1,0 +1,29 @@
+# Surfaces Registry
+#
+# Declares available output surfaces for this repository.
+
+#>spwashi_surfaces_index
+#:registry #!surfaces
+
+^"surfaces"{
+  publish: ~"./publish.spw"
+  plugin_protocol: ~"./plugin-protocol.spw"
+  domains: ~"./domains.spw"
+}
+
+^"output_formats"{
+  html: { mime: "text/html" extension: ".html" }
+  json: { mime: "application/json" extension: ".json" }
+  markdown: { mime: "text/markdown" extension: ".md" }
+  spw: { mime: "text/plain" extension: ".spw" }
+}
+
+^"plugin_hooks"{
+  before_select: "optional"
+  after_select: "optional"
+  before_transform: "optional"
+  after_transform: "optional"
+  before_emit: "optional"
+  after_emit: "optional"
+  on_error: "optional"
+}

@@ -20,6 +20,11 @@ Source-first contract for agents that read this repository to determine what alr
 - `.spw/editing.spw`
 - `.spw/workspace.spw`
 - `.spw/index.spw`
+- `.spw/surfaces/index.spw`
+- `.spw/surfaces/plugin-protocol.spw`
+- `.spw/state/observable.spw`
+- `.spw/substrates/structural.spw`
+- `.spw/runtime/precipitates.spw`
 
 These files are authored to match parser patterns used in the workbench LSP server (`server-index.ts`) so code lens and category/plane inference can project to this repo.
 

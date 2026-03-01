@@ -1,0 +1,12 @@
+# Naming Convention
+
+#>spwashi_convention_naming
+#:convention #!naming
+
+^"rules"{
+  js_modules: "kebab-case.js"
+  spw_modules: "kebab-case.spw"
+  plugin_ids: "kebab-case"
+  event_names: "spw:domain:action"
+  runtime_interfaces: "camelCase"
+}

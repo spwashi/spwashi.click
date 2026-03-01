@@ -14,7 +14,7 @@
   repo: "https://github.com/spwashi/spwashi.work"
   relation: "downstream-reference"
   contract: "spwashi.work references this repository by index and workspace contracts without mirroring source."
-  entrypoints: [spw.index.json, spw.index.spw, .spw/workspace.spw]
+  entrypoints: [spw.index.json, spw.index.spw, .spw/index.spw, .spw/workspace.spw, .spw/surfaces/plugin-protocol.spw]
 }
 
 ^feature[click-stage]{
@@ -134,6 +134,19 @@
   files: [
     seed/extern/spw-workbench/docs/design/md/history.md,
     seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md
+  ]
+}
+
+^care[plugin-architecture]{
+  control_plane: [
+    .spw/surfaces/index.spw,
+    .spw/surfaces/plugin-protocol.spw,
+    .spw/substrates/structural.spw,
+    .spw/runtime/precipitates.spw
+  ]
+  runtime_surfaces: [
+    src/core/runtime/js/spwlang-parser.js,
+    seed/site/enhancements/workbench-parser-adapter.js
   ]
 }
 

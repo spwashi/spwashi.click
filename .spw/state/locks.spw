@@ -1,0 +1,30 @@
+# Locks State
+#
+# Advisory coordination locks for concurrent editing.
+
+#>spwashi_state_locks
+#:manifest #!coordination
+
+^"locks"{
+  runtime: {
+    owner: null
+    since: null
+    scope: "src/core/runtime/js/*"
+  }
+  control_plane: {
+    owner: null
+    since: null
+    scope: ".spw/*"
+  }
+  crawler_contracts: {
+    owner: null
+    since: null
+    scope: "spw.index.json|spw.index.spw|docs/llm-crawler-contract.md"
+  }
+}
+
+^"policy"{
+  mode: "advisory"
+  stale_after_minutes: 120
+  release: "lock owner clears after commit"
+}

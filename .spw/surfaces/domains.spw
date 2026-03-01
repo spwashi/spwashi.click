@@ -1,0 +1,26 @@
+# Domains Surface
+#
+# Domain grouping for plugin and crawler routing.
+
+#>spwashi_surfaces_domains
+#:surface #!domains
+
+^domain[runtime]{
+  roots: [@runtime_js, @runtime_spw]
+  contracts: [@runtime_core, @runtime_config, @runtime_control, @runtime_parser]
+}
+
+^domain[crawler]{
+  roots: [@repo]
+  contracts: [@crawler_json, @crawler_spw, @workspace]
+}
+
+^domain[plugin]{
+  roots: [@spw/surfaces, @seed/site/enhancements]
+  contracts: [@plugin_protocol, @runtime_parser, @runtime_spw_command]
+}
+
+^domain[workbench]{
+  roots: [@workbench]
+  contracts: [@workbench/.spw/surfaces/index.spw, @workbench/.spw/surfaces/plugin-protocol.spw]
+}
