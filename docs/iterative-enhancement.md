@@ -36,6 +36,7 @@ Enhancement failures are isolated and reported as events:
 
 `seed/site/enhancements/seed-atlas.js` reads your `seed/images/2026-02-28/*.webp` set and rotates imagery by click count + phase.
 It also emits interaction-literacy prompts so abstract visuals teach state intuition (cause/effect, phase progression, and feedback clarity).
+Atlas thumbnails are keyboard navigable (`ArrowLeft/ArrowRight/Home/End`) and use sporadic local size sampling to tune strip density across view sizes.
 Core syntax controls can additionally project page-level layout/component modes via:
 
 - `data-spw-layout-view`

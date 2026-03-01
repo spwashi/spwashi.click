@@ -10,8 +10,13 @@
   .site-header,
   .site-footer,
   .site-main {
-    width: min(100% - 2rem, var(--container-max));
+    width: min(100% - clamp(1rem, 2.8vw, 3rem), var(--container-main-max, var(--container-max)));
     margin-inline: auto;
+  }
+
+  .site-header,
+  .site-footer {
+    width: min(100% - clamp(1rem, 2.8vw, 3rem), var(--container-chassis-max, var(--container-max)));
   }
 
   .site-header {
@@ -67,13 +72,18 @@
 
   .site-main {
     display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--spacing-7);
     padding: var(--spacing-5) 0 var(--spacing-8);
   }
 
+  .site-main > * {
+    grid-column: 1 / -1;
+  }
+
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, min(42rem, 1.2fr)) minmax(18rem, 1fr);
+    grid-template-columns: minmax(0, min(48rem, 1.25fr)) minmax(20rem, 1fr);
     gap: var(--spacing-6);
     align-items: start;
   }
@@ -157,6 +167,49 @@
     contain-intrinsic-size: 320px;
   }
 
+  body[data-page='home'] .site-main > [data-layout-region='hero'] {
+    grid-column: 1 / -1;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='selected-work'] {
+    grid-column: 1 / span 6;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='syntax-lab'] {
+    grid-column: 7 / -1;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='chapters'] {
+    grid-column: 1 / span 7;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='ecology'] {
+    grid-column: 8 / -1;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='seed-atlas'] {
+    grid-column: 1 / span 8;
+  }
+
+  body[data-page='home'] .site-main > [data-layout-region='contact'] {
+    grid-column: 9 / -1;
+  }
+
+  body[data-page='work'] .site-main > [data-layout-region='intro'],
+  body[data-page='notes'] .site-main > [data-layout-region='intro'] {
+    grid-column: 1 / span 4;
+    align-content: start;
+  }
+
+  body[data-page='work'] .site-main > [data-layout-region='stream'],
+  body[data-page='notes'] .site-main > [data-layout-region='stream'] {
+    grid-column: 5 / -1;
+  }
+
+  body[data-page='notes'] .site-main > [data-layout-region='seed-atlas'] {
+    grid-column: 1 / -1;
+  }
+
   .not-found {
     display: grid;
     gap: var(--spacing-4);
@@ -166,7 +219,8 @@
   }
 
   html[data-spw-layout-view='focus'] {
-    --container-max: 60rem;
+    --container-main-max: 60rem;
+    --container-chassis-max: 60rem;
   }
 
   html[data-spw-layout-view='grid'] .hero {
@@ -195,6 +249,10 @@
   }
 
   @media (max-width: 900px) {
+    .site-main {
+      grid-template-columns: 1fr;
+    }
+
     .hero,
     .selected-work-list,
     .project-grid,
@@ -215,6 +273,36 @@
     .site-nav {
       flex-wrap: wrap;
       gap: var(--spacing-2);
+    }
+  }
+
+  @media (max-width: 1240px) {
+    body[data-page='home'] .site-main > [data-layout-region='selected-work'],
+    body[data-page='home'] .site-main > [data-layout-region='chapters'],
+    body[data-page='home'] .site-main > [data-layout-region='seed-atlas'] {
+      grid-column: 1 / span 7;
+    }
+
+    body[data-page='home'] .site-main > [data-layout-region='syntax-lab'],
+    body[data-page='home'] .site-main > [data-layout-region='ecology'],
+    body[data-page='home'] .site-main > [data-layout-region='contact'] {
+      grid-column: 8 / -1;
+    }
+
+    body[data-page='work'] .site-main > [data-layout-region='intro'],
+    body[data-page='notes'] .site-main > [data-layout-region='intro'] {
+      grid-column: 1 / -1;
+    }
+
+    body[data-page='work'] .site-main > [data-layout-region='stream'],
+    body[data-page='notes'] .site-main > [data-layout-region='stream'] {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 900px) {
+    body[data-page] .site-main > [data-layout-region] {
+      grid-column: 1 / -1;
     }
   }
 }

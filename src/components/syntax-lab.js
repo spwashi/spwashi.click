@@ -9,6 +9,7 @@
 
 import { noteComponentLifecycle } from '../core/ecology.js';
 import { parseSpwForm } from '../core/spwlang-parser.js';
+import { installSporadicSpaceSampler } from '../core/space-metrics.js';
 
 const BRACE_SET = Object.freeze(['<>', '()', '[]', '{}']);
 const DEFAULT_OPERATORS = Object.freeze(['?', '~', '@', '&', '*', '^', '!', '=', '%', '#', '.']);
@@ -148,15 +149,6 @@ function resolveFacetNode(nodeId, state) {
   return NODE_LOOKUP[resolvedNode.id] ?? sourceNode;
 }
 
-function facetMapLine(state) {
-  return NODE_MAP
-    .map((node) => {
-      const resolvedNode = resolveFacetNode(node.id, state);
-      return `${node.id}>${resolvedNode.id}`;
-    })
-    .join(' ');
-}
-
 function expressionFromState(state) {
   const [openBrace, closeBrace] = braceTokens(state.bracePair);
   return `${state.activeOperator}facet[${state.activeNode}]${openBrace} weave:${state.operators.join('')} turn:${state.lastTurn} ${closeBrace}`;
@@ -174,12 +166,30 @@ function createSvgNode(tagName) {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
 }
 
+function isTextEntryTarget(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+  if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+    return true;
+  }
+
+  return target.getAttribute('contenteditable') === 'true';
+}
+
 class SpwSyntaxLab extends HTMLElement {
   connectedCallback() {
     this.dataset.component = 'syntax-lab';
     this.setAttribute('role', 'region');
     this.setAttribute('aria-label', 'Spw syntax lab');
+    this.setAttribute(
+      'aria-keyshortcuts',
+      'Alt+ArrowLeft Alt+ArrowRight ArrowUp ArrowDown ArrowLeft ArrowRight Home End'
+    );
     this.setAttribute('data-structure-label', 'Exploratory syntax lab with swappable operators and geometric facet navigation');
+    this.tabIndex = 0;
 
     this.state = {
       bracePair: '{}',
@@ -194,6 +204,7 @@ class SpwSyntaxLab extends HTMLElement {
     this.renderScaffold();
     this.bindEvents();
     this.installStructureObserver();
+    this.installSpaceSampler();
     this.renderState();
 
     noteComponentLifecycle('spw-syntax-lab', 'connected', {
@@ -203,7 +214,10 @@ class SpwSyntaxLab extends HTMLElement {
 
   disconnectedCallback() {
     this.removeEventListener('click', this.onClick);
+    this.removeEventListener('keydown', this.onKeydown);
     this.structureObserver?.disconnect();
+    this.cleanupSpaceSampler?.();
+    this.cleanupSpaceSampler = null;
     noteComponentLifecycle('spw-syntax-lab', 'disconnected', {
       node: this.state.activeNode
     });
@@ -238,7 +252,7 @@ class SpwSyntaxLab extends HTMLElement {
             data-structure-label="Operator controls support two-step swap actions and active operator focus"
           >
             <h3 class="syntax-lab__control-title">^operators</h3>
-            <p class="syntax-lab__hint">~hint{ pick operator_a then operator_b to swap; pick same twice to rotate views }</p>
+            <p class="syntax-lab__hint">~hint{ click:swap keyboard:arrow-nav alt+left/right:rotate symbol-keys:focus-op }</p>
             <div class="syntax-lab__operator-grid" data-role="operator-grid"></div>
           </section>
 
@@ -392,7 +406,22 @@ class SpwSyntaxLab extends HTMLElement {
       }
     };
 
+    this.onKeydown = (event) => {
+      const target = event.target;
+      if (isTextEntryTarget(target)) {
+        return;
+      }
+
+      const button = target instanceof Element ? target.closest('button[data-role]') : null;
+      if (button && this.handleButtonKeyboard(event, button)) {
+        return;
+      }
+
+      this.handleShortcutKeyboard(event);
+    };
+
     this.addEventListener('click', this.onClick);
+    this.addEventListener('keydown', this.onKeydown);
   }
 
   installStructureObserver() {
@@ -424,6 +453,29 @@ class SpwSyntaxLab extends HTMLElement {
         node.removeAttribute('aria-description');
       }
     }
+  }
+
+  installSpaceSampler() {
+    this.cleanupSpaceSampler?.();
+    this.cleanupSpaceSampler = installSporadicSpaceSampler({
+      node: this,
+      intervalMs: 2600,
+      minDelta: 10,
+      onSample: (metrics) => {
+        this.applySpaceMetrics(metrics);
+      }
+    });
+  }
+
+  applySpaceMetrics(metrics) {
+    this.dataset.inlineBand = metrics.inlineBand;
+    this.dataset.blockBand = metrics.blockBand;
+    this.dataset.areaBand = metrics.areaBand;
+    this.style.setProperty('--syntax-inline-size', `${metrics.width}px`);
+    this.style.setProperty('--syntax-block-size', `${metrics.height}px`);
+
+    const controlColumns = metrics.width >= 1060 ? 3 : metrics.width >= 760 ? 2 : 1;
+    this.style.setProperty('--syntax-control-columns', String(controlColumns));
   }
 
   setStatus(statusLine) {
@@ -489,6 +541,40 @@ class SpwSyntaxLab extends HTMLElement {
     this.renderState();
   }
 
+  stepBrace(step = 1) {
+    const currentIndex = Math.max(0, BRACE_SET.indexOf(this.state.bracePair));
+    const nextIndex = wrapIndex(currentIndex + step, BRACE_SET.length);
+    const nextBrace = BRACE_SET[nextIndex];
+    this.handleBrace(nextBrace);
+  }
+
+  activateOperator(operatorSymbol, reasonLabel = 'direct') {
+    if (!this.state.operators.includes(operatorSymbol)) {
+      return;
+    }
+
+    this.state.pendingSwapIndex = null;
+    this.state.activeOperator = operatorSymbol;
+    this.setStatus(`^operator-focus{ active:${operatorSymbol} reason:${reasonLabel} }`);
+    this.renderState();
+  }
+
+  rotateOperators(direction = 1, reasonLabel = 'rotate') {
+    const normalizedDirection = direction >= 0 ? 1 : -1;
+    this.state.operators = rotateArray(this.state.operators, normalizedDirection);
+    this.state.pendingSwapIndex = null;
+
+    if (!this.state.operators.includes(this.state.activeOperator)) {
+      this.state.activeOperator = this.state.operators[0];
+    }
+
+    const componentView = componentViewFromState(this.state);
+    this.setStatus(
+      `^operator-rotate{ active:${this.state.activeOperator} direction:${normalizedDirection > 0 ? 'cw' : 'ccw'} component-view:${componentView} reason:${reasonLabel} }`
+    );
+    this.renderState();
+  }
+
   handleOperator(operatorSymbol) {
     const nextIndex = this.state.operators.indexOf(operatorSymbol);
     if (nextIndex === -1) {
@@ -507,14 +593,8 @@ class SpwSyntaxLab extends HTMLElement {
 
     if (firstIndex === nextIndex) {
       const rotationDirection = operatorRule(operatorSymbol).shift >= 0 ? 1 : -1;
-      this.state.operators = rotateArray(this.state.operators, rotationDirection);
-      this.state.pendingSwapIndex = null;
       this.state.activeOperator = operatorSymbol;
-      const componentView = componentViewFromState(this.state);
-      this.setStatus(
-        `^operator-rotate{ active:${operatorSymbol} direction:${rotationDirection > 0 ? 'cw' : 'ccw'} component-view:${componentView} }`
-      );
-      this.renderState();
+      this.rotateOperators(rotationDirection, 'pointer:same-symbol');
       return;
     }
 
@@ -530,15 +610,213 @@ class SpwSyntaxLab extends HTMLElement {
     this.renderState();
   }
 
-  handleNode(nodeId) {
+  handleNode(nodeId, reasonLabel = null) {
     if (!NODE_LOOKUP[nodeId]) {
       return;
     }
 
     const resolvedNode = resolveFacetNode(nodeId, this.state);
-    this.navigateToNode(resolvedNode.id, `operator:${this.state.activeOperator}:pick:${nodeId}`);
+    const reason = reasonLabel ?? `operator:${this.state.activeOperator}:pick:${nodeId}`;
+    this.navigateToNode(resolvedNode.id, reason);
     this.setStatus(`^facet-turn{ pick:${nodeId} op:${this.state.activeOperator} resolve:${resolvedNode.id} }`);
     this.renderState();
+  }
+
+  stepNode(step = 1, reasonLabel = 'facet:step') {
+    const sourceNode = NODE_LOOKUP[this.state.activeNode] ?? NODE_LOOKUP.seed;
+    const nextIndex = wrapIndex(sourceNode.index + step, NODE_MAP.length);
+    const candidateNode = NODE_MAP[nextIndex];
+    this.handleNode(candidateNode.id, reasonLabel);
+  }
+
+  focusButtonByIndex(buttons, nextIndex) {
+    if (!Array.isArray(buttons) || buttons.length === 0) {
+      return null;
+    }
+
+    const safeIndex = wrapIndex(nextIndex, buttons.length);
+    const nextButton = buttons[safeIndex] ?? null;
+    nextButton?.focus();
+    return nextButton;
+  }
+
+  handleButtonKeyboard(event, button) {
+    const role = button.dataset.role;
+    if (!role) {
+      return false;
+    }
+
+    if (role === 'brace') {
+      const buttons = this.refs?.braceButtons ?? [];
+      const index = buttons.indexOf(button);
+      let nextIndex = null;
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        nextIndex = index - 1;
+      } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        nextIndex = index + 1;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = buttons.length - 1;
+      }
+
+      if (nextIndex === null) {
+        return false;
+      }
+
+      event.preventDefault();
+      const nextButton = this.focusButtonByIndex(buttons, nextIndex);
+      const nextBrace = nextButton?.dataset.brace;
+      if (nextBrace) {
+        this.handleBrace(nextBrace);
+      }
+      return true;
+    }
+
+    if (role === 'operator') {
+      const buttons = this.refs?.operatorButtons ?? [];
+      const index = buttons.indexOf(button);
+      let nextIndex = null;
+
+      if (event.key === 'ArrowLeft') {
+        nextIndex = index - 1;
+      } else if (event.key === 'ArrowRight') {
+        nextIndex = index + 1;
+      } else if (event.key === 'ArrowUp') {
+        nextIndex = index - 6;
+      } else if (event.key === 'ArrowDown') {
+        nextIndex = index + 6;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = buttons.length - 1;
+      }
+
+      if (nextIndex === null) {
+        return false;
+      }
+
+      event.preventDefault();
+      const nextButton = this.focusButtonByIndex(buttons, nextIndex);
+      const nextOperator = nextButton?.dataset.operator;
+      if (nextOperator) {
+        this.activateOperator(nextOperator, 'keyboard:operator-grid');
+      }
+      return true;
+    }
+
+    if (role === 'node') {
+      const buttons = this.refs?.navButtons ?? [];
+      const index = buttons.indexOf(button);
+      let nextIndex = null;
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        nextIndex = index - 1;
+      } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        nextIndex = index + 1;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = buttons.length - 1;
+      }
+
+      if (nextIndex === null) {
+        return false;
+      }
+
+      event.preventDefault();
+      const nextButton = this.focusButtonByIndex(buttons, nextIndex);
+      const nextNodeId = nextButton?.dataset.nodeId;
+      if (nextNodeId) {
+        this.handleNode(nextNodeId, 'keyboard:node-grid');
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  handleShortcutKeyboard(event) {
+    if (event.metaKey || event.ctrlKey) {
+      return false;
+    }
+
+    if (event.altKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.rotateOperators(-1, 'keyboard:alt-arrow');
+      return true;
+    }
+
+    if (event.altKey && event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.rotateOperators(1, 'keyboard:alt-arrow');
+      return true;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.stepNode(-1, 'keyboard:arrow');
+      return true;
+    }
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.stepNode(1, 'keyboard:arrow');
+      return true;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.stepBrace(-1);
+      return true;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.stepBrace(1);
+      return true;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      this.navigateToNode('seed', 'keyboard:home');
+      this.renderState();
+      return true;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      this.navigateToNode('contact', 'keyboard:end');
+      this.renderState();
+      return true;
+    }
+
+    const braceByShortcut = {
+      '{': '{}',
+      '}': '{}',
+      '[': '[]',
+      ']': '[]',
+      '(': '()',
+      ')': '()',
+      '<': '<>',
+      '>': '<>'
+    };
+
+    const bracePair = braceByShortcut[event.key];
+    if (bracePair) {
+      event.preventDefault();
+      this.handleBrace(bracePair);
+      return true;
+    }
+
+    if (DEFAULT_OPERATORS.includes(event.key)) {
+      event.preventDefault();
+      this.activateOperator(event.key, 'keyboard:symbol');
+      return true;
+    }
+
+    return false;
   }
 
   applyFacetLighting() {
@@ -581,10 +859,14 @@ class SpwSyntaxLab extends HTMLElement {
       button.style.setProperty('--operator-order', String(index));
     }
 
+    const resolvedNodeBySource = Object.fromEntries(
+      NODE_MAP.map((node) => [node.id, resolveFacetNode(node.id, this.state)])
+    );
+
     const navButtons = this.refs?.navButtons ?? this.querySelectorAll('[data-role="node"]');
     for (const button of navButtons) {
       const sourceNodeId = button.dataset.nodeId;
-      const resolvedNode = resolveFacetNode(sourceNodeId, this.state);
+      const resolvedNode = resolvedNodeBySource[sourceNodeId] ?? NODE_LOOKUP.seed;
       const isResolvedActive = resolvedNode.id === this.state.activeNode;
       const isOriginActive = sourceNodeId === this.state.activeNode;
 
@@ -629,7 +911,10 @@ class SpwSyntaxLab extends HTMLElement {
       : `!parse[fail]{ reason: ${parseResult.reason ?? 'unknown'} }`;
     parseStatusNode.dataset.parse = parseIsValid ? 'valid' : 'invalid';
 
-    facetMapNode.textContent = `^view-map{ layout:${layoutView} components:${componentView} facets:${facetMapLine(this.state)} }`;
+    const facetMap = NODE_MAP
+      .map((node) => `${node.id}>${(resolvedNodeBySource[node.id] ?? NODE_LOOKUP.seed).id}`)
+      .join(' ');
+    facetMapNode.textContent = `^view-map{ layout:${layoutView} components:${componentView} facets:${facetMap} }`;
     statusNode.textContent = this.state.statusLine;
 
     this.applyFacetLighting();

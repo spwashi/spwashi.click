@@ -50,20 +50,20 @@
       </header>
 
       <main id="main-content" class="site-main" role="main">
-        <section class="page-section" aria-labelledby="work-title" data-structure-label="Work route intro and curation context">
+        <section class="page-section" aria-labelledby="work-title" data-layout-region="intro" data-structure-label="Work route intro and curation context">
           <p class="page-section__eyebrow">^index[collections]</p>
           <h1 id="work-title" data-slot="page_title_slot">Collections</h1>
-          <p data-slot="page_intro_slot">^curation{ rule: replace }</p>
+          <p data-slot="page_intro_slot">^curation[spw]{ source: workbench outputs: scenes+systems read: executable }</p>
         </section>
 
-        <section class="page-section" aria-labelledby="project-grid-title" data-structure-label="Project grid containing structured case-study placeholders">
+        <section class="page-section" aria-labelledby="project-grid-title" data-layout-region="stream" data-structure-label="Project grid containing structured case-study placeholders">
           <h2 id="project-grid-title" class="visually-hidden">Project cards</h2>
           <div class="project-grid" data-role="project-grid">
             <article class="project-card" id="project-one" data-project-id="project-one">
               <h2 class="project-card__title">^project{ id: capsule_01 }</h2>
               <p class="project-card__role">^role{ creative-direction }</p>
-              <p class="project-card__summary">~summary{ visual-language-established }</p>
-              <p class="project-card__metrics">%metric{ engagement }</p>
+              <p class="project-card__summary">~summary{ web-language capsule from spw-workbench grammar }</p>
+              <p class="project-card__metrics">%metric{ signal:style-memory loop:click->state->meaning }</p>
             </article>
           </div>
         </section>

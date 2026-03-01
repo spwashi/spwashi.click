@@ -28,45 +28,45 @@ export const HOME_MANIFEST = Object.freeze({
   metaTitle: 'spwashi.click',
   slots: Object.freeze({
     hero_title: 'Spwashi',
-    hero_tagline_slot: '^[identity]{ name: spwashi physics: spw surface: web }',
-    hero_subline_slot: '^[state-model]{ seed>pulse>counterpoint>chorus ui: language }',
-    intro_body_slot: '^[profile-slot]{ ~summary: replace }',
-    contact_cta_slot: '![contact]{ channel: bookings+collabs }'
+    hero_tagline_slot: '^identity[spwashi]{ physics:spw role:internet-persona medium:web-language }',
+    hero_subline_slot: '^state-model[scene]{ seed>pulse>counterpoint>chorus loop:click->phase }',
+    intro_body_slot: '^profile[spw-workbench]{ function:language-kernel claim:executable-copy demo:spwashi.click }',
+    contact_cta_slot: '!contact[primary]{ channel:bookings+collabs mode:runtime-open }'
   }),
   selectedWork: Object.freeze([
     Object.freeze({
-      title_slot: '^[item]{ id: drop_01 }',
-      summary_slot: '~summary{ replace }',
+      title_slot: '^demo[facet_nav]{ id:drop_01 }',
+      summary_slot: '~summary[workbench]{ module:syntax-lab signal:brace+operator navigation:facet-graph }',
       href: '/work/#project-one'
     }),
     Object.freeze({
-      title_slot: '^[item]{ id: editorial_02 }',
-      summary_slot: '~summary{ replace }',
+      title_slot: '^demo[runtime_control]{ id:editorial_02 }',
+      summary_slot: '~summary[control]{ api:setTopLevel+setRegion+setWindowVars action:llm-tunable }',
       href: '/work/#project-two'
     }),
     Object.freeze({
-      title_slot: '^[item]{ id: performance_03 }',
-      summary_slot: '~summary{ replace }',
+      title_slot: '^demo[texture_tuner]{ id:performance_03 }',
+      summary_slot: '~summary[release]{ source:tealstripesvibes.com strategy:arc+vibe refresh:fresh-paint }',
       href: '/work/#project-three'
     })
   ]),
   chapters: Object.freeze([
     Object.freeze({
       chapter: 'identity',
-      heading: '^[module]{ physics }',
-      body: '~body{ replace_existence_frame }',
+      heading: '^module[physics]{ source:spw }',
+      body: '~body[kernel]{ seed:spw-workbench output:interaction-grammar }',
       unlockAt: 'seed'
     }),
     Object.freeze({
       chapter: 'systems',
-      heading: '^[module]{ disposition }',
-      body: '~body{ replace_disposition_vectors }',
+      heading: '^module[disposition]{ vectors:operators }',
+      body: '~body[systems]{ braces:layout-view operators:component-view route:combinatoric }',
       unlockAt: 'pulse'
     }),
     Object.freeze({
       chapter: 'improv',
-      heading: '^[module]{ geometry }',
-      body: '~body{ replace_combinatoric_crystal_model }',
+      heading: '^module[geometry]{ medium:facet-nav }',
+      body: '~body[improv]{ click->state->lighting result:learnable-abstraction }',
       unlockAt: 'counterpoint'
     })
   ])
@@ -76,29 +76,29 @@ export const WORK_MANIFEST = Object.freeze({
   metaTitle: 'spwashi.click / collections',
   slots: Object.freeze({
     page_title_slot: 'Collections',
-    page_intro_slot: '^[curation]{ rule: replace }'
+    page_intro_slot: '^curation[spw]{ source:workbench theme:fashion+systems mode:web-language }'
   }),
   projects: Object.freeze([
     Object.freeze({
       id: 'project-one',
-      title_slot: '^[project]{ id: capsule_01 }',
-      role_slot: '^[role]{ creative-direction }',
-      summary_slot: '~summary{ visual-language-established }',
-      metrics_slot: '%metric{ engagement }'
+      title_slot: '^project[capsule_01]{ type:language-ui }',
+      role_slot: '^role[creative-direction]{ scope:signal-system }',
+      summary_slot: '~summary[demo]{ braces-as-navigation operators-as-lenses component-ecology-live }',
+      metrics_slot: '%metric[response]{ memory:high dwell:deep }'
     }),
     Object.freeze({
       id: 'project-two',
-      title_slot: '^[project]{ id: editorial_02 }',
-      role_slot: '^[role]{ narrative-direction }',
-      summary_slot: '~summary{ movement+lighting+posture }',
-      metrics_slot: '%metric{ reach }'
+      title_slot: '^project[editorial_02]{ type:runtime-literature }',
+      role_slot: '^role[narrative-direction]{ scope:reader+llm }',
+      summary_slot: '~summary[runtime]{ controls:reset+rebind parameters:top-level+region+window-vars }',
+      metrics_slot: '%metric[reach]{ channels:notes+work expansion:lore-land-ready }'
     }),
     Object.freeze({
       id: 'project-three',
-      title_slot: '^[project]{ id: performance_03 }',
-      role_slot: '^[role]{ performer }',
-      summary_slot: '~summary{ interaction+style fusion }',
-      metrics_slot: '%metric{ response }'
+      title_slot: '^project[performance_03]{ type:texture-loop }',
+      role_slot: '^role[performer]{ scope:interaction-style-fusion }',
+      summary_slot: '~summary[release]{ asset-version:date-based cadence:arc+vibe cache:tealstripesvibes }',
+      metrics_slot: '%metric[response]{ refresh:regular quality:stable }'
     })
   ])
 });
@@ -107,25 +107,25 @@ export const NOTES_MANIFEST = Object.freeze({
   metaTitle: 'spwashi.click / notes',
   slots: Object.freeze({
     page_title_slot: 'Notes',
-    page_intro_slot: '^[notes]{ tags: replace }'
+    page_intro_slot: '^notes[spwlang]{ tags:interaction-literacy+component-ecology+software-literature }'
   }),
   notes: Object.freeze([
     Object.freeze({
       id: 'note-state-machines',
-      title_slot: '^[note]{ id: state_composition }',
-      excerpt_slot: '~excerpt{ transition-logic + audience-expectation }',
+      title_slot: '^note[state_composition]{ lens:click-phase-machine }',
+      excerpt_slot: '~excerpt[interaction]{ deterministic-transitions teach-intuition through repeatable novelty }',
       date_slot: 'SLOT: YYYY-MM-DD'
     }),
     Object.freeze({
       id: 'note-motion-ethics',
-      title_slot: '^[note]{ id: motion_presence }',
-      excerpt_slot: '~excerpt{ motion-legibility in static+dynamic }',
+      title_slot: '^note[motion_presence]{ lens:tempo+accessibility }',
+      excerpt_slot: '~excerpt[motion]{ reduced-motion parity and lighting discipline keep meaning readable }',
       date_slot: 'SLOT: YYYY-MM-DD'
     }),
     Object.freeze({
       id: 'note-rhythm-api',
-      title_slot: '^[note]{ id: rhythm_signature }',
-      excerpt_slot: '~excerpt{ cadence+geometry as identity-signal }',
+      title_slot: '^note[rhythm_signature]{ lens:api+cadence }',
+      excerpt_slot: '~excerpt[language]{ braces/operators become navigation operators and cognitive scaffolds }',
       date_slot: 'SLOT: YYYY-MM-DD'
     })
   ])

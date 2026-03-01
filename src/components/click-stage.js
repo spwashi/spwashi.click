@@ -10,6 +10,7 @@
 import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
 import { noteComponentLifecycle } from '../core/ecology.js';
 import { intensityFromPhase } from '../core/motion.js';
+import { installSporadicSpaceSampler } from '../core/space-metrics.js';
 
 const PHASE_COPY = Object.freeze({
   seed: '^phase[seed]{ model: geometry-init learn: click=>state }',
@@ -18,6 +19,19 @@ const PHASE_COPY = Object.freeze({
   chorus: '^phase[chorus]{ model: full-combinatorics learn: system=>presence }'
 });
 
+function isTextEntryTarget(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+  if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+    return true;
+  }
+
+  return target.getAttribute('contenteditable') === 'true';
+}
+
 class SpwClickStage extends HTMLElement {
   static observedAttributes = ['phase', 'clicks'];
 
@@ -25,12 +39,15 @@ class SpwClickStage extends HTMLElement {
     this.dataset.component = 'click-stage';
     this.setAttribute('role', 'group');
     this.setAttribute('aria-label', this.getAttribute('aria-label') ?? 'Interactive click stage');
+    this.setAttribute('aria-keyshortcuts', 'Enter Space ArrowRight');
+    this.tabIndex = 0;
     noteComponentLifecycle('spw-click-stage', 'connected', {
       phase: this.getAttribute('phase') ?? 'seed'
     });
 
     this.ensureScaffolding();
     this.bindIntents();
+    this.installSpaceSampler();
     this.attachStoreSubscription();
     this.renderFromState(window.__SPW_APP__?.store?.getState());
   }
@@ -42,6 +59,9 @@ class SpwClickStage extends HTMLElement {
     if (this.triggerButton && this.onClickIntent) {
       this.triggerButton.removeEventListener('click', this.onClickIntent);
     }
+    this.removeEventListener('keydown', this.onKeyIntent);
+    this.cleanupSpaceSampler?.();
+    this.cleanupSpaceSampler = null;
 
     if (this.unsubscribe) {
       this.unsubscribe();
@@ -62,6 +82,7 @@ class SpwClickStage extends HTMLElement {
       button.className = 'click-stage__trigger';
       button.dataset.role = 'click-trigger';
       button.setAttribute('aria-controls', 'click-stage-status');
+      button.setAttribute('aria-keyshortcuts', 'Enter Space ArrowRight');
       button.textContent = 'Click to build the scene';
       this.prepend(button);
     }
@@ -112,18 +133,67 @@ class SpwClickStage extends HTMLElement {
       rhythmGrid.setAttribute('intensity', '0');
       this.append(rhythmGrid);
     }
+
+    this.triggerButton = this.querySelector('[data-role="click-trigger"]');
+    this.statusNode = this.querySelector('[data-role="status"]');
+    this.rhythmGrid = this.querySelector('spw-rhythm-grid');
+    this.layerNodes = Array.from(this.querySelectorAll('[data-layer]'));
   }
 
   bindIntents() {
-    this.triggerButton = this.querySelector('[data-role="click-trigger"]');
-    this.statusNode = this.querySelector('[data-role="status"]');
-
     this.onClickIntent = () => {
-      dispatchTypedEvent(this, EVENT_INTENT_CLICK, { source: 'click-stage' });
-      noteComponentLifecycle('spw-click-stage', 'intent', { source: 'click-stage' });
+      this.emitClickIntent('click-stage');
+    };
+
+    this.onKeyIntent = (event) => {
+      if (isTextEntryTarget(event.target)) {
+        return;
+      }
+
+      const onTriggerButton =
+        event.target instanceof Element &&
+        Boolean(event.target.closest('[data-role="click-trigger"]'));
+      if (onTriggerButton && (event.key === 'Enter' || event.key === ' ')) {
+        return;
+      }
+
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        this.emitClickIntent('click-stage:keyboard');
+      }
     };
 
     this.triggerButton.addEventListener('click', this.onClickIntent);
+    this.addEventListener('keydown', this.onKeyIntent);
+  }
+
+  emitClickIntent(source) {
+    dispatchTypedEvent(this, EVENT_INTENT_CLICK, { source });
+    noteComponentLifecycle('spw-click-stage', 'intent', { source });
+  }
+
+  installSpaceSampler() {
+    this.cleanupSpaceSampler?.();
+    this.cleanupSpaceSampler = installSporadicSpaceSampler({
+      node: this,
+      intervalMs: 2400,
+      minDelta: 10,
+      onSample: (metrics) => {
+        this.applySpaceMetrics(metrics);
+      }
+    });
+  }
+
+  applySpaceMetrics(metrics) {
+    this.dataset.inlineBand = metrics.inlineBand;
+    this.dataset.blockBand = metrics.blockBand;
+    this.dataset.areaBand = metrics.areaBand;
+    this.style.setProperty('--stage-inline-size', `${metrics.width}px`);
+    this.style.setProperty('--stage-block-size', `${metrics.height}px`);
   }
 
   attachStoreSubscription() {
@@ -150,6 +220,12 @@ class SpwClickStage extends HTMLElement {
       return;
     }
 
+    const renderKey = `${state.phase}:${state.clickCount}:${state.unlockedLayers.join('|')}`;
+    if (this.lastRenderKey === renderKey) {
+      return;
+    }
+    this.lastRenderKey = renderKey;
+
     this.setAttribute('phase', state.phase);
     this.setAttribute('clicks', String(state.clickCount));
     this.dataset.phase = state.phase;
@@ -159,13 +235,11 @@ class SpwClickStage extends HTMLElement {
       this.statusNode.textContent = `${PHASE_COPY[state.phase]} Clicks: ${state.clickCount}.`;
     }
 
-    const rhythmGrid = this.querySelector('spw-rhythm-grid');
-    if (rhythmGrid) {
-      rhythmGrid.setAttribute('intensity', String(intensityFromPhase(state.phase)));
+    if (this.rhythmGrid) {
+      this.rhythmGrid.setAttribute('intensity', String(intensityFromPhase(state.phase)));
     }
 
-    const layerNodes = this.querySelectorAll('[data-layer]');
-    for (const layerNode of layerNodes) {
+    for (const layerNode of this.layerNodes ?? []) {
       const layerName = layerNode.getAttribute('data-layer');
       const layerUnlocked = state.unlockedLayers.includes(layerName);
       layerNode.setAttribute('data-unlocked', layerUnlocked ? 'true' : 'false');

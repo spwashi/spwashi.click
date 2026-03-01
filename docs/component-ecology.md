@@ -9,6 +9,7 @@ The component layer is modeled as a small ecology with explicit roles.
 - `spw-rhythm-grid`: metronome and intensity visualizer
 - `spw-chapter-panel`: narrative gatekeeper
 - `spw-ecology-map`: observer and reporter
+- `spw-syntax-lab`: symbolic navigator and layout/component mode projector
 
 ## Ecology Ledger
 
@@ -40,6 +41,14 @@ The component writes global runtime flags on `<html>`:
 - `data-spw-component-view`
 
 This means symbolic navigation is not isolated to the lab; it can reframe page layout and component presentation coherently.
+
+## Space-Aware Behavior
+
+`src/core/space-metrics.js` provides a sporadic sampler used by interactive components/enhancements.
+
+- Components project local geometry as `data-inline-band`, `data-block-band`, `data-area-band`.
+- Components also expose CSS vars (`--stage-inline-size`, `--syntax-inline-size`, `--atlas-inline-size`) so style can respond without tight JS loops.
+- Sampling is low-frequency + resize-observer-backed to keep perf stable while still adapting to changing layout real estate.
 
 ## Practical Debug Loop
 

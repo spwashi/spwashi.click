@@ -1,3 +1,5 @@
+import { installSporadicSpaceSampler } from '../../../src/core/space-metrics.js';
+
 const PHASE_SEQUENCE = Object.freeze(['seed', 'pulse', 'counterpoint', 'chorus']);
 
 const PHASE_GRAMMAR = Object.freeze({
@@ -45,6 +47,20 @@ function resolveIndex(images, clickCount) {
   }
 
   return clickCount % images.length;
+}
+
+function clickCountForIndex(images, clickCount, requestedIndex) {
+  const currentIndex = resolveIndex(images, clickCount);
+  if (currentIndex < 0) {
+    return 0;
+  }
+
+  let nextClickCount = clickCount - currentIndex + requestedIndex;
+  while (nextClickCount < 0) {
+    nextClickCount += images.length;
+  }
+
+  return nextClickCount;
 }
 
 function phaseGrammar(phaseName) {
@@ -122,6 +138,8 @@ function ensureAtlasMarkup(container, documentRef) {
   const strip = documentRef.createElement('ul');
   strip.className = 'seed-atlas__strip';
   strip.setAttribute('role', 'list');
+  strip.setAttribute('aria-label', 'Seed atlas frame selector');
+  strip.setAttribute('data-role', 'atlas-strip');
 
   figure.append(leadImage, caption, literacy, strip);
   container.append(figure);
@@ -148,6 +166,7 @@ function buildStrip(stripNode, images, documentRef, assetVersion) {
     button.dataset.index = String(imageIndex);
     button.setAttribute('aria-label', `Focus seed frame ${imageIndex + 1}`);
     button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight Home End Enter Space');
 
     thumb.src = appendVersion(imagePath, assetVersion);
     thumb.alt = `${humanLabelFromImagePath(imagePath)} thumbnail`;
@@ -170,6 +189,11 @@ function applyActiveThumbs(thumbButtons, activeIndex) {
     const isActive = index === activeIndex;
     button.setAttribute('data-active', isActive ? 'true' : 'false');
     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    if (isActive) {
+      button.setAttribute('aria-current', 'true');
+    } else {
+      button.removeAttribute('aria-current');
+    }
   });
 }
 
@@ -196,6 +220,45 @@ export function installEnhancement({ app, route, document: documentRef, entry, m
   const { leadImage, caption, strip, literacyBody } = ensureAtlasMarkup(container, documentRef);
   const stripButtons = buildStrip(strip, images, documentRef, entry.assetVersion);
   let lastState = app.store.getState();
+  let lastActiveIndex = -1;
+  let lastLeadImageSrc = '';
+
+  const applySpaceMetrics = (metrics) => {
+    container.dataset.inlineBand = metrics.inlineBand;
+    container.dataset.blockBand = metrics.blockBand;
+    container.dataset.areaBand = metrics.areaBand;
+    container.style.setProperty('--atlas-inline-size', `${metrics.width}px`);
+    container.style.setProperty('--atlas-block-size', `${metrics.height}px`);
+
+    const columns = Math.max(3, Math.min(10, Math.round(metrics.width / 120)));
+    container.style.setProperty('--atlas-strip-columns', String(columns));
+  };
+
+  const cleanupSpaceSampler = installSporadicSpaceSampler({
+    node: container,
+    intervalMs: 2800,
+    minDelta: 12,
+    onSample: (metrics) => {
+      applySpaceMetrics(metrics);
+    }
+  });
+
+  const setFrameIndex = (requestedIndex, sourceLabel) => {
+    if (!Number.isFinite(requestedIndex) || requestedIndex < 0 || requestedIndex >= images.length) {
+      return;
+    }
+
+    const currentState = app.store.getState();
+    const nextClickCount = clickCountForIndex(images, currentState.clickCount, requestedIndex);
+    if (nextClickCount === currentState.clickCount) {
+      return;
+    }
+
+    app.store.update((draft) => {
+      draft.clickCount = clickCountForIndex(images, draft.clickCount, requestedIndex);
+      draft.lastClickSource = sourceLabel;
+    }, 'seed:thumb:select');
+  };
 
   const applyState = (state) => {
     const activeIndex = resolveIndex(images, state.clickCount);
@@ -209,14 +272,21 @@ export function installEnhancement({ app, route, document: documentRef, entry, m
     container.style.setProperty('--atlas-lumen-power', lighting.power);
     container.style.setProperty('--atlas-tilt', lighting.tilt);
 
-    leadImage.src = appendVersion(activeImage, entry.assetVersion);
+    const nextImageSrc = appendVersion(activeImage, entry.assetVersion);
+    if (lastLeadImageSrc !== nextImageSrc) {
+      leadImage.src = nextImageSrc;
+      lastLeadImageSrc = nextImageSrc;
+    }
     leadImage.alt = `${label} seed image`;
     caption.textContent = seedCaption(label, state.phase, state.clickCount);
     if (literacyBody) {
       literacyBody.textContent = literacyPrompt(label, state.phase, state.clickCount);
     }
 
-    applyActiveThumbs(stripButtons, activeIndex);
+    if (lastActiveIndex !== activeIndex) {
+      applyActiveThumbs(stripButtons, activeIndex);
+      lastActiveIndex = activeIndex;
+    }
     lastState = state;
   };
 
@@ -236,20 +306,49 @@ export function installEnhancement({ app, route, document: documentRef, entry, m
       return;
     }
 
-    const currentIndex = resolveIndex(images, lastState.clickCount);
-    const delta = (requestedIndex - currentIndex + images.length) % images.length;
+    setFrameIndex(requestedIndex, 'seed-atlas-thumb');
+  };
 
-    if (delta === 0) {
+  const onStripKeydown = (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) {
       return;
     }
 
-    app.store.update((draft) => {
-      draft.clickCount += delta;
-      draft.lastClickSource = 'seed-atlas-thumb';
-    }, 'seed:thumb:select');
+    const button = target.closest('.seed-atlas__thumb-button');
+    if (!button) {
+      return;
+    }
+
+    const currentIndex = Number.parseInt(button.dataset.index ?? '', 10);
+    if (!Number.isFinite(currentIndex)) {
+      return;
+    }
+
+    let nextIndex = null;
+
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + images.length) % images.length;
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % images.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = images.length - 1;
+    }
+
+    if (nextIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    const nextButton = stripButtons[nextIndex];
+    nextButton?.focus();
+    setFrameIndex(nextIndex, 'seed-atlas-keyboard');
   };
 
   strip.addEventListener('click', onStripClick);
+  strip.addEventListener('keydown', onStripKeydown);
 
   applyState(lastState);
   const unsubscribe = app.store.subscribe((nextState) => {
@@ -266,6 +365,8 @@ export function installEnhancement({ app, route, document: documentRef, entry, m
 
   return () => {
     strip.removeEventListener('click', onStripClick);
+    strip.removeEventListener('keydown', onStripKeydown);
+    cleanupSpaceSampler();
     unsubscribe();
   };
 }

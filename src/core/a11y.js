@@ -26,7 +26,11 @@ export function installAccessibilityEnhancements(doc = globalThis.document) {
   body.dataset.inputModality = 'pointer';
 
   const onKeydown = (event) => {
-    if (event.key === 'Tab') {
+    if (event.metaKey || event.ctrlKey || event.altKey) {
+      return;
+    }
+
+    if (event.key.length === 1 || event.key.startsWith('Arrow') || event.key === 'Tab') {
       body.dataset.inputModality = 'keyboard';
     }
   };

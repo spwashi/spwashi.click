@@ -18,8 +18,11 @@
 
   spw-click-stage {
     --stage-accent: var(--color-accent);
+    --stage-row-gap: var(--spacing-4);
     display: grid;
-    gap: var(--spacing-4);
+    gap: var(--stage-row-gap);
+    container-type: inline-size;
+    container-name: click-stage;
     position: relative;
     overflow: clip;
     padding: var(--spacing-5);
@@ -87,6 +90,15 @@
     box-shadow:
       0 20px 60px rgba(0, 184, 217, 0.15),
       var(--shadow-soft);
+  }
+
+  spw-click-stage[data-inline-band='immersive'] {
+    --stage-row-gap: var(--spacing-5);
+  }
+
+  spw-click-stage[data-inline-band='compact'],
+  spw-click-stage[data-inline-band='nano'] {
+    --stage-row-gap: var(--spacing-3);
   }
 
   .click-stage__trigger,
@@ -300,9 +312,12 @@
     --atlas-lumen-angle: 118deg;
     --atlas-lumen-power: 0.42;
     --atlas-tilt: 0deg;
+    --atlas-strip-columns: 6;
     display: grid;
     gap: var(--spacing-3);
     position: relative;
+    container-type: inline-size;
+    container-name: seed-atlas;
     isolation: isolate;
     overflow: clip;
     border: 1px solid var(--color-border);
@@ -401,7 +416,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+    grid-template-columns: repeat(var(--atlas-strip-columns), minmax(0, 1fr));
     gap: var(--spacing-2);
   }
 
@@ -435,6 +450,11 @@
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 25%, transparent) inset;
   }
 
+  .seed-atlas__thumb-button:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
   .seed-atlas__thumb {
     display: block;
     width: 100%;
@@ -453,9 +473,12 @@
   spw-syntax-lab {
     --syntax-accent: color-mix(in srgb, var(--color-accent) 72%, var(--color-brass));
     --syntax-grid-min: minmax(0, 1fr);
+    --syntax-control-columns: 3;
     --facet-angle: 112deg;
     --facet-glow: 0.48;
     display: block;
+    container-type: inline-size;
+    container-name: syntax-lab;
   }
 
   .syntax-lab__panel {
@@ -537,7 +560,7 @@
 
   .syntax-lab__controls {
     display: grid;
-    grid-template-columns: repeat(3, var(--syntax-grid-min));
+    grid-template-columns: repeat(var(--syntax-control-columns), var(--syntax-grid-min));
     gap: var(--spacing-3);
   }
 
@@ -756,6 +779,75 @@
   .syntax-lab__nav-node[data-origin='true'] {
     border-style: dashed;
     opacity: 0.92;
+  }
+
+  spw-syntax-lab[data-inline-band='immersive'] {
+    --node-size: 5.8rem;
+  }
+
+  spw-syntax-lab[data-inline-band='compact'],
+  spw-syntax-lab[data-inline-band='nano'] {
+    --node-size: 4.6rem;
+  }
+
+  spw-syntax-lab[data-inline-band='compact'] .syntax-lab__radial,
+  spw-syntax-lab[data-inline-band='nano'] .syntax-lab__radial {
+    min-height: 13rem;
+  }
+
+  @container click-stage (min-width: 44rem) {
+    spw-click-stage {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .click-stage__trigger,
+    spw-click-stage [data-role='click-trigger'] {
+      grid-column: 1;
+      align-self: start;
+    }
+
+    .click-stage__status,
+    spw-click-stage [data-role='status'] {
+      grid-column: 2;
+      align-self: center;
+      min-height: 2.2rem;
+    }
+
+    .click-stage__score,
+    spw-click-stage [data-role='svg-score'],
+    spw-rhythm-grid,
+    spw-click-stage [data-layer='fragments'] {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @container seed-atlas (max-width: 44rem) {
+    .seed-atlas {
+      --atlas-strip-columns: 4;
+    }
+  }
+
+  @container seed-atlas (max-width: 30rem) {
+    .seed-atlas {
+      --atlas-strip-columns: 3;
+    }
+  }
+
+  @container syntax-lab (max-width: 62rem) {
+    .syntax-lab__controls {
+      grid-template-columns: repeat(2, var(--syntax-grid-min));
+    }
+  }
+
+  @container syntax-lab (max-width: 43rem) {
+    .syntax-lab__controls {
+      grid-template-columns: 1fr;
+    }
+
+    .syntax-lab__operator-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @supports not (left: calc(50% + 1px * cos(60deg))) {

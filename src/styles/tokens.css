@@ -38,6 +38,8 @@
     --ease-jazz: cubic-bezier(0.32, 0.94, 0.6, 1);
 
     --container-max: 72rem;
+    --container-chassis-max: 84rem;
+    --container-main-max: 96rem;
 
     --fx-motion-gain: 0.56;
     --fx-light-depth: 0.68;
