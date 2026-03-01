@@ -23,6 +23,12 @@
   isolation: "plugin gets scoped context; no implicit global writes"
 }
 
+^"workbench_mount"{
+  convention: "mount spw-workbench at .spw/_workbench for site-native references"
+  path: ".spw/_workbench"
+  bridge: "seed/extern/spw-workbench remains canonical git submodule source in this repo"
+}
+
 ^"parser_plugins"{
   path: "seed/site/enhancements/workbench-parser-adapter.js"
   contract: "must expose parseSpwForm|parseExpression|parse|parseWithLog"

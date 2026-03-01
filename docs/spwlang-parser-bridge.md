@@ -15,7 +15,7 @@ Both include host metadata (`hostId`, `hostVersion`) so multi-repo embeddings re
 
 ## Why This Exists
 
-- Keep UI language aligned with the `seed/extern/spw-workbench` north star.
+- Keep UI language aligned with the `.spw/_workbench` north star.
 - Ensure copy can be parsed, not only read.
 - Preserve deterministic behavior even when external parser artifacts are absent.
 

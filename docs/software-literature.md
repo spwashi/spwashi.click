@@ -11,7 +11,7 @@ This project treats source code as readable prose with executable invariants.
 5. `src/components/`
 6. `src/pages/`
 
-This order mirrors the workbench-style architecture discipline from `seed/extern/spw-workbench`: deterministic inner layers first, composition layers second, optional enhancement layers last.
+This order mirrors the workbench-style architecture discipline from `.spw/_workbench`: deterministic inner layers first, composition layers second, optional enhancement layers last.
 
 ## Module Contract
 

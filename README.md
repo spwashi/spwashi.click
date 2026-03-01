@@ -71,7 +71,7 @@ This keeps behavior contracts explicit without adding inline prose noise to runt
 - `docs/llm-crawler-contract.md`
 - `docs/embed-package.md`
 
-These docs intentionally mirror the layered, waypointed thinking found in `seed/extern/spw-workbench` while keeping this repository independently shippable.
+These docs intentionally mirror the layered, waypointed thinking found in `.spw/_workbench` while keeping this repository independently shippable.
 
 ## Crawler + Spw Index
 

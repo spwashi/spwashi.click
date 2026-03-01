@@ -22,7 +22,7 @@
   @tests: ~"../tests"
   @scripts: ~"../scripts"
 
-  @workbench: ~"../seed/extern/spw-workbench"
+  @workbench: ~"./_workbench"
 
   @runtime_module: ~"../src/runtime/index.js"
   @runtime_boot: ~"../src/core/runtime/js/boot.js"

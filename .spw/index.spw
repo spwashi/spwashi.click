@@ -56,7 +56,7 @@
   @tests: ~"../tests"
   @scripts: ~"../scripts"
   @seed: ~"../seed"
-  @workbench: ~"../seed/extern/spw-workbench"
+  @workbench: ~"./_workbench"
 
   @manifest: ~"../manifest.webmanifest"
   @service_worker: ~"../sw.js"

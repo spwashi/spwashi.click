@@ -17,5 +17,5 @@
 
 ^pattern[plugin-surface]{
   goal: "plugin registration and lifecycle discipline"
-  sources: [".spw/surfaces/plugin-protocol.spw", "seed/extern/spw-workbench/.spw/surfaces/plugin-protocol.spw"]
+  sources: [".spw/surfaces/plugin-protocol.spw", ".spw/_workbench/.spw/surfaces/plugin-protocol.spw"]
 }

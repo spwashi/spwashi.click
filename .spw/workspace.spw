@@ -43,8 +43,8 @@
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
 
-  @workbench: ~"../seed/extern/spw-workbench"
-  @workbench_plugin_protocol: ~"../seed/extern/spw-workbench/.spw/surfaces/plugin-protocol.spw"
+  @workbench: ~"./_workbench"
+  @workbench_plugin_protocol: ~"./_workbench/.spw/surfaces/plugin-protocol.spw"
 }
 
 ^"kernel"{

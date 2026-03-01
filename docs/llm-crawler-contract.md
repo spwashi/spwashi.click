@@ -42,27 +42,27 @@ Avoid speculative roadmap claims inside the crawler index; only include shipped 
 ## Tooling Care Map (Workbench References)
 
 ### LSP
-- `seed/extern/spw-workbench/scripts/lsp/stdio-server.ts`
-- `seed/extern/spw-workbench/scripts/lsp/server-index.ts`
-- `seed/extern/spw-workbench/scripts/lsp/smoke-navigation.ts`
-- `seed/extern/spw-workbench/docs/runtime/md/lsp-editor-integration.md`
+- `.spw/_workbench/scripts/lsp/stdio-server.ts`
+- `.spw/_workbench/scripts/lsp/server-index.ts`
+- `.spw/_workbench/scripts/lsp/smoke-navigation.ts`
+- `.spw/_workbench/docs/runtime/md/lsp-editor-integration.md`
 
 ### Neovim
-- `seed/extern/spw-workbench/extensions/neovim-spw/lua/spw-lsp.lua`
-- `seed/extern/spw-workbench/extensions/neovim-spw/README.md`
+- `.spw/_workbench/extensions/neovim-spw/lua/spw-lsp.lua`
+- `.spw/_workbench/extensions/neovim-spw/README.md`
 
 ### VS Code
-- `seed/extern/spw-workbench/extensions/vscode-spw/src/extension.ts`
-- `seed/extern/spw-workbench/extensions/vscode-spw/src/roots.ts`
-- `seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts`
+- `.spw/_workbench/extensions/vscode-spw/src/extension.ts`
+- `.spw/_workbench/extensions/vscode-spw/src/roots.ts`
+- `.spw/_workbench/extensions/vscode-spw/src/semantics.ts`
 
 ### IntelliJ
-- `seed/extern/spw-workbench/extensions/intellij-spw/src/main/kotlin/com/spwashi/spw/SpwLspServerSupportProvider.kt`
+- `.spw/_workbench/extensions/intellij-spw/src/main/kotlin/com/spwashi/spw/SpwLspServerSupportProvider.kt`
 
 ### History / Design Lineage
-- `seed/extern/spw-workbench/docs/design/md/history.md`
-- `seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md`
-- `seed/extern/spw-workbench/docs/audits/md/vim-keybindings-inconsistencies-audit.md`
+- `.spw/_workbench/docs/design/md/history.md`
+- `.spw/_workbench/docs/archive/status/md/vim-implementation-complete.md`
+- `.spw/_workbench/docs/audits/md/vim-keybindings-inconsistencies-audit.md`
 
 ## Runtime Access
 
