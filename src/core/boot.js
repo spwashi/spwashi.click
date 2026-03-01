@@ -260,7 +260,11 @@ async function bootstrap() {
 
   app.enhancementRuntime = { manifest: { profile: 'baseline', enhancements: [] }, cleanups: [] };
 
-  // Defer enhancement loading to not block initial rendering
+  // Defer enhancement loading to not block initial rendering.
+  // Using setTimeout with 0 delay allows the browser to complete the current event loop,
+  // render the page, and process user interactions before loading optional enhancements.
+  // This improves First Contentful Paint (FCP) and Time to Interactive (TTI).
+  // requestIdleCallback would be ideal but isn't supported in Safari as of 2026.
   setTimeout(() => {
     runIterativeEnhancements({
       app,
@@ -290,24 +294,26 @@ async function bootstrap() {
   });
 }
 
+/**
+ * Shows a user-visible error message when bootstrap fails.
+ */
+function showBootFailureMessage() {
+  const fallback = document.createElement('div');
+  fallback.style.cssText = 'padding: 2rem; max-width: 48rem; margin: 2rem auto; background: #fff3cd; border: 2px solid #856404; border-radius: 0.5rem; color: #856404;';
+  fallback.innerHTML = '<p style="margin: 0;"><strong>Site initialization failed.</strong> Please refresh the page. If the issue persists, try clearing your browser cache.</p>';
+  document.body.prepend(fallback);
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     bootstrap().catch((error) => {
       console.error('Boot failed', error);
-      // Provide user-visible fallback
-      const fallback = document.createElement('div');
-      fallback.style.cssText = 'padding: 2rem; max-width: 48rem; margin: 2rem auto; background: #fff3cd; border: 2px solid #856404; border-radius: 0.5rem; color: #856404;';
-      fallback.innerHTML = '<p style="margin: 0;"><strong>Site initialization failed.</strong> Please refresh the page. If the issue persists, try clearing your browser cache.</p>';
-      document.body.prepend(fallback);
+      showBootFailureMessage();
     });
   }, { once: true });
 } else {
   bootstrap().catch((error) => {
     console.error('Boot failed', error);
-    // Provide user-visible fallback
-    const fallback = document.createElement('div');
-    fallback.style.cssText = 'padding: 2rem; max-width: 48rem; margin: 2rem auto; background: #fff3cd; border: 2px solid #856404; border-radius: 0.5rem; color: #856404;';
-    fallback.innerHTML = '<p style="margin: 0;"><strong>Site initialization failed.</strong> Please refresh the page. If the issue persists, try clearing your browser cache.</p>';
-    document.body.prepend(fallback);
+    showBootFailureMessage();
   });
 }
