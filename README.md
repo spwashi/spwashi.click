@@ -27,6 +27,12 @@ npm install
 npm run check
 ```
 
+If this is a fresh clone, initialize submodules first:
+
+```bash
+git submodule update --init --recursive
+```
+
 ### Scripts
 
 - `npm run lint`: checks source modules for code-as-literature headers and named exports only.
