@@ -52,7 +52,7 @@
   ^invariants{
     ^invariant[order]{ version-compare deterministic }
     ^invariant[range]{ empty-bounds => pass-through }
-    ^invariant[contract]{ runtime+interface versions frozen }
+    ^invariant[contract]{ runtime+interface versions frozen runtime-api:1.3.0 registers:1.1.0 }
   }
 
   ^potential{

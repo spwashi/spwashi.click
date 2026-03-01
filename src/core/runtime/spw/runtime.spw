@@ -13,7 +13,7 @@
 
   ^prefix-utility{
     !:: role:create-runtime seeds:store+controllers+components
-    @:: role:bridge-store->events->datasets parser-bridge->event host-metadata+manifest
+    @:: role:bridge-store->events->datasets parser-bridge->event host-metadata+manifest+viewport
     ~:: role:cleanup-on-destroy listeners+timers+controllers
   }
 
@@ -56,6 +56,7 @@
     ^invariant[parser]{ parser-bridge status emits:spw:workbench:parser:state }
     ^invariant[host]{ app-ready+parser-state include:host-id+host-version }
     ^invariant[manifest]{ host-manifest required+missing => compatibility-guard }
+    ^invariant[viewport]{ viewport bridge writes mode+band+mobile datasets and emits:spw:viewport:changed }
   }
 
   ^potential{

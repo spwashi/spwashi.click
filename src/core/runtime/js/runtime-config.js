@@ -3,6 +3,10 @@ import { appendAssetVersion } from './release.js';
 const DEFAULT_EMBED_MODE = 'standalone';
 const KNOWN_EMBED_MODES = Object.freeze(['standalone', 'embedded', 'assets-only']);
 const DEFAULT_HOST_ID = 'spwashi.click';
+const DEFAULT_VIEWPORT_MODE = 'adaptive';
+const KNOWN_VIEWPORT_MODES = Object.freeze(['adaptive', 'fixed']);
+const DEFAULT_MOBILE_BREAKPOINT = 900;
+const DEFAULT_COMPACT_BREAKPOINT = 640;
 
 function parseBooleanToken(value, fallbackValue) {
   if (typeof value === 'boolean') {
@@ -53,6 +57,27 @@ function normalizeHostVersion(value) {
 function normalizePathToken(value) {
   const normalized = String(value ?? '').trim();
   return normalized.length > 0 ? normalized : '';
+}
+
+function normalizeViewportMode(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
+
+  if (KNOWN_VIEWPORT_MODES.includes(normalized)) {
+    return normalized;
+  }
+
+  return DEFAULT_VIEWPORT_MODE;
+}
+
+function normalizeBreakpoint(value, fallbackValue) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  if (!Number.isFinite(parsed) || parsed < 320 || parsed > 2400) {
+    return fallbackValue;
+  }
+
+  return parsed;
 }
 
 function hasScheme(value) {
@@ -110,6 +135,12 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     documentRef?.querySelector('meta[name="spw:host-manifest-required"]')?.getAttribute('content') ?? '';
   const metaHostEnhancementManifest =
     documentRef?.querySelector('meta[name="spw:host-enhancements-manifest"]')?.getAttribute('content') ?? '';
+  const metaViewportMode =
+    documentRef?.querySelector('meta[name="spw:viewport-mode"]')?.getAttribute('content') ?? '';
+  const metaMobileBreakpoint =
+    documentRef?.querySelector('meta[name="spw:mobile-breakpoint"]')?.getAttribute('content') ?? '';
+  const metaCompactBreakpoint =
+    documentRef?.querySelector('meta[name="spw:compact-breakpoint"]')?.getAttribute('content') ?? '';
 
   const embedMode = normalizeEmbedMode(
     overrides.embedMode ?? overrides.mode ?? metaEmbedMode ?? root?.dataset?.spwEmbedMode
@@ -145,6 +176,17 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
       root?.dataset?.spwHostEnhancementsManifest ??
       ''
   );
+  const viewportMode = normalizeViewportMode(
+    overrides.viewportMode ?? metaViewportMode ?? root?.dataset?.spwViewportMode
+  );
+  const mobileBreakpoint = normalizeBreakpoint(
+    overrides.mobileBreakpoint ?? metaMobileBreakpoint ?? root?.dataset?.spwMobileBreakpoint,
+    DEFAULT_MOBILE_BREAKPOINT
+  );
+  const compactBreakpoint = normalizeBreakpoint(
+    overrides.compactBreakpoint ?? metaCompactBreakpoint ?? root?.dataset?.spwCompactBreakpoint,
+    DEFAULT_COMPACT_BREAKPOINT
+  );
 
   return Object.freeze({
     embedMode,
@@ -157,7 +199,10 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     hostVersion,
     hostManifestPath,
     hostManifestRequired,
-    hostEnhancementManifestPath
+    hostEnhancementManifestPath,
+    viewportMode,
+    mobileBreakpoint,
+    compactBreakpoint
   });
 }
 

@@ -8,7 +8,9 @@ import {
   EVENT_HOST_MANIFEST_STATE,
   EVENT_HOST_THEME_CHANGED,
   EVENT_ENHANCEMENT_GATED,
+  EVENT_REGISTER_CHANGED,
   EVENT_RUNTIME_REBIND,
+  EVENT_VIEWPORT_CHANGED,
   EVENT_WORKBENCH_PARSER_STATE,
   KNOWN_EVENT_NAMES,
   createTypedEvent,
@@ -24,7 +26,9 @@ test('known event names include core contracts', () => {
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_HOST_MANIFEST_STATE));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_HOST_THEME_CHANGED));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_ENHANCEMENT_GATED));
+  assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_REGISTER_CHANGED));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_RUNTIME_REBIND));
+  assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_VIEWPORT_CHANGED));
   assert.ok(KNOWN_EVENT_NAMES.includes(EVENT_WORKBENCH_PARSER_STATE));
   assert.equal(isKnownEventName('spw:missing'), false);
   assert.equal(isKnownEventName(EVENT_INTENT_CLICK), true);

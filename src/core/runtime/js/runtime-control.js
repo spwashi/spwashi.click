@@ -1,7 +1,19 @@
 import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../../../content/feature-catalog.js';
-import { EVENT_RUNTIME_REBIND, dispatchTypedEvent } from './events.js';
+import {
+  EVENT_REGISTER_CHANGED,
+  EVENT_RUNTIME_REBIND,
+  EVENT_VIEWPORT_CHANGED,
+  dispatchTypedEvent
+} from './events.js';
 import { createRuntimeApiContract } from './runtime-contract.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
+
+const DEFAULT_FOCUS_REGISTER_KEY = '"';
+const DEFAULT_VIEWPORT_MODE = 'adaptive';
+const FALLBACK_MOBILE_BREAKPOINT = 900;
+const FALLBACK_COMPACT_BREAKPOINT = 640;
+const MAX_REGISTER_LIMINALITY = 3;
+const DEFAULT_REGISTER_MEASURE_SCALE = 10;
 
 function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -89,12 +101,647 @@ function resolveInterfaceList(payload = {}) {
   return [];
 }
 
+function cloneRuntimeValue(value) {
+  if (typeof structuredClone === 'function') {
+    try {
+      return structuredClone(value);
+    } catch {
+      // fall through to JSON clone fallback
+    }
+  }
+
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return value;
+  }
+}
+
+function normalizeRegisterKey(value, fallbackValue = DEFAULT_FOCUS_REGISTER_KEY) {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : fallbackValue;
+}
+
+function normalizeMarkName(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '');
+  return normalized;
+}
+
+function summarizeRegisterValue(value) {
+  if (isObject(value) && isObject(value.state)) {
+    return {
+      route: value.state.activeRoute ?? '',
+      phase: value.state.phase ?? '',
+      clickCount: value.state.clickCount ?? 0
+    };
+  }
+
+  if (isObject(value) && isObject(value.topLevel)) {
+    return {
+      route: value.topLevel.route ?? '',
+      clickCount: value.topLevel.clickCount ?? 0,
+      profile: value.topLevel.performanceProfile ?? ''
+    };
+  }
+
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    return `[array:${value.length}]`;
+  }
+
+  return '[object]';
+}
+
+function clampLiminality(value) {
+  const parsed = Number.parseInt(String(value ?? 0), 10);
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(MAX_REGISTER_LIMINALITY, parsed));
+}
+
+function normalizeMeasureDepth(value) {
+  const parsed = Number.parseInt(String(value ?? 0), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return 0;
+  }
+  return parsed;
+}
+
+function normalizeRegisterCouplings(value, selfKey = '') {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .map((entry) => String(entry ?? '').trim())
+        .filter((entry) => entry.length > 0 && entry !== selfKey)
+    )
+  ).sort();
+}
+
+function parseEpochMs(value) {
+  const parsed = Date.parse(String(value ?? ''));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function computeRegisterFrequency(entry, nowMs = Date.now()) {
+  const writeCount = Number.parseInt(String(entry.writeCount ?? 0), 10);
+  if (!Number.isFinite(writeCount) || writeCount <= 0) {
+    return 0;
+  }
+
+  const firstWriteAtMs = parseEpochMs(entry.firstWriteAt ?? entry.updatedAt);
+  if (firstWriteAtMs === null) {
+    return writeCount;
+  }
+
+  const elapsedSeconds = Math.max((nowMs - firstWriteAtMs) / 1000, 1);
+  return Number((writeCount / elapsedSeconds).toFixed(3));
+}
+
+function summarizeRegisterAcoustics(entry, registerCount, nowMs = Date.now()) {
+  const coupledCount = Array.isArray(entry.coupledKeys) ? entry.coupledKeys.length : 0;
+  const denominator = Math.max(registerCount - 1, 1);
+
+  return {
+    liminality: clampLiminality(entry.liminality),
+    frequency: computeRegisterFrequency(entry, nowMs),
+    coupling: Number((coupledCount / denominator).toFixed(3)),
+    measureDepth: normalizeMeasureDepth(entry.measureDepth)
+  };
+}
+
 export function installRuntimeControl({ app, document, window, rebindPage }) {
   if (!app || !document || !window) {
     return () => {};
   }
 
   const root = document.documentElement;
+  const registerEntries = new Map();
+  const registerMarks = new Map();
+  let registerFocusKey = normalizeRegisterKey(
+    app.runtimeConfig?.registerFocusKey,
+    DEFAULT_FOCUS_REGISTER_KEY
+  );
+
+  function resolveViewportFromPayload(payload = {}) {
+    const modeToken =
+      typeof payload === 'string'
+        ? payload
+        : String(payload.mode ?? root.dataset.spwViewportMode ?? app.viewport?.mode ?? DEFAULT_VIEWPORT_MODE);
+    const normalizedMode = modeToken === 'fixed' ? 'fixed' : DEFAULT_VIEWPORT_MODE;
+    const mobileBreakpoint = Number.isFinite(Number(app.runtimeConfig?.mobileBreakpoint))
+      ? Number(app.runtimeConfig.mobileBreakpoint)
+      : FALLBACK_MOBILE_BREAKPOINT;
+    const compactBreakpoint = Number.isFinite(Number(app.runtimeConfig?.compactBreakpoint))
+      ? Number(app.runtimeConfig.compactBreakpoint)
+      : FALLBACK_COMPACT_BREAKPOINT;
+
+    const viewportWidth = Number.isFinite(Number(payload.width))
+      ? Number(payload.width)
+      : Number(window.innerWidth ?? 0);
+    const viewportHeight = Number.isFinite(Number(payload.height))
+      ? Number(payload.height)
+      : Number(window.innerHeight ?? 0);
+
+    const explicitBand = String(payload.band ?? '').trim();
+    const derivedBand =
+      viewportWidth <= compactBreakpoint
+        ? 'nano'
+        : viewportWidth <= mobileBreakpoint
+          ? 'compact'
+          : 'immersive';
+    const band = explicitBand || derivedBand;
+
+    const mobile =
+      typeof payload.mobile === 'boolean'
+        ? payload.mobile
+        : band === 'nano' || band === 'compact';
+
+    return {
+      mode: normalizedMode,
+      band,
+      mobile,
+      width: Math.round(viewportWidth),
+      height: Math.round(viewportHeight),
+      mobileBreakpoint,
+      compactBreakpoint
+    };
+  }
+
+  function setViewportMode(payload = {}) {
+    const viewport = resolveViewportFromPayload(payload);
+    root.dataset.spwViewportMode = viewport.mode;
+    root.dataset.spwViewportBand = viewport.band;
+    root.dataset.spwMobile = viewport.mobile ? 'true' : 'false';
+    root.dataset.spwMobileBreakpoint = String(viewport.mobileBreakpoint);
+    root.dataset.spwCompactBreakpoint = String(viewport.compactBreakpoint);
+    if (viewport.height > 0) {
+      root.style.setProperty('--spw-vh', `${(viewport.height * 0.01).toFixed(4)}px`);
+    }
+
+    app.viewport = Object.freeze(viewport);
+    dispatchTypedEvent(window, EVENT_VIEWPORT_CHANGED, {
+      ...viewport,
+      reason: String(payload.reason ?? 'runtime-control')
+    });
+
+    return {
+      viewport,
+      snapshot: getSnapshot()
+    };
+  }
+
+  function ensureRegisterEntry(key) {
+    const normalizedKey = normalizeRegisterKey(key, registerFocusKey);
+    const nowIso = new Date().toISOString();
+    const existing = registerEntries.get(normalizedKey);
+    if (!existing) {
+      registerEntries.set(normalizedKey, {
+        value: null,
+        source: 'init',
+        updatedAt: nowIso,
+        firstWriteAt: nowIso,
+        writeCount: 0,
+        liminality: 0,
+        measureDepth: 0,
+        coupledKeys: []
+      });
+      return normalizedKey;
+    }
+
+    registerEntries.set(normalizedKey, {
+      value: existing.value ?? null,
+      source: typeof existing.source === 'string' ? existing.source : 'init',
+      updatedAt: typeof existing.updatedAt === 'string' ? existing.updatedAt : nowIso,
+      firstWriteAt:
+        typeof existing.firstWriteAt === 'string'
+          ? existing.firstWriteAt
+          : typeof existing.updatedAt === 'string'
+            ? existing.updatedAt
+            : nowIso,
+      writeCount: normalizeMeasureDepth(existing.writeCount),
+      liminality: clampLiminality(existing.liminality),
+      measureDepth: normalizeMeasureDepth(existing.measureDepth),
+      coupledKeys: normalizeRegisterCouplings(existing.coupledKeys, normalizedKey)
+    });
+
+    return normalizedKey;
+  }
+
+  function getRegisterEntry(key) {
+    const normalizedKey = ensureRegisterEntry(key);
+    return {
+      key: normalizedKey,
+      ...registerEntries.get(normalizedKey)
+    };
+  }
+
+  function updateRegisterEntry(key, updater) {
+    const current = getRegisterEntry(key);
+    const nextEntry = updater(current) ?? current;
+    registerEntries.set(current.key, {
+      value: nextEntry.value ?? null,
+      source: typeof nextEntry.source === 'string' ? nextEntry.source : current.source,
+      updatedAt:
+        typeof nextEntry.updatedAt === 'string' ? nextEntry.updatedAt : new Date().toISOString(),
+      firstWriteAt:
+        typeof nextEntry.firstWriteAt === 'string' ? nextEntry.firstWriteAt : current.firstWriteAt,
+      writeCount: normalizeMeasureDepth(nextEntry.writeCount),
+      liminality: clampLiminality(nextEntry.liminality),
+      measureDepth: normalizeMeasureDepth(nextEntry.measureDepth),
+      coupledKeys: normalizeRegisterCouplings(nextEntry.coupledKeys, current.key)
+    });
+
+    return registerEntries.get(current.key);
+  }
+
+  function registerAcousticsFromKey(key, nowMs = Date.now()) {
+    const entry = getRegisterEntry(key);
+    return summarizeRegisterAcoustics(entry, registerEntries.size, nowMs);
+  }
+
+  function listRegisters({ includeValues = false } = {}) {
+    const nowMs = Date.now();
+    const entries = Array.from(registerEntries.keys()).map((key) => {
+      const entry = getRegisterEntry(key);
+      const acoustics = summarizeRegisterAcoustics(entry, registerEntries.size, nowMs);
+
+      return {
+        key,
+        source: entry.source,
+        updatedAt: entry.updatedAt,
+        firstWriteAt: entry.firstWriteAt,
+        writeCount: entry.writeCount,
+        summary: summarizeRegisterValue(entry.value),
+        liminality: acoustics.liminality,
+        measureDepth: acoustics.measureDepth,
+        frequency: acoustics.frequency,
+        coupling: acoustics.coupling,
+        coupledKeys: [...entry.coupledKeys],
+        ...(includeValues ? { value: cloneRuntimeValue(entry.value) } : {})
+      };
+    });
+
+    return {
+      focusKey: registerFocusKey,
+      registerCount: entries.length,
+      entries,
+      marks: Object.fromEntries(registerMarks.entries())
+    };
+  }
+
+  function emitRegisterEvent(action, payload = {}) {
+    dispatchTypedEvent(window, EVENT_REGISTER_CHANGED, {
+      action,
+      focusKey: registerFocusKey,
+      ...payload
+    });
+  }
+
+  function focusRegister(payload = {}) {
+    const key = normalizeRegisterKey(
+      typeof payload === 'string' ? payload : payload.key,
+      registerFocusKey
+    );
+    registerFocusKey = ensureRegisterEntry(key);
+    emitRegisterEvent('focus', { key: registerFocusKey });
+    return listRegisters();
+  }
+
+  function setRegister(payload = {}) {
+    const sourcePayload = isObject(payload) ? payload : {};
+    const key = ensureRegisterEntry(
+      normalizeRegisterKey(
+        typeof payload === 'string' ? payload : sourcePayload.key,
+        registerFocusKey
+      )
+    );
+    const source = String(sourcePayload.source ?? 'set');
+    const value = sourcePayload.value === undefined ? getSnapshot() : sourcePayload.value;
+    const nowIso = new Date().toISOString();
+    const entry = updateRegisterEntry(key, (current) => ({
+      ...current,
+      value: cloneRuntimeValue(value),
+      source,
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1
+    }));
+    registerFocusKey = key;
+
+    emitRegisterEvent('set', {
+      key,
+      source,
+      summary: summarizeRegisterValue(value),
+      liminality: entry.liminality,
+      measureDepth: entry.measureDepth
+    });
+
+    return {
+      key,
+      value: cloneRuntimeValue(value),
+      registers: listRegisters()
+    };
+  }
+
+  function extractRegister(payload = {}) {
+    const sourcePayload = isObject(payload) ? payload : {};
+    return setRegister({
+      ...sourcePayload,
+      value: getSnapshot(),
+      source: sourcePayload.source ?? 'extract'
+    });
+  }
+
+  function getRegister(payload = {}) {
+    const key = normalizeRegisterKey(
+      typeof payload === 'string' ? payload : payload.key,
+      registerFocusKey
+    );
+    if (!registerEntries.has(key)) {
+      return { ok: false, reason: 'register-missing', key, registers: listRegisters() };
+    }
+    const entry = getRegisterEntry(key);
+    if (!entry) {
+      return { ok: false, reason: 'register-missing', key, registers: listRegisters() };
+    }
+    const acoustics = registerAcousticsFromKey(key);
+
+    return {
+      ok: true,
+      key,
+      value: cloneRuntimeValue(entry.value),
+      source: entry.source,
+      updatedAt: entry.updatedAt,
+      firstWriteAt: entry.firstWriteAt,
+      writeCount: entry.writeCount,
+      liminality: entry.liminality,
+      measureDepth: entry.measureDepth,
+      coupledKeys: [...entry.coupledKeys],
+      acoustics
+    };
+  }
+
+  function depositRegister(payload = {}) {
+    const key = normalizeRegisterKey(
+      typeof payload === 'string' ? payload : payload.key,
+      registerFocusKey
+    );
+    const entry = registerEntries.get(key);
+    if (!entry) {
+      return { ok: false, reason: 'register-missing', key, snapshot: getSnapshot() };
+    }
+
+    const value = cloneRuntimeValue(entry.value);
+    let applied = false;
+
+    if (isObject(value)) {
+      const topLevel = isObject(value.topLevel)
+        ? value.topLevel
+        : isObject(value.state)
+          ? {
+              route: value.state.activeRoute,
+              clickCount: value.state.clickCount,
+              reducedMotion: value.state.reducedMotion,
+              performanceProfile: value.performanceProfile,
+              llmReadableStructure: value.llmReadableStructure
+            }
+          : value;
+
+      const hasTopLevel =
+        topLevel.route !== undefined ||
+        topLevel.clickCount !== undefined ||
+        topLevel.reducedMotion !== undefined ||
+        topLevel.performanceProfile !== undefined ||
+        topLevel.llmReadableStructure !== undefined;
+
+      if (hasTopLevel) {
+        setTopLevel(topLevel);
+        applied = true;
+      }
+
+      if (isObject(value.windowVars) && Object.keys(value.windowVars).length > 0) {
+        setWindowVars(value.windowVars);
+        applied = true;
+      }
+    }
+
+    registerFocusKey = key;
+    emitRegisterEvent('deposit', {
+      key,
+      applied
+    });
+
+    return {
+      ok: true,
+      key,
+      applied,
+      snapshot: getSnapshot()
+    };
+  }
+
+  function markRegister(payload = {}) {
+    const markName = normalizeMarkName(payload.name ?? payload.mark);
+    if (!markName) {
+      return { ok: false, reason: 'mark-name-required', registers: listRegisters() };
+    }
+
+    const key = ensureRegisterEntry(
+      normalizeRegisterKey(payload.key ?? payload.register, registerFocusKey)
+    );
+    registerMarks.set(markName, key);
+
+    emitRegisterEvent('mark', {
+      mark: markName,
+      key
+    });
+
+    return {
+      ok: true,
+      mark: markName,
+      key,
+      registers: listRegisters()
+    };
+  }
+
+  function getMark(payload = {}) {
+    const markName = normalizeMarkName(payload.name ?? payload.mark);
+    const key = registerMarks.get(markName);
+    if (!markName || !key) {
+      return { ok: false, reason: 'mark-missing', mark: markName };
+    }
+
+    return {
+      ok: true,
+      mark: markName,
+      key,
+      register: getRegister({ key })
+    };
+  }
+
+  function promoteRegister(payload = {}) {
+    const key = ensureRegisterEntry(
+      normalizeRegisterKey(
+        typeof payload === 'string' ? payload : payload.key ?? payload.register,
+        registerFocusKey
+      )
+    );
+    const nowIso = new Date().toISOString();
+    const nextEntry = updateRegisterEntry(key, (current) => ({
+      ...current,
+      source: 'promote',
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1,
+      liminality: clampLiminality(current.liminality + 1)
+    }));
+    registerFocusKey = key;
+
+    emitRegisterEvent('promote', {
+      key,
+      liminality: nextEntry.liminality
+    });
+
+    return {
+      ok: true,
+      key,
+      liminality: nextEntry.liminality,
+      register: getRegister({ key }),
+      registers: listRegisters()
+    };
+  }
+
+  function demoteRegister(payload = {}) {
+    const key = ensureRegisterEntry(
+      normalizeRegisterKey(
+        typeof payload === 'string' ? payload : payload.key ?? payload.register,
+        registerFocusKey
+      )
+    );
+    const nowIso = new Date().toISOString();
+    const nextEntry = updateRegisterEntry(key, (current) => ({
+      ...current,
+      source: 'demote',
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1,
+      liminality: clampLiminality(current.liminality - 1)
+    }));
+    registerFocusKey = key;
+
+    emitRegisterEvent('demote', {
+      key,
+      liminality: nextEntry.liminality
+    });
+
+    return {
+      ok: true,
+      key,
+      liminality: nextEntry.liminality,
+      register: getRegister({ key }),
+      registers: listRegisters()
+    };
+  }
+
+  function coupleRegisters(payload = {}) {
+    const sourcePayload = isObject(payload) ? payload : {};
+    const keyA = ensureRegisterEntry(
+      normalizeRegisterKey(sourcePayload.key ?? sourcePayload.a ?? sourcePayload.left, registerFocusKey)
+    );
+    const candidateB = sourcePayload.with ?? sourcePayload.to ?? sourcePayload.b ?? sourcePayload.right;
+    const keyB = normalizeRegisterKey(candidateB, '');
+    if (!keyB) {
+      return { ok: false, reason: 'couple-target-required', key: keyA, registers: listRegisters() };
+    }
+    if (keyA === keyB) {
+      return { ok: false, reason: 'couple-target-must-differ', key: keyA, registers: listRegisters() };
+    }
+
+    const normalizedKeyB = ensureRegisterEntry(keyB);
+    const nowIso = new Date().toISOString();
+
+    updateRegisterEntry(keyA, (current) => ({
+      ...current,
+      source: 'couple',
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1,
+      coupledKeys: normalizeRegisterCouplings([...current.coupledKeys, normalizedKeyB], keyA)
+    }));
+    updateRegisterEntry(normalizedKeyB, (current) => ({
+      ...current,
+      source: 'couple',
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1,
+      coupledKeys: normalizeRegisterCouplings([...current.coupledKeys, keyA], normalizedKeyB)
+    }));
+    registerFocusKey = keyA;
+
+    emitRegisterEvent('couple', {
+      key: keyA,
+      with: normalizedKeyB
+    });
+
+    return {
+      ok: true,
+      key: keyA,
+      with: normalizedKeyB,
+      registers: listRegisters()
+    };
+  }
+
+  function measureRegister(payload = {}) {
+    const sourcePayload = isObject(payload) ? payload : {};
+    const key = ensureRegisterEntry(
+      normalizeRegisterKey(
+        typeof payload === 'string' ? payload : sourcePayload.key ?? sourcePayload.register,
+        registerFocusKey
+      )
+    );
+
+    const scaleInput = Number(sourcePayload.scale ?? sourcePayload.max ?? DEFAULT_REGISTER_MEASURE_SCALE);
+    const scale = Number.isFinite(scaleInput) && scaleInput > 0 ? scaleInput : DEFAULT_REGISTER_MEASURE_SCALE;
+    const nowIso = new Date().toISOString();
+    const nextEntry = updateRegisterEntry(key, (current) => ({
+      ...current,
+      source: 'measure',
+      updatedAt: nowIso,
+      writeCount: current.writeCount + 1,
+      measureDepth: normalizeMeasureDepth(current.measureDepth + 1)
+    }));
+    const acoustics = registerAcousticsFromKey(key);
+    const value = Number((Math.min(nextEntry.measureDepth / scale, 1)).toFixed(3));
+    registerFocusKey = key;
+
+    emitRegisterEvent('measure', {
+      key,
+      value,
+      scale,
+      measureDepth: nextEntry.measureDepth
+    });
+
+    return {
+      ok: true,
+      key,
+      value,
+      scale,
+      measureDepth: nextEntry.measureDepth,
+      liminality: nextEntry.liminality,
+      frequency: acoustics.frequency,
+      coupling: acoustics.coupling,
+      register: getRegister({ key })
+    };
+  }
 
   function getParserBridgeStatus() {
     const parserBridge = isObject(app.parserBridge) ? app.parserBridge : {};
@@ -130,7 +777,10 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
         hostId: app.runtimeConfig?.hostId ?? 'spwashi.click',
         hostVersion: app.runtimeConfig?.hostVersion ?? '',
         hostManifestPath: app.runtimeConfig?.hostManifestPath ?? '',
-        hostManifestRequired: Boolean(app.runtimeConfig?.hostManifestRequired)
+        hostManifestRequired: Boolean(app.runtimeConfig?.hostManifestRequired),
+        viewportMode: root.dataset.spwViewportMode ?? app.runtimeConfig?.viewportMode ?? DEFAULT_VIEWPORT_MODE,
+        viewportBand: root.dataset.spwViewportBand ?? app.viewport?.band ?? 'immersive',
+        mobile: (root.dataset.spwMobile ?? 'false') === 'true'
       },
       hostManifest: hostManifest
         ? {
@@ -156,7 +806,8 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
         profile: app.enhancementRuntime?.manifest?.profile ?? 'baseline',
         loadedCount: app.enhancementRuntime?.loadedEnhancements?.length ?? 0,
         gatedCount: app.enhancementRuntime?.gatedEnhancements?.length ?? 0
-      }
+      },
+      registers: listRegisters()
     };
   }
 
@@ -179,8 +830,29 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       parserBridge: getParserBridgeStatus(),
       hostManifestReason: app.hostManifest?.reason ?? 'none',
       hostCompatibility: app.hostCompatibility?.compatible === true ? 'compatible' : 'incompatible',
-      hostThemeRuleCount: app.hostThemeController?.getState?.()?.activeRuleIds?.length ?? 0
+      hostThemeRuleCount: app.hostThemeController?.getState?.()?.activeRuleIds?.length ?? 0,
+      viewportMode: root.dataset.spwViewportMode ?? app.runtimeConfig?.viewportMode ?? DEFAULT_VIEWPORT_MODE,
+      viewportBand: root.dataset.spwViewportBand ?? app.viewport?.band ?? 'immersive',
+      mobile: (root.dataset.spwMobile ?? 'false') === 'true',
+      registerFocusKey,
+      registerCount: registerEntries.size
     };
+  }
+
+  const bootstrapTimestamp = new Date().toISOString();
+  registerEntries.set(registerFocusKey, {
+    value: cloneRuntimeValue(getSnapshot()),
+    source: 'bootstrap',
+    updatedAt: bootstrapTimestamp,
+    firstWriteAt: bootstrapTimestamp,
+    writeCount: 1,
+    liminality: 0,
+    measureDepth: 0,
+    coupledKeys: []
+  });
+
+  if (!root.dataset.spwViewportMode || !root.dataset.spwViewportBand) {
+    setViewportMode({ reason: 'runtime-control:init' });
   }
 
   function getCatalog(options = {}) {
@@ -410,6 +1082,20 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       catalog: Object.freeze(['getCatalog']),
       integration: Object.freeze(['getIntegrationStatus', 'getApiContract', 'listInterfaces', 'composeInterface']),
       ecology: Object.freeze(['getEcologySnapshot', 'registerEcologySpecies', 'noteEcologyLifecycle']),
+      registers: Object.freeze([
+        'listRegisters',
+        'focusRegister',
+        'setRegister',
+        'getRegister',
+        'extractRegister',
+        'depositRegister',
+        'markRegister',
+        'getMark',
+        'promoteRegister',
+        'demoteRegister',
+        'coupleRegisters',
+        'measureRegister'
+      ]),
       theming: Object.freeze(['getHostThemeState']),
       host: Object.freeze(['getIntegrationStatus', 'getHostThemeState', 'getHostManifest'])
     };
@@ -435,7 +1121,7 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
   }
 
   const runtimeApi = {
-    version: app.apiContract?.runtimeApiVersion ?? '1.1.0',
+    version: app.apiContract?.runtimeApiVersion ?? '1.3.0',
     getSnapshot,
     getCatalog,
     getIntegrationStatus,
@@ -445,6 +1131,19 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     getEcologySnapshot,
     registerEcologySpecies,
     noteEcologyLifecycle,
+    listRegisters,
+    focusRegister,
+    setRegister,
+    getRegister,
+    extractRegister,
+    depositRegister,
+    markRegister,
+    getMark,
+    promoteRegister,
+    demoteRegister,
+    coupleRegisters,
+    measureRegister,
+    setViewportMode,
     getHostThemeState,
     getHostManifest,
     setTopLevel,
@@ -514,6 +1213,58 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
 
       if (method === 'lifecycle' || method === 'noteEcologyLifecycle') {
         return noteEcologyLifecycle(payload);
+      }
+
+      if (method === 'registers' || method === 'listRegisters') {
+        return listRegisters(payload);
+      }
+
+      if (method === 'focus' || method === 'focusRegister') {
+        return focusRegister(payload);
+      }
+
+      if (method === 'register' || method === 'setRegister') {
+        return setRegister(payload);
+      }
+
+      if (method === 'getRegister') {
+        return getRegister(payload);
+      }
+
+      if (method === 'extract' || method === 'extractRegister') {
+        return extractRegister(payload);
+      }
+
+      if (method === 'deposit' || method === 'depositRegister') {
+        return depositRegister(payload);
+      }
+
+      if (method === 'mark' || method === 'markRegister') {
+        return markRegister(payload);
+      }
+
+      if (method === 'getMark') {
+        return getMark(payload);
+      }
+
+      if (method === 'promote' || method === 'promoteRegister') {
+        return promoteRegister(payload);
+      }
+
+      if (method === 'demote' || method === 'demoteRegister') {
+        return demoteRegister(payload);
+      }
+
+      if (method === 'couple' || method === 'coupleRegisters') {
+        return coupleRegisters(payload);
+      }
+
+      if (method === 'measure' || method === 'measureRegister') {
+        return measureRegister(payload);
+      }
+
+      if (method === 'viewport' || method === 'setViewportMode') {
+        return setViewportMode(payload);
       }
 
       if (method === 'theme' || method === 'getHostThemeState') {

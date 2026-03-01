@@ -23,6 +23,20 @@ const SYMBOL_METHOD = Object.freeze({
   ecology: 'getEcologySnapshot',
   species: 'registerEcologySpecies',
   lifecycle: 'noteEcologyLifecycle',
+  registers: 'listRegisters',
+  register: 'setRegister',
+  focus: 'focusRegister',
+  extract: 'extractRegister',
+  deposit: 'depositRegister',
+  mark: 'markRegister',
+  markget: 'getMark',
+  getregister: 'getRegister',
+  promote: 'promoteRegister',
+  demote: 'demoteRegister',
+  couple: 'coupleRegisters',
+  measure: 'measureRegister',
+  viewport: 'setViewportMode',
+  mobile: 'setViewportMode',
   theme: 'getHostThemeState',
   manifest: 'getHostManifest'
 });
@@ -348,6 +362,99 @@ function mapComposePayload(selectorHint, pairs) {
   };
 }
 
+function mapRegisterPayload(selectorHint, pairs) {
+  const key = String(pairs.key ?? pairs.register ?? selectorHint ?? '').trim();
+  const source = String(pairs.source ?? '').trim();
+  const topLevel = mapTopLevelConfig(pairs);
+  const payload = {};
+
+  if (key) {
+    payload.key = key;
+  }
+
+  if (source) {
+    payload.source = source;
+  }
+
+  if (Object.keys(topLevel).length > 0) {
+    payload.value = { topLevel };
+  } else if (pairs.value !== undefined) {
+    payload.value = pairs.value;
+  } else if (pairs.text !== undefined) {
+    payload.value = String(pairs.text);
+  }
+
+  return payload;
+}
+
+function mapRegisterKeyPayload(selectorHint, pairs) {
+  const key = String(pairs.key ?? pairs.register ?? selectorHint ?? '').trim();
+  return key ? { key } : {};
+}
+
+function mapMarkPayload(selectorHint, pairs) {
+  const payload = {
+    name: String(pairs.name ?? pairs.mark ?? selectorHint ?? '').trim()
+  };
+  const key = String(pairs.key ?? pairs.register ?? '').trim();
+  if (key) {
+    payload.key = key;
+  }
+  return payload;
+}
+
+function mapCouplePayload(selectorHint, pairs) {
+  const fromKey = String(pairs.key ?? pairs.a ?? pairs.left ?? selectorHint ?? '').trim();
+  const withKey = String(pairs.with ?? pairs.to ?? pairs.b ?? pairs.right ?? '').trim();
+  const payload = {};
+  if (fromKey) {
+    payload.key = fromKey;
+  }
+  if (withKey) {
+    payload.with = withKey;
+  }
+  return payload;
+}
+
+function mapMeasurePayload(selectorHint, pairs) {
+  const key = String(pairs.key ?? pairs.register ?? selectorHint ?? '').trim();
+  const payload = {};
+  if (key) {
+    payload.key = key;
+  }
+  if (pairs.scale !== undefined) {
+    payload.scale = pairs.scale;
+  } else if (pairs.max !== undefined) {
+    payload.scale = pairs.max;
+  }
+  return payload;
+}
+
+function mapViewportPayload(selectorHint, pairs) {
+  const payload = {};
+  const mode = String(pairs.mode ?? selectorHint ?? '').trim();
+  if (mode) {
+    payload.mode = mode;
+  }
+  if (pairs.band !== undefined) {
+    payload.band = String(pairs.band).trim();
+  }
+  if (pairs.mobile !== undefined) {
+    payload.mobile = Boolean(pairs.mobile);
+  }
+  if (pairs.width !== undefined) {
+    payload.width = pairs.width;
+  }
+  if (pairs.height !== undefined) {
+    payload.height = pairs.height;
+  }
+  if (pairs.reason !== undefined) {
+    payload.reason = String(pairs.reason);
+  }
+
+  return payload;
+}
+
 function parseCommandExpression(expression) {
   const source = String(expression ?? '').trim();
   if (source.length === 0) {
@@ -478,6 +585,78 @@ function parseCommandExpression(expression) {
       command: symbol,
       method,
       payload: mapComposePayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'setRegister') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapRegisterPayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'focusRegister' || method === 'extractRegister' || method === 'depositRegister' || method === 'getRegister' || method === 'promoteRegister' || method === 'demoteRegister') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapRegisterKeyPayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'markRegister' || method === 'getMark') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapMarkPayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'coupleRegisters') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapCouplePayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'measureRegister') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapMeasurePayload(selector, pairs),
+      parsed
+    };
+  }
+
+  if (method === 'listRegisters') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: {
+        includeValues: pairs.includeValues === true || pairs.values === true || pairs.full === true
+      },
+      parsed
+    };
+  }
+
+  if (method === 'setViewportMode') {
+    return {
+      ok: true,
+      command: symbol,
+      method,
+      payload: mapViewportPayload(selector, pairs),
       parsed
     };
   }
@@ -643,6 +822,149 @@ export function runSpwRuntimeCommand({ expression, runtimeApi }) {
       method,
       payload,
       result: runtimeApi.composeInterface(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'setRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.setRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'focusRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.focusRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'extractRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.extractRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'depositRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.depositRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'markRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.markRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getMark') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getMark(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'getRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.getRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'promoteRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.promoteRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'demoteRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.demoteRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'coupleRegisters') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.coupleRegisters(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'measureRegister') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.measureRegister(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'listRegisters') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.listRegisters(payload),
+      parser: parsed.parser
+    };
+  }
+
+  if (method === 'setViewportMode') {
+    return {
+      ok: true,
+      command,
+      method,
+      payload,
+      result: runtimeApi.setViewportMode(payload),
       parser: parsed.parser
     };
   }

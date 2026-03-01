@@ -1,12 +1,13 @@
 const VERSION_PATTERN = /^(\d+)(?:\.(\d+))?(?:\.(\d+))?/;
 
-export const RUNTIME_API_VERSION = '1.1.0';
+export const RUNTIME_API_VERSION = '1.3.0';
 
 export const RUNTIME_INTERFACE_VERSIONS = Object.freeze({
-  core: '1.1.0',
+  core: '1.3.0',
   catalog: '1.0.0',
-  integration: '1.1.0',
+  integration: '1.3.0',
   ecology: '1.0.0',
+  registers: '1.1.0',
   theming: '1.0.0',
   host: '1.0.0'
 });

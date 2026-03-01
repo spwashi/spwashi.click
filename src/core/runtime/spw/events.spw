@@ -12,7 +12,7 @@
   ^intent[module]{ id:core.events axis:typed-event-contracts output:explicit-runtime-signals }
 
   ^prefix-utility{
-    !:: role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating
+    !:: role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating+register+viewport
     @:: role:subscribe event:known-contract returns:unsubscribe
     =:: role:registry anchor:KNOWN_EVENT_NAMES
   }
@@ -24,7 +24,7 @@
   }
 
   ^operator-overload{
-    !{ role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating }
+    !{ role:dispatch event:CustomEvent detail:frozen includes:workbench-parser+runtime-rebind+host-manifest+theme+gating+register+viewport }
     @{ role:subscribe event:known-contract returns:unsubscribe }
     ={ role:registry anchor:KNOWN_EVENT_NAMES }
   }
@@ -54,6 +54,8 @@
     ^invariant[payload]{ detail:frozen shape:serializable-first }
     ^invariant[transport]{ window|element dispatch parity:true runtime-rebind typed:true }
     ^invariant[host]{ host-manifest+theme+gating events included in-registry }
+    ^invariant[register]{ register-bank activity emits:spw:register:changed }
+    ^invariant[viewport]{ responsive transitions emit:spw:viewport:changed }
   }
 
   ^potential{

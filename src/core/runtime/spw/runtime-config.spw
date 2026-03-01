@@ -12,7 +12,7 @@
   ^intent[module]{ id:core.runtime-config axis:embed-normalization output:stable-asset-addressing }
 
   ^prefix-utility{
-    !:: role:read-config source:meta+overrides includes:host-id+host-version+host-manifest paths
+    !:: role:read-config source:meta+overrides includes:host-id+host-version+host-manifest+viewport paths
     @:: role:resolve-asset-url base:embed-aware
     ~:: role:coerce-bool+mode values:robust
   }
@@ -31,8 +31,8 @@
 
   ^state-embed{
     @reads: meta-tags+overrides
-    @writes: runtime-config+resolved-urls+host-identity+host-manifest controls
-    @bridge: runtime+pwa+enhancements+host-manifest+multi-host diagnostics
+    @writes: runtime-config+resolved-urls+host-identity+host-manifest+viewport controls
+    @bridge: runtime+pwa+enhancements+host-manifest+multi-host+mobile diagnostics
     @shape: deterministic-projection
   }
 
@@ -55,6 +55,7 @@
     ^invariant[release]{ asset-version:append preserve:existing-query }
     ^invariant[host]{ host-id normalized fallback:spwashi.click host-version optional }
     ^invariant[manifest]{ host-manifest paths normalized required-flag:boolean }
+    ^invariant[viewport]{ mode-in:{adaptive,fixed} breakpoints bounded(320..2400) }
   }
 
   ^potential{

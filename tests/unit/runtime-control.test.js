@@ -377,12 +377,13 @@ test('runtime control exposes versioned api contract, composable interfaces, and
     releaseMeta: { releaseDate: '2026-03-01', releaseId: 'r2', releaseArc: 'host', releaseVibe: 'adaptive' },
     runtimeConfig: { embedMode: 'embedded', baseUrl: '/vendor/spw', enableServiceWorker: false, hostId: 'lore.land', hostVersion: '2026.03.01' },
     apiContract: {
-      runtimeApiVersion: '1.1.0',
+      runtimeApiVersion: '1.3.0',
       interfaces: {
-        core: '1.1.0',
+        core: '1.3.0',
         catalog: '1.0.0',
-        integration: '1.1.0',
+        integration: '1.3.0',
         ecology: '1.0.0',
+        registers: '1.1.0',
         theming: '1.0.0',
         host: '1.0.0'
       }
@@ -420,7 +421,7 @@ test('runtime control exposes versioned api contract, composable interfaces, and
   });
 
   const contract = win.__SPW_RUNTIME__.run('contract');
-  assert.equal(contract.runtimeApiVersion, '1.1.0');
+  assert.equal(contract.runtimeApiVersion, '1.3.0');
   assert.equal(contract.interfaces.ecology, '1.0.0');
 
   const composed = win.__SPW_RUNTIME__.run('compose', { interfaces: ['ecology', 'integration'] });
@@ -452,6 +453,115 @@ test('runtime control exposes versioned api contract, composable interfaces, and
   const hostManifest = win.__SPW_RUNTIME__.run('hostManifest');
   assert.equal(hostManifest.reason, 'ok');
   assert.equal(hostManifest.source, '/seed/hosts/lore.manifest.json');
+
+  cleanup();
+});
+
+test('runtime control supports register-bank and viewport Spw commands', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+  win.innerWidth = 1280;
+  win.innerHeight = 800;
+
+  const app = {
+    store,
+    ecology: { getSnapshot: () => ({ species: {} }) },
+    releaseMeta: { releaseDate: '2026-03-01', releaseId: 'r3' },
+    runtimeConfig: {
+      embedMode: 'embedded',
+      baseUrl: '/vendor/spw',
+      enableServiceWorker: false,
+      hostId: 'lore.land',
+      hostVersion: '2026.03.01',
+      viewportMode: 'adaptive',
+      mobileBreakpoint: 900,
+      compactBreakpoint: 640
+    },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {}
+  });
+
+  const setRegister = win.__SPW_RUNTIME__.evalSpw('!register[scene]{ route:work clicks:4 profile:maximal }');
+  assert.equal(setRegister.ok, true);
+  assert.equal(setRegister.method, 'setRegister');
+  assert.equal(setRegister.result.key, 'scene');
+
+  const focusRegister = win.__SPW_RUNTIME__.evalSpw('!focus[scene]{}');
+  assert.equal(focusRegister.ok, true);
+  assert.equal(focusRegister.method, 'focusRegister');
+  assert.equal(focusRegister.result.focusKey, 'scene');
+
+  const promoteRegister = win.__SPW_RUNTIME__.evalSpw('!promote[scene]{}');
+  assert.equal(promoteRegister.ok, true);
+  assert.equal(promoteRegister.method, 'promoteRegister');
+  assert.equal(promoteRegister.result.liminality, 1);
+
+  const coupleRegisters = win.__SPW_RUNTIME__.evalSpw('!couple[scene]{ with:archive }');
+  assert.equal(coupleRegisters.ok, true);
+  assert.equal(coupleRegisters.method, 'coupleRegisters');
+  assert.equal(coupleRegisters.result.with, 'archive');
+
+  const measureRegister = win.__SPW_RUNTIME__.evalSpw('!measure[scene]{ scale:4 }');
+  assert.equal(measureRegister.ok, true);
+  assert.equal(measureRegister.method, 'measureRegister');
+  assert.equal(measureRegister.result.value > 0, true);
+  assert.equal(measureRegister.result.value <= 1, true);
+
+  const markRegister = win.__SPW_RUNTIME__.evalSpw('!mark[scene]{ name:hero }');
+  assert.equal(markRegister.ok, true);
+  assert.equal(markRegister.method, 'markRegister');
+
+  const readMark = win.__SPW_RUNTIME__.evalSpw('!markget[hero]{}');
+  assert.equal(readMark.ok, true);
+  assert.equal(readMark.method, 'getMark');
+  assert.equal(readMark.result.ok, true);
+  assert.equal(readMark.result.key, 'scene');
+
+  const depositRegister = win.__SPW_RUNTIME__.evalSpw('!deposit[scene]{}');
+  assert.equal(depositRegister.ok, true);
+  assert.equal(depositRegister.method, 'depositRegister');
+  assert.equal(depositRegister.result.ok, true);
+  assert.equal(depositRegister.result.applied, true);
+
+  const viewportUpdate = win.__SPW_RUNTIME__.evalSpw('!viewport[fixed]{ band:compact width:540 height:960 reason:test }');
+  assert.equal(viewportUpdate.ok, true);
+  assert.equal(viewportUpdate.method, 'setViewportMode');
+  assert.equal(viewportUpdate.result.viewport.mode, 'fixed');
+  assert.equal(viewportUpdate.result.viewport.band, 'compact');
+  assert.equal(doc.documentElement.dataset.spwMobile, 'true');
+
+  const getRegister = win.__SPW_RUNTIME__.getRegister({ key: 'scene' });
+  assert.equal(getRegister.ok, true);
+  assert.ok(getRegister.coupledKeys.includes('archive'));
+  assert.equal(typeof getRegister.acoustics.frequency, 'number');
+
+  const registers = win.__SPW_RUNTIME__.listRegisters();
+  assert.equal(registers.registerCount >= 2, true);
+
+  assert.ok(win.events.includes('spw:register:changed'));
+  assert.ok(win.events.includes('spw:viewport:changed'));
 
   cleanup();
 });

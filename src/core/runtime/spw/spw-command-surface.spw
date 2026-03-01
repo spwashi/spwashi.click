@@ -13,7 +13,7 @@
 
   ^prefix-utility{
     !:: role:run-command expression:spw-form
-    @:: role:map-symbol->runtime-method table:explicit includes:status+integration+contract+ecology+theme+manifest
+    @:: role:map-symbol->runtime-method table:explicit includes:status+integration+contract+ecology+register-bank+viewport+theme+manifest
     ~:: role:coerce-values bool|num|list|string
   }
 
@@ -25,7 +25,7 @@
 
   ^operator-overload{
     !{ role:run-command expression:spw-form }
-    @{ role:map-symbol->runtime-method table:explicit includes:status+integration+contract+ecology+theme+manifest }
+    @{ role:map-symbol->runtime-method table:explicit includes:status+integration+contract+ecology+register-bank+viewport+theme+manifest }
     ~{ role:coerce-values bool|num|list|string }
   }
 
@@ -54,7 +54,7 @@
     ^invariant[mapping]{ symbol=>method explicit no-ad-hoc-dispatch:true }
     ^invariant[payload]{ scalar-coercion typed selector/vars payloads:normalized }
     ^invariant[integration]{ status symbols resolve:getIntegrationStatus }
-    ^invariant[extensions]{ ecology+contract symbols resolve:runtime-control methods }
+    ^invariant[extensions]{ ecology+contract+register-bank+viewport symbols resolve:runtime-control methods }
   }
 
   ^potential{
@@ -62,5 +62,5 @@
     ^potential[batch]{ transaction-style multi-command scenes }
   }
 
-  ^compose[neighbors]{ ingress:parseSpwForm+runtime-api egress:runSpwRuntimeCommand bridge:runtime-control.evalSpw+host-extension surfaces }
+  ^compose[neighbors]{ ingress:parseSpwForm+runtime-api egress:runSpwRuntimeCommand bridge:runtime-control.evalSpw+register-bank+mobile-host surfaces }
 }

@@ -9,6 +9,7 @@ import {
   EVENT_STATE_CHANGED,
   EVENT_HOST_MANIFEST_STATE,
   EVENT_HOST_THEME_CHANGED,
+  EVENT_VIEWPORT_CHANGED,
   EVENT_WORKBENCH_PARSER_STATE,
   dispatchTypedEvent,
   subscribeTypedEvent
@@ -57,6 +58,105 @@ function syncRootStateAttributes(doc, nextState) {
 
 function syncLiteratureAttributes(doc, marginalia) {
   doc.documentElement.dataset.marginaliaLines = String(marginalia.count());
+}
+
+function resolveViewportBand(width, runtimeConfig = {}) {
+  const compactBreakpoint = Number.isFinite(Number(runtimeConfig.compactBreakpoint))
+    ? Number(runtimeConfig.compactBreakpoint)
+    : 640;
+  const mobileBreakpoint = Number.isFinite(Number(runtimeConfig.mobileBreakpoint))
+    ? Number(runtimeConfig.mobileBreakpoint)
+    : 900;
+
+  if (width <= compactBreakpoint) {
+    return 'nano';
+  }
+
+  if (width <= mobileBreakpoint) {
+    return 'compact';
+  }
+
+  return 'immersive';
+}
+
+function installViewportBridge({ app, doc, win }) {
+  if (!doc?.documentElement || !win) {
+    return () => {};
+  }
+
+  const root = doc.documentElement;
+  let rafId = 0;
+  let previousBand = '';
+  let previousMobile = '';
+
+  const viewportMode = app.runtimeConfig?.viewportMode ?? 'adaptive';
+
+  function updateViewport(reason = 'viewport:update') {
+    const width = Number(win.innerWidth ?? 0);
+    const height = Number(win.innerHeight ?? 0);
+    const band = resolveViewportBand(width, app.runtimeConfig);
+    const mobile = band === 'nano' || band === 'compact';
+
+    root.dataset.spwViewportMode = viewportMode;
+    root.dataset.spwViewportBand = band;
+    root.dataset.spwMobile = mobile ? 'true' : 'false';
+    root.dataset.spwMobileBreakpoint = String(app.runtimeConfig?.mobileBreakpoint ?? 900);
+    root.dataset.spwCompactBreakpoint = String(app.runtimeConfig?.compactBreakpoint ?? 640);
+
+    if (height > 0) {
+      root.style.setProperty('--spw-vh', `${(height * 0.01).toFixed(4)}px`);
+    }
+
+    app.viewport = Object.freeze({
+      mode: viewportMode,
+      band,
+      mobile,
+      width: Math.round(width),
+      height: Math.round(height)
+    });
+
+    if (previousBand !== band || previousMobile !== root.dataset.spwMobile) {
+      previousBand = band;
+      previousMobile = root.dataset.spwMobile;
+      dispatchTypedEvent(win, EVENT_VIEWPORT_CHANGED, {
+        ...app.viewport,
+        reason
+      });
+    }
+  }
+
+  function scheduleViewportUpdate(reason = 'viewport:resize') {
+    if (rafId) {
+      return;
+    }
+
+    rafId = win.requestAnimationFrame(() => {
+      rafId = 0;
+      updateViewport(reason);
+    });
+  }
+
+  updateViewport('viewport:init');
+
+  if (viewportMode === 'adaptive') {
+    const onResize = () => scheduleViewportUpdate('viewport:resize');
+    win.addEventListener('resize', onResize, { passive: true });
+    win.addEventListener('orientationchange', onResize, { passive: true });
+
+    return () => {
+      if (rafId) {
+        win.cancelAnimationFrame(rafId);
+      }
+      win.removeEventListener('resize', onResize);
+      win.removeEventListener('orientationchange', onResize);
+    };
+  }
+
+  return () => {
+    if (rafId) {
+      win.cancelAnimationFrame(rafId);
+    }
+  };
 }
 
 function bridgeStoreToEvents({ app, doc, win }) {
@@ -176,6 +276,13 @@ function createApp({ doc, win, runtimeConfig }) {
     marginalia,
     structureController,
     performanceController,
+    viewport: Object.freeze({
+      mode: runtimeConfig.viewportMode,
+      band: 'immersive',
+      mobile: false,
+      width: 0,
+      height: 0
+    }),
     enhancementRuntime: null,
     runtimeControlCleanup: null,
     pwaController: null,
@@ -227,6 +334,9 @@ function createApp({ doc, win, runtimeConfig }) {
     ? 'true'
     : 'false';
   doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
+  doc.documentElement.dataset.spwViewportMode = runtimeConfig.viewportMode;
+  doc.documentElement.dataset.spwMobileBreakpoint = String(runtimeConfig.mobileBreakpoint);
+  doc.documentElement.dataset.spwCompactBreakpoint = String(runtimeConfig.compactBreakpoint);
   ecology.setRoute(activeRoute);
   ecology.setPhase(store.getState().phase);
 
@@ -242,7 +352,10 @@ function createApp({ doc, win, runtimeConfig }) {
     baseUrl: runtimeConfig.baseUrl,
     hostId: runtimeConfig.hostId,
     hostVersion: runtimeConfig.hostVersion,
-    runtimeApiVersion: app.apiContract.runtimeApiVersion
+    runtimeApiVersion: app.apiContract.runtimeApiVersion,
+    viewportMode: runtimeConfig.viewportMode,
+    mobileBreakpoint: runtimeConfig.mobileBreakpoint,
+    compactBreakpoint: runtimeConfig.compactBreakpoint
   });
   syncLiteratureAttributes(doc, marginalia);
 
@@ -252,6 +365,7 @@ function createApp({ doc, win, runtimeConfig }) {
   cleanups.push(installIntentListeners({ app, win }));
   cleanups.push(() => structureController.destroy());
   cleanups.push(() => performanceController.destroy());
+  cleanups.push(installViewportBridge({ app, doc, win }));
   cleanups.push(installAtmosphereDrift(doc, win, performanceController));
   cleanups.push(
     watchReducedMotionPreference(win, (nextReducedMotion) => {
@@ -439,7 +553,8 @@ async function mountRuntimeApp({ app, doc, win }) {
     runtimeApiVersion: app.apiContract.runtimeApiVersion,
     hostManifestReason: app.hostManifest?.reason ?? 'unknown',
     hostCompatibility: app.hostCompatibility,
-    hostThemeRules: app.hostThemeController?.getState?.()?.activeRuleIds ?? []
+    hostThemeRules: app.hostThemeController?.getState?.()?.activeRuleIds ?? [],
+    viewport: app.viewport
   });
 
   return app;
@@ -487,6 +602,9 @@ export function createSpwRuntime(options = {}) {
         ? 'true'
         : 'false';
       doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
+      doc.documentElement.dataset.spwViewportMode = runtimeConfig.viewportMode;
+      doc.documentElement.dataset.spwMobileBreakpoint = String(runtimeConfig.mobileBreakpoint);
+      doc.documentElement.dataset.spwCompactBreakpoint = String(runtimeConfig.compactBreakpoint);
       doc.documentElement.dataset.pwaState = 'disabled';
       return null;
     }

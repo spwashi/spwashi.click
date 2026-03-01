@@ -12,6 +12,8 @@ export const EVENT_WORKBENCH_PARSER_STATE = 'spw:workbench:parser:state';
 export const EVENT_HOST_MANIFEST_STATE = 'spw:host:manifest:state';
 export const EVENT_HOST_THEME_CHANGED = 'spw:host:theme:changed';
 export const EVENT_ENHANCEMENT_GATED = 'spw:enhancement:gated';
+export const EVENT_REGISTER_CHANGED = 'spw:register:changed';
+export const EVENT_VIEWPORT_CHANGED = 'spw:viewport:changed';
 
 export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_INTENT_CLICK,
@@ -27,7 +29,9 @@ export const KNOWN_EVENT_NAMES = Object.freeze([
   EVENT_WORKBENCH_PARSER_STATE,
   EVENT_HOST_MANIFEST_STATE,
   EVENT_HOST_THEME_CHANGED,
-  EVENT_ENHANCEMENT_GATED
+  EVENT_ENHANCEMENT_GATED,
+  EVENT_REGISTER_CHANGED,
+  EVENT_VIEWPORT_CHANGED
 ]);
 
 export function isKnownEventName(eventName) {

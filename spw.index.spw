@@ -43,7 +43,7 @@
 
 ^feature[runtime-control]{
   route: "global"
-  contract: "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }"
+  contract: "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+register-bank+viewport+rebind }"
   files: [src/core/runtime/js/runtime-control.js, src/core/runtime/js/spw-command-surface.js, src/core/runtime/js/boot.js]
 }
 
@@ -79,7 +79,7 @@
 
 ^semantics[operators]{
   chain: "? ~ @ & * ^ ! = % # ."
-  source: [src/components/syntax-lab.js, seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts]
+  source: [src/components/syntax-lab.js, .spw/_workbench/extensions/vscode-spw/src/semantics.ts]
 }
 
 ^semantics[braces]{
@@ -93,7 +93,7 @@
 }
 
 ^semantics[runtime-command]{
-  forms: "!top{} !region{} !component{} !vars{} !reset{} !rebind{} !catalog{}"
+  forms: "!top{} !region{} !component{} !vars{} !register[]{} !focus[]{} !promote[]{} !couple[]{} !measure[]{} !viewport[]{} !reset{} !rebind{} !catalog{}"
   source: [src/core/runtime/js/spw-command-surface.js, src/core/runtime/js/runtime-control.js]
 }
 
@@ -104,8 +104,18 @@
 
 ^semantics[embed-modes]{
   map: "standalone, embedded, assets-only"
-  controls: "spw:embed-mode spw:base-url spw:sw-enabled spw:auto-mount"
+  controls: "spw:embed-mode spw:base-url spw:sw-enabled spw:auto-mount spw:viewport-mode spw:mobile-breakpoint spw:compact-breakpoint"
   source: [src/core/runtime/js/runtime-config.js, src/core/runtime/js/runtime.js, src/runtime/index.js]
+}
+
+^semantics[register-bank]{
+  map: "focus+set+extract+deposit+mark+promote+demote+couple+measure"
+  source: [src/core/runtime/js/runtime-control.js, .spw/_workbench/.spw/registries/register-bank.spw]
+}
+
+^semantics[viewport-band]{
+  map: "immersive(>mobile-breakpoint), compact(<=mobile-breakpoint), nano(<=compact-breakpoint)"
+  source: [src/core/runtime/js/runtime-config.js, src/core/runtime/js/runtime.js, src/core/runtime/js/runtime-control.js]
 }
 
 ^semantics[medium-flow]{
@@ -114,26 +124,26 @@
 }
 
 ^care[lsp]{
-  entry: seed/extern/spw-workbench/scripts/lsp/stdio-server.ts
-  index: seed/extern/spw-workbench/scripts/lsp/server-index.ts
-  smoke: seed/extern/spw-workbench/scripts/lsp/smoke-navigation.ts
+  entry: .spw/_workbench/scripts/lsp/stdio-server.ts
+  index: .spw/_workbench/scripts/lsp/server-index.ts
+  smoke: .spw/_workbench/scripts/lsp/smoke-navigation.ts
 }
 
 ^care[neovim]{
-  plugin: seed/extern/spw-workbench/extensions/neovim-spw
-  lsp_client: seed/extern/spw-workbench/extensions/neovim-spw/lua/spw-lsp.lua
+  plugin: .spw/_workbench/extensions/neovim-spw
+  lsp_client: .spw/_workbench/extensions/neovim-spw/lua/spw-lsp.lua
 }
 
 ^care[vscode]{
-  extension: seed/extern/spw-workbench/extensions/vscode-spw/src/extension.ts
-  roots: seed/extern/spw-workbench/extensions/vscode-spw/src/roots.ts
-  semantics: seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts
+  extension: .spw/_workbench/extensions/vscode-spw/src/extension.ts
+  roots: .spw/_workbench/extensions/vscode-spw/src/roots.ts
+  semantics: .spw/_workbench/extensions/vscode-spw/src/semantics.ts
 }
 
 ^care[history]{
   files: [
-    seed/extern/spw-workbench/docs/design/md/history.md,
-    seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md
+    .spw/_workbench/docs/design/md/history.md,
+    .spw/_workbench/docs/archive/status/md/vim-implementation-complete.md
   ]
 }
 
