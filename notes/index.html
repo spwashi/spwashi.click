@@ -20,6 +20,7 @@
     <meta name="spw:base-url" content="/" />
     <meta name="spw:sw-enabled" content="true" />
     <meta name="spw:auto-mount" content="true" />
+    <meta name="spw:space-mode" content="adaptive" />
     <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
     <meta name="spw:feature-index" content="/spw.index.json" />
     <meta name="spw:feature-index-spw" content="/spw.index.spw" />
@@ -60,13 +61,13 @@
       </header>
 
       <main id="main-content" class="site-main" role="main">
-        <section class="page-section" aria-labelledby="notes-title" data-layout-region="intro" data-structure-label="Notes route intro with thematic placeholder writing context">
+        <section class="page-section" aria-labelledby="notes-title" data-layout-region="intro" data-layout-layer="support" data-layout-container="dense" data-structure-label="Notes route intro with thematic placeholder writing context">
           <p class="page-section__eyebrow">^index[notes]</p>
           <h1 id="notes-title" data-slot="page_title_slot">Notes</h1>
           <p data-slot="page_intro_slot">^notes[spwlang]{ channel: operators+braces intent: teach-interaction-literacy }</p>
         </section>
 
-        <section class="page-section" aria-labelledby="notes-stream-title" data-layout-region="stream" data-structure-label="Notes stream list with title, date, and excerpt structure">
+        <section class="page-section" aria-labelledby="notes-stream-title" data-layout-region="stream" data-layout-layer="primary" data-layout-container="wide" data-structure-label="Notes stream list with title, date, and excerpt structure">
           <h2 id="notes-stream-title" class="visually-hidden">Notes list</h2>
           <div class="notes-stream" data-role="notes-list">
             <article class="note-card" id="note-state-machines">
@@ -77,7 +78,7 @@
           </div>
         </section>
 
-        <section class="page-section surface-panel" aria-labelledby="notes-seed-atlas-title" data-layout-region="seed-atlas" data-enhancement-zone="seed-atlas" data-structure-label="Optional lore atlas enhancement zone for visual learning prompts">
+        <section class="page-section surface-panel" aria-labelledby="notes-seed-atlas-title" data-layout-region="seed-atlas" data-layout-layer="ambient" data-layout-container="wide" data-enhancement-zone="seed-atlas" data-structure-label="Optional lore atlas enhancement zone for visual learning prompts">
           <p class="page-section__eyebrow">^seed[imagery]</p>
           <h2 id="notes-seed-atlas-title">Lore Atlas</h2>
           <div class="seed-atlas" data-role="seed-atlas" data-atlas-state="dormant" aria-live="polite">

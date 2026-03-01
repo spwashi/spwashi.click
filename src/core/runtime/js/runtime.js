@@ -30,6 +30,11 @@ import { createStore } from './store.js';
 import { installStructureMode } from './structure-mode.js';
 import { installMediumFlow } from './medium-flow.js';
 import { createRuntimeApiContract } from './runtime-contract.js';
+import {
+  DEFAULT_SPACE_MODE,
+  DEFAULT_VIEWPORT_MODE,
+  resolveViewportSpace
+} from './viewport-space.js';
 import { defineAllComponents } from '../../../components/index.js';
 import { CONTENT_MANIFESTS } from '../../../content/index.js';
 import { PAGE_INITIALIZERS } from '../../../pages/index.js';
@@ -46,23 +51,19 @@ function syncLiteratureAttributes(doc, marginalia) {
   doc.documentElement.dataset.marginaliaLines = String(marginalia.count());
 }
 
-function resolveViewportBand(width, runtimeConfig = {}) {
-  const compactBreakpoint = Number.isFinite(Number(runtimeConfig.compactBreakpoint))
-    ? Number(runtimeConfig.compactBreakpoint)
-    : 640;
-  const mobileBreakpoint = Number.isFinite(Number(runtimeConfig.mobileBreakpoint))
-    ? Number(runtimeConfig.mobileBreakpoint)
-    : 900;
-
-  if (width <= compactBreakpoint) {
-    return 'nano';
+function applyRootViewportAttributes(root, viewport) {
+  root.dataset.spwViewportMode = viewport.mode;
+  root.dataset.spwViewportBand = viewport.band;
+  root.dataset.spwViewportAspect = viewport.aspect;
+  root.dataset.spwMobile = viewport.mobile ? 'true' : 'false';
+  root.dataset.spwSpaceMode = viewport.spaceMode;
+  root.dataset.spwSpaceLayer = viewport.spaceLayer;
+  root.dataset.spwMobileBreakpoint = String(viewport.mobileBreakpoint);
+  root.dataset.spwCompactBreakpoint = String(viewport.compactBreakpoint);
+  root.style.setProperty('--spw-vw', `${(viewport.width * 0.01).toFixed(4)}px`);
+  if (viewport.height > 0) {
+    root.style.setProperty('--spw-vh', `${(viewport.height * 0.01).toFixed(4)}px`);
   }
-
-  if (width <= mobileBreakpoint) {
-    return 'compact';
-  }
-
-  return 'immersive';
 }
 
 function installViewportBridge({ app, doc, win }) {
@@ -72,38 +73,32 @@ function installViewportBridge({ app, doc, win }) {
 
   const root = doc.documentElement;
   let rafId = 0;
-  let previousBand = '';
-  let previousMobile = '';
+  let previousSignature = '';
 
-  const viewportMode = app.runtimeConfig?.viewportMode ?? 'adaptive';
+  const viewportMode = app.runtimeConfig?.viewportMode ?? DEFAULT_VIEWPORT_MODE;
+  const requestedSpaceMode = app.runtimeConfig?.spaceMode ?? DEFAULT_SPACE_MODE;
 
   function updateViewport(reason = 'viewport:update') {
-    const width = Number(win.innerWidth ?? 0);
-    const height = Number(win.innerHeight ?? 0);
-    const band = resolveViewportBand(width, app.runtimeConfig);
-    const mobile = band === 'nano' || band === 'compact';
-
-    root.dataset.spwViewportMode = viewportMode;
-    root.dataset.spwViewportBand = band;
-    root.dataset.spwMobile = mobile ? 'true' : 'false';
-    root.dataset.spwMobileBreakpoint = String(app.runtimeConfig?.mobileBreakpoint ?? 900);
-    root.dataset.spwCompactBreakpoint = String(app.runtimeConfig?.compactBreakpoint ?? 640);
-
-    if (height > 0) {
-      root.style.setProperty('--spw-vh', `${(height * 0.01).toFixed(4)}px`);
-    }
-
-    app.viewport = Object.freeze({
+    const viewport = resolveViewportSpace({
       mode: viewportMode,
-      band,
-      mobile,
-      width: Math.round(width),
-      height: Math.round(height)
+      spaceMode: requestedSpaceMode,
+      width: Number(win.innerWidth ?? 0),
+      height: Number(win.innerHeight ?? 0),
+      mobileBreakpoint: app.runtimeConfig?.mobileBreakpoint,
+      compactBreakpoint: app.runtimeConfig?.compactBreakpoint
     });
+    applyRootViewportAttributes(root, viewport);
+    app.viewport = viewport;
 
-    if (previousBand !== band || previousMobile !== root.dataset.spwMobile) {
-      previousBand = band;
-      previousMobile = root.dataset.spwMobile;
+    const signature = [
+      viewport.band,
+      viewport.mobile ? '1' : '0',
+      viewport.aspect,
+      viewport.spaceMode,
+      viewport.spaceLayer
+    ].join('|');
+    if (previousSignature !== signature) {
+      previousSignature = signature;
       dispatchTypedEvent(win, EVENT_VIEWPORT_CHANGED, {
         ...app.viewport,
         reason
@@ -124,7 +119,7 @@ function installViewportBridge({ app, doc, win }) {
 
   updateViewport('viewport:init');
 
-  if (viewportMode === 'adaptive') {
+  if (viewportMode === DEFAULT_VIEWPORT_MODE) {
     const onResize = () => scheduleViewportUpdate('viewport:resize');
     win.addEventListener('resize', onResize, { passive: true });
     win.addEventListener('orientationchange', onResize, { passive: true });
@@ -230,6 +225,14 @@ function initializePage({ routeName, app, doc }) {
 function createApp({ doc, win, runtimeConfig }) {
   const activeRoute = routeFromPathname(win.location.pathname);
   const reducedMotion = detectReducedMotionPreference(win);
+  const initialViewport = resolveViewportSpace({
+    mode: runtimeConfig.viewportMode,
+    spaceMode: runtimeConfig.spaceMode,
+    width: Number(win.innerWidth ?? 0),
+    height: Number(win.innerHeight ?? 0),
+    mobileBreakpoint: runtimeConfig.mobileBreakpoint,
+    compactBreakpoint: runtimeConfig.compactBreakpoint
+  });
   const releaseMeta = readReleaseMeta(doc);
   const store = createStore({ activeRoute, reducedMotion });
   const ecology = createEcologyLedger();
@@ -262,13 +265,7 @@ function createApp({ doc, win, runtimeConfig }) {
     marginalia,
     structureController,
     performanceController,
-    viewport: Object.freeze({
-      mode: runtimeConfig.viewportMode,
-      band: 'immersive',
-      mobile: false,
-      width: 0,
-      height: 0
-    }),
+    viewport: initialViewport,
     enhancementRuntime: null,
     runtimeControlCleanup: null,
     pwaController: null,
@@ -320,9 +317,7 @@ function createApp({ doc, win, runtimeConfig }) {
     ? 'true'
     : 'false';
   doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
-  doc.documentElement.dataset.spwViewportMode = runtimeConfig.viewportMode;
-  doc.documentElement.dataset.spwMobileBreakpoint = String(runtimeConfig.mobileBreakpoint);
-  doc.documentElement.dataset.spwCompactBreakpoint = String(runtimeConfig.compactBreakpoint);
+  applyRootViewportAttributes(doc.documentElement, initialViewport);
   ecology.setRoute(activeRoute);
   ecology.setPhase(store.getState().phase);
 
@@ -340,6 +335,9 @@ function createApp({ doc, win, runtimeConfig }) {
     hostVersion: runtimeConfig.hostVersion,
     runtimeApiVersion: app.apiContract.runtimeApiVersion,
     viewportMode: runtimeConfig.viewportMode,
+    spaceMode: runtimeConfig.spaceMode,
+    spaceLayer: initialViewport.spaceLayer,
+    viewportAspect: initialViewport.aspect,
     mobileBreakpoint: runtimeConfig.mobileBreakpoint,
     compactBreakpoint: runtimeConfig.compactBreakpoint
   });
@@ -588,9 +586,17 @@ export function createSpwRuntime(options = {}) {
         ? 'true'
         : 'false';
       doc.documentElement.dataset.spwHostEnhancementsManifest = runtimeConfig.hostEnhancementManifestPath;
-      doc.documentElement.dataset.spwViewportMode = runtimeConfig.viewportMode;
-      doc.documentElement.dataset.spwMobileBreakpoint = String(runtimeConfig.mobileBreakpoint);
-      doc.documentElement.dataset.spwCompactBreakpoint = String(runtimeConfig.compactBreakpoint);
+      applyRootViewportAttributes(
+        doc.documentElement,
+        resolveViewportSpace({
+          mode: runtimeConfig.viewportMode,
+          spaceMode: runtimeConfig.spaceMode,
+          width: Number(win?.innerWidth ?? 0),
+          height: Number(win?.innerHeight ?? 0),
+          mobileBreakpoint: runtimeConfig.mobileBreakpoint,
+          compactBreakpoint: runtimeConfig.compactBreakpoint
+        })
+      );
       doc.documentElement.dataset.pwaState = 'disabled';
       return null;
     }

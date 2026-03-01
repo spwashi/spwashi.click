@@ -20,6 +20,7 @@
     <meta name="spw:base-url" content="/" />
     <meta name="spw:sw-enabled" content="true" />
     <meta name="spw:auto-mount" content="true" />
+    <meta name="spw:space-mode" content="adaptive" />
     <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
     <meta name="spw:feature-index" content="/spw.index.json" />
     <meta name="spw:feature-index-spw" content="/spw.index.spw" />
@@ -60,13 +61,13 @@
       </header>
 
       <main id="main-content" class="site-main" role="main">
-        <section class="page-section" aria-labelledby="work-title" data-layout-region="intro" data-structure-label="Work route intro and curation context">
+        <section class="page-section" aria-labelledby="work-title" data-layout-region="intro" data-layout-layer="support" data-layout-container="dense" data-structure-label="Work route intro and curation context">
           <p class="page-section__eyebrow">^index[collections]</p>
           <h1 id="work-title" data-slot="page_title_slot">Collections</h1>
           <p data-slot="page_intro_slot">^curation[spw]{ source: workbench outputs: scenes+systems read: executable }</p>
         </section>
 
-        <section class="page-section" aria-labelledby="project-grid-title" data-layout-region="stream" data-structure-label="Project grid containing structured case-study placeholders">
+        <section class="page-section" aria-labelledby="project-grid-title" data-layout-region="stream" data-layout-layer="primary" data-layout-container="wide" data-structure-label="Project grid containing structured case-study placeholders">
           <h2 id="project-grid-title" class="visually-hidden">Project cards</h2>
           <div class="project-grid" data-role="project-grid">
             <article class="project-card" id="project-one" data-project-id="project-one">

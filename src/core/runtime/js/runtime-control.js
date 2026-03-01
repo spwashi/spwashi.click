@@ -7,11 +7,13 @@ import {
 } from './events.js';
 import { createRuntimeApiContract } from './runtime-contract.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
+import {
+  DEFAULT_SPACE_MODE,
+  DEFAULT_VIEWPORT_MODE,
+  resolveViewportSpace
+} from './viewport-space.js';
 
 const DEFAULT_FOCUS_REGISTER_KEY = '"';
-const DEFAULT_VIEWPORT_MODE = 'adaptive';
-const FALLBACK_MOBILE_BREAKPOINT = 900;
-const FALLBACK_COMPACT_BREAKPOINT = 640;
 const MAX_REGISTER_LIMINALITY = 3;
 const DEFAULT_REGISTER_MEASURE_SCALE = 10;
 
@@ -238,57 +240,46 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
   );
 
   function resolveViewportFromPayload(payload = {}) {
+    const payloadObject = isObject(payload) ? payload : {};
     const modeToken =
       typeof payload === 'string'
         ? payload
-        : String(payload.mode ?? root.dataset.spwViewportMode ?? app.viewport?.mode ?? DEFAULT_VIEWPORT_MODE);
-    const normalizedMode = modeToken === 'fixed' ? 'fixed' : DEFAULT_VIEWPORT_MODE;
-    const mobileBreakpoint = Number.isFinite(Number(app.runtimeConfig?.mobileBreakpoint))
-      ? Number(app.runtimeConfig.mobileBreakpoint)
-      : FALLBACK_MOBILE_BREAKPOINT;
-    const compactBreakpoint = Number.isFinite(Number(app.runtimeConfig?.compactBreakpoint))
-      ? Number(app.runtimeConfig.compactBreakpoint)
-      : FALLBACK_COMPACT_BREAKPOINT;
+        : payloadObject.mode ?? root.dataset.spwViewportMode ?? app.viewport?.mode ?? DEFAULT_VIEWPORT_MODE;
 
-    const viewportWidth = Number.isFinite(Number(payload.width))
-      ? Number(payload.width)
-      : Number(window.innerWidth ?? 0);
-    const viewportHeight = Number.isFinite(Number(payload.height))
-      ? Number(payload.height)
-      : Number(window.innerHeight ?? 0);
-
-    const explicitBand = String(payload.band ?? '').trim();
-    const derivedBand =
-      viewportWidth <= compactBreakpoint
-        ? 'nano'
-        : viewportWidth <= mobileBreakpoint
-          ? 'compact'
-          : 'immersive';
-    const band = explicitBand || derivedBand;
-
-    const mobile =
-      typeof payload.mobile === 'boolean'
-        ? payload.mobile
-        : band === 'nano' || band === 'compact';
-
-    return {
-      mode: normalizedMode,
-      band,
-      mobile,
-      width: Math.round(viewportWidth),
-      height: Math.round(viewportHeight),
-      mobileBreakpoint,
-      compactBreakpoint
-    };
+    return resolveViewportSpace({
+      mode: modeToken,
+      band: payloadObject.band,
+      aspect: payloadObject.aspect ?? root.dataset.spwViewportAspect ?? app.viewport?.aspect,
+      mobile: payloadObject.mobile,
+      width: payloadObject.width ?? window.innerWidth ?? 0,
+      height: payloadObject.height ?? window.innerHeight ?? 0,
+      spaceMode:
+        payloadObject.spaceMode ??
+        payloadObject.space ??
+        root.dataset.spwSpaceMode ??
+        app.runtimeConfig?.spaceMode ??
+        app.viewport?.spaceMode,
+      spaceLayer:
+        payloadObject.spaceLayer ??
+        payloadObject.layer ??
+        root.dataset.spwSpaceLayer ??
+        app.viewport?.spaceLayer,
+      mobileBreakpoint: app.runtimeConfig?.mobileBreakpoint,
+      compactBreakpoint: app.runtimeConfig?.compactBreakpoint
+    });
   }
 
   function setViewportMode(payload = {}) {
     const viewport = resolveViewportFromPayload(payload);
     root.dataset.spwViewportMode = viewport.mode;
     root.dataset.spwViewportBand = viewport.band;
+    root.dataset.spwViewportAspect = viewport.aspect;
     root.dataset.spwMobile = viewport.mobile ? 'true' : 'false';
+    root.dataset.spwSpaceMode = viewport.spaceMode;
+    root.dataset.spwSpaceLayer = viewport.spaceLayer;
     root.dataset.spwMobileBreakpoint = String(viewport.mobileBreakpoint);
     root.dataset.spwCompactBreakpoint = String(viewport.compactBreakpoint);
+    root.style.setProperty('--spw-vw', `${(viewport.width * 0.01).toFixed(4)}px`);
     if (viewport.height > 0) {
       root.style.setProperty('--spw-vh', `${(viewport.height * 0.01).toFixed(4)}px`);
     }
@@ -780,6 +771,9 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
         hostManifestRequired: Boolean(app.runtimeConfig?.hostManifestRequired),
         viewportMode: root.dataset.spwViewportMode ?? app.runtimeConfig?.viewportMode ?? DEFAULT_VIEWPORT_MODE,
         viewportBand: root.dataset.spwViewportBand ?? app.viewport?.band ?? 'immersive',
+        viewportAspect: root.dataset.spwViewportAspect ?? app.viewport?.aspect ?? 'square',
+        spaceMode: root.dataset.spwSpaceMode ?? app.runtimeConfig?.spaceMode ?? DEFAULT_SPACE_MODE,
+        spaceLayer: root.dataset.spwSpaceLayer ?? app.viewport?.spaceLayer ?? 'nested',
         mobile: (root.dataset.spwMobile ?? 'false') === 'true'
       },
       hostManifest: hostManifest
@@ -833,6 +827,9 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       hostThemeRuleCount: app.hostThemeController?.getState?.()?.activeRuleIds?.length ?? 0,
       viewportMode: root.dataset.spwViewportMode ?? app.runtimeConfig?.viewportMode ?? DEFAULT_VIEWPORT_MODE,
       viewportBand: root.dataset.spwViewportBand ?? app.viewport?.band ?? 'immersive',
+      viewportAspect: root.dataset.spwViewportAspect ?? app.viewport?.aspect ?? 'square',
+      spaceMode: root.dataset.spwSpaceMode ?? app.runtimeConfig?.spaceMode ?? DEFAULT_SPACE_MODE,
+      spaceLayer: root.dataset.spwSpaceLayer ?? app.viewport?.spaceLayer ?? 'nested',
       mobile: (root.dataset.spwMobile ?? 'false') === 'true',
       registerFocusKey,
       registerCount: registerEntries.size
@@ -851,7 +848,13 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     coupledKeys: []
   });
 
-  if (!root.dataset.spwViewportMode || !root.dataset.spwViewportBand) {
+  if (
+    !root.dataset.spwViewportMode ||
+    !root.dataset.spwViewportBand ||
+    !root.dataset.spwViewportAspect ||
+    !root.dataset.spwSpaceMode ||
+    !root.dataset.spwSpaceLayer
+  ) {
     setViewportMode({ reason: 'runtime-control:init' });
   }
 

@@ -40,6 +40,14 @@
     --container-max: 72rem;
     --container-chassis-max: 84rem;
     --container-main-max: 96rem;
+    --site-gutter-inline: clamp(1rem, 2.8vw, 3rem);
+    --site-main-gap: var(--spacing-7);
+    --site-section-gap: var(--spacing-4);
+    --site-panel-padding: var(--spacing-5);
+    --site-column-min: 18rem;
+    --layout-layer-depth: 0px;
+    --layout-layer-opacity: 0;
+    --layout-layer-blur: 0px;
 
     --fx-motion-gain: 0.56;
     --fx-light-depth: 0.68;
@@ -50,6 +58,61 @@
     --fx-drift-x: 0px;
     --fx-drift-y: 0px;
     --fx-lumen-angle: 128deg;
+  }
+
+  :root[data-spw-space-mode='compact'] {
+    --container-main-max: 72rem;
+    --container-chassis-max: 74rem;
+    --site-gutter-inline: clamp(0.75rem, 4.5vw, 1.15rem);
+    --site-main-gap: var(--spacing-5);
+    --site-section-gap: var(--spacing-3);
+    --site-panel-padding: var(--spacing-4);
+    --site-column-min: 14rem;
+  }
+
+  :root[data-spw-space-mode='balanced'] {
+    --site-main-gap: var(--spacing-6);
+    --site-section-gap: var(--spacing-4);
+    --site-panel-padding: var(--spacing-5);
+  }
+
+  :root[data-spw-space-mode='expansive'] {
+    --container-main-max: 104rem;
+    --container-chassis-max: 92rem;
+    --site-gutter-inline: clamp(1.1rem, 2.2vw, 3.4rem);
+    --site-main-gap: calc(var(--spacing-7) + 0.4rem);
+    --site-section-gap: calc(var(--spacing-4) + 0.2rem);
+    --site-panel-padding: calc(var(--spacing-5) + 0.2rem);
+    --site-column-min: 20rem;
+  }
+
+  :root[data-spw-space-layer='stack'] {
+    --layout-layer-depth: 0px;
+    --layout-layer-opacity: 0.02;
+    --layout-layer-blur: 0px;
+  }
+
+  :root[data-spw-space-layer='nested'] {
+    --layout-layer-depth: 8px;
+    --layout-layer-opacity: 0.08;
+    --layout-layer-blur: 3px;
+  }
+
+  :root[data-spw-space-layer='spread'] {
+    --layout-layer-depth: 16px;
+    --layout-layer-opacity: 0.12;
+    --layout-layer-blur: 6px;
+  }
+
+  :root[data-spw-viewport-band='nano'] {
+    --site-gutter-inline: clamp(0.7rem, 5vw, 1rem);
+    --site-main-gap: var(--spacing-5);
+    --site-section-gap: var(--spacing-3);
+  }
+
+  :root[data-spw-viewport-aspect='portrait'][data-spw-space-mode='balanced'] {
+    --site-main-gap: var(--spacing-5);
+    --site-section-gap: var(--spacing-3);
   }
 
   @media (prefers-contrast: more) {

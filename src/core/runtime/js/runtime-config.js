@@ -1,12 +1,16 @@
 import { appendAssetVersion } from './release.js';
+import {
+  DEFAULT_COMPACT_BREAKPOINT,
+  DEFAULT_MOBILE_BREAKPOINT,
+  DEFAULT_SPACE_MODE,
+  DEFAULT_VIEWPORT_MODE,
+  normalizeSpaceMode,
+  normalizeViewportMode
+} from './viewport-space.js';
 
 const DEFAULT_EMBED_MODE = 'standalone';
 const KNOWN_EMBED_MODES = Object.freeze(['standalone', 'embedded', 'assets-only']);
 const DEFAULT_HOST_ID = 'spwashi.click';
-const DEFAULT_VIEWPORT_MODE = 'adaptive';
-const KNOWN_VIEWPORT_MODES = Object.freeze(['adaptive', 'fixed']);
-const DEFAULT_MOBILE_BREAKPOINT = 900;
-const DEFAULT_COMPACT_BREAKPOINT = 640;
 
 function parseBooleanToken(value, fallbackValue) {
   if (typeof value === 'boolean') {
@@ -57,18 +61,6 @@ function normalizeHostVersion(value) {
 function normalizePathToken(value) {
   const normalized = String(value ?? '').trim();
   return normalized.length > 0 ? normalized : '';
-}
-
-function normalizeViewportMode(value) {
-  const normalized = String(value ?? '')
-    .trim()
-    .toLowerCase();
-
-  if (KNOWN_VIEWPORT_MODES.includes(normalized)) {
-    return normalized;
-  }
-
-  return DEFAULT_VIEWPORT_MODE;
 }
 
 function normalizeBreakpoint(value, fallbackValue) {
@@ -137,6 +129,8 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     documentRef?.querySelector('meta[name="spw:host-enhancements-manifest"]')?.getAttribute('content') ?? '';
   const metaViewportMode =
     documentRef?.querySelector('meta[name="spw:viewport-mode"]')?.getAttribute('content') ?? '';
+  const metaSpaceMode =
+    documentRef?.querySelector('meta[name="spw:space-mode"]')?.getAttribute('content') ?? '';
   const metaMobileBreakpoint =
     documentRef?.querySelector('meta[name="spw:mobile-breakpoint"]')?.getAttribute('content') ?? '';
   const metaCompactBreakpoint =
@@ -179,6 +173,10 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
   const viewportMode = normalizeViewportMode(
     overrides.viewportMode ?? metaViewportMode ?? root?.dataset?.spwViewportMode
   );
+  const spaceMode = normalizeSpaceMode(
+    overrides.spaceMode ?? metaSpaceMode ?? root?.dataset?.spwSpaceMode,
+    DEFAULT_SPACE_MODE
+  );
   const mobileBreakpoint = normalizeBreakpoint(
     overrides.mobileBreakpoint ?? metaMobileBreakpoint ?? root?.dataset?.spwMobileBreakpoint,
     DEFAULT_MOBILE_BREAKPOINT
@@ -201,6 +199,7 @@ export function readRuntimeConfig({ documentRef = globalThis.document, overrides
     hostManifestRequired,
     hostEnhancementManifestPath,
     viewportMode,
+    spaceMode,
     mobileBreakpoint,
     compactBreakpoint
   });

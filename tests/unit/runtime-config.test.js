@@ -23,6 +23,7 @@ test('readRuntimeConfig normalizes embed mode and base url defaults', () => {
   assert.equal(config.hostManifestRequired, false);
   assert.equal(config.hostEnhancementManifestPath, '');
   assert.equal(config.viewportMode, 'adaptive');
+  assert.equal(config.spaceMode, 'adaptive');
   assert.equal(config.mobileBreakpoint, 900);
   assert.equal(config.compactBreakpoint, 640);
 });
@@ -50,6 +51,7 @@ test('readRuntimeConfig respects embedded overrides and disables service worker 
   assert.equal(config.hostManifestRequired, false);
   assert.equal(config.hostEnhancementManifestPath, '');
   assert.equal(config.viewportMode, 'adaptive');
+  assert.equal(config.spaceMode, 'adaptive');
   assert.equal(config.mobileBreakpoint, 900);
   assert.equal(config.compactBreakpoint, 640);
 });
@@ -150,6 +152,7 @@ test('readRuntimeConfig accepts host identity from overrides and meta tags', () 
 test('readRuntimeConfig accepts viewport controls from overrides and meta tags', () => {
   const metaValues = new Map([
     ['spw:viewport-mode', 'fixed'],
+    ['spw:space-mode', 'expansive'],
     ['spw:mobile-breakpoint', '960'],
     ['spw:compact-breakpoint', '700']
   ]);
@@ -186,16 +189,19 @@ test('readRuntimeConfig accepts viewport controls from overrides and meta tags',
     },
     overrides: {
       viewportMode: 'fixed',
+      spaceMode: 'compact',
       mobileBreakpoint: 1024,
       compactBreakpoint: 720
     }
   });
 
   assert.equal(fromMeta.viewportMode, 'fixed');
+  assert.equal(fromMeta.spaceMode, 'expansive');
   assert.equal(fromMeta.mobileBreakpoint, 960);
   assert.equal(fromMeta.compactBreakpoint, 700);
 
   assert.equal(fromOverrides.viewportMode, 'fixed');
+  assert.equal(fromOverrides.spaceMode, 'compact');
   assert.equal(fromOverrides.mobileBreakpoint, 1024);
   assert.equal(fromOverrides.compactBreakpoint, 720);
 });

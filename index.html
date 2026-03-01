@@ -20,6 +20,7 @@
     <meta name="spw:base-url" content="/" />
     <meta name="spw:sw-enabled" content="true" />
     <meta name="spw:auto-mount" content="true" />
+    <meta name="spw:space-mode" content="adaptive" />
     <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
     <meta name="spw:feature-index" content="/spw.index.json" />
     <meta name="spw:feature-index-spw" content="/spw.index.spw" />
@@ -60,7 +61,7 @@
       </header>
 
       <main id="main-content" class="site-main" role="main" data-spw-node="doc.root" data-spw-depth="0" data-spw-route="home">
-        <nav class="doc-hierarchy surface-panel" aria-label="Spw document hierarchy" data-spw-node="doc.hierarchy" data-spw-depth="1">
+        <nav class="doc-hierarchy surface-panel" aria-label="Spw document hierarchy" data-layout-region="hierarchy" data-layout-layer="support" data-layout-container="dense" data-spw-node="doc.hierarchy" data-spw-depth="1">
           <p class="doc-hierarchy__label">^hierarchy{ home }</p>
           <ol class="doc-hierarchy__list">
             <li><a href="#hero-title">Hero</a></li>
@@ -72,7 +73,7 @@
           </ol>
         </nav>
 
-        <section class="hero" aria-labelledby="hero-title" data-layout-region="hero" data-structure-label="Hero composition with identity copy and interactive click stage" data-spw-node="doc.hero" data-spw-depth="1">
+        <section class="hero" aria-labelledby="hero-title" data-layout-region="hero" data-layout-layer="primary" data-layout-container="wide" data-structure-label="Hero composition with identity copy and interactive click stage" data-spw-node="doc.hero" data-spw-depth="1">
           <div class="hero__copy" data-spw-node="doc.hero.copy" data-spw-depth="2">
             <p class="page-section__eyebrow">^profile</p>
             <h1 id="hero-title" class="hero__title" data-slot="hero_title">Spwashi</h1>
@@ -118,7 +119,7 @@
           </spw-click-stage>
         </section>
 
-        <section class="page-section" aria-labelledby="selected-work-title" data-layout-region="selected-work" data-structure-label="Selected work preview cards linking into deeper route pages" data-spw-node="doc.selected-work" data-spw-depth="1">
+        <section class="page-section" aria-labelledby="selected-work-title" data-layout-region="selected-work" data-layout-layer="support" data-layout-container="dense" data-structure-label="Selected work preview cards linking into deeper route pages" data-spw-node="doc.selected-work" data-spw-depth="1">
           <p class="page-section__eyebrow">^index[collections]</p>
           <h2 id="selected-work-title">Preview</h2>
           <ul class="selected-work-list" data-role="selected-work-list" data-spw-node="doc.selected-work.list" data-spw-depth="2">
@@ -147,6 +148,8 @@
           class="page-section surface-panel"
           aria-labelledby="shader-field-title"
           data-layout-region="shader-field"
+          data-layout-layer="ambient"
+          data-layout-container="wide"
           data-structure-label="Shader interaction field with keyboard and pointer controls that projects phase and performance profile"
           data-spw-node="doc.shader-field"
           data-spw-depth="1"
@@ -162,6 +165,8 @@
           class="page-section surface-panel"
           aria-labelledby="syntax-lab-title"
           data-layout-region="syntax-lab"
+          data-layout-layer="support"
+          data-layout-container="wide"
           data-structure-label="Exploratory syntax lab with clickable braces, swappable operators, and geometric navigation"
           data-spw-node="doc.syntax-lab"
           data-spw-depth="1"
@@ -170,7 +175,7 @@
           <spw-syntax-lab data-state="exploratory"></spw-syntax-lab>
         </section>
 
-        <section class="page-section" aria-labelledby="chapter-title" data-layout-region="chapters" data-structure-label="Progressive chapter panels that unlock by interaction phase" data-spw-node="doc.chapters" data-spw-depth="1">
+        <section class="page-section" aria-labelledby="chapter-title" data-layout-region="chapters" data-layout-layer="primary" data-layout-container="wide" data-structure-label="Progressive chapter panels that unlock by interaction phase" data-spw-node="doc.chapters" data-spw-depth="1">
           <p class="page-section__eyebrow">^layer-map</p>
           <h2 id="chapter-title">Modules</h2>
           <div class="chapter-grid" data-role="chapter-panels" data-spw-node="doc.chapters.grid" data-spw-depth="2">
@@ -189,12 +194,12 @@
           </div>
         </section>
 
-        <section class="page-section surface-panel" aria-labelledby="ecology-title" data-layout-region="ecology" data-structure-label="Live ecology map summarizing component roles and lifecycle activity" data-spw-node="doc.ecology" data-spw-depth="1">
+        <section class="page-section surface-panel" aria-labelledby="ecology-title" data-layout-region="ecology" data-layout-layer="support" data-layout-container="dense" data-structure-label="Live ecology map summarizing component roles and lifecycle activity" data-spw-node="doc.ecology" data-spw-depth="1">
           <h2 id="ecology-title" class="visually-hidden">Web component ecology</h2>
           <spw-ecology-map data-state="observing"></spw-ecology-map>
         </section>
 
-        <section class="page-section surface-panel" aria-labelledby="seed-atlas-title" data-layout-region="seed-atlas" data-enhancement-zone="seed-atlas" data-structure-label="Optional seed atlas enhancement zone for iterative visuals and behavior" data-spw-node="doc.seed-atlas" data-spw-depth="1">
+        <section class="page-section surface-panel" aria-labelledby="seed-atlas-title" data-layout-region="seed-atlas" data-layout-layer="ambient" data-layout-container="wide" data-enhancement-zone="seed-atlas" data-structure-label="Optional seed atlas enhancement zone for iterative visuals and behavior" data-spw-node="doc.seed-atlas" data-spw-depth="1">
           <p class="page-section__eyebrow">Iterative enhancement</p>
           <h2 id="seed-atlas-title">Seed Atlas</h2>
           <p>^enhancement-zone{ source: seed/site manifest: iterative behavior: progressive-hydration }</p>
@@ -205,7 +210,7 @@
           </div>
         </section>
 
-        <section class="page-section surface-panel" aria-labelledby="contact-title" data-layout-region="contact" data-structure-label="Contact call-to-action and collaboration entrypoint" data-spw-node="doc.contact" data-spw-depth="1">
+        <section class="page-section surface-panel" aria-labelledby="contact-title" data-layout-region="contact" data-layout-layer="support" data-layout-container="dense" data-structure-label="Contact call-to-action and collaboration entrypoint" data-spw-node="doc.contact" data-spw-depth="1">
           <p class="page-section__eyebrow">^contact</p>
           <h2 id="contact-title">Channels</h2>
           <p>

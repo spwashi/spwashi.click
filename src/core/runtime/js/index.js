@@ -22,3 +22,4 @@ export * from './spw-command-surface.js';
 export * from './spwlang-parser.js';
 export * from './store.js';
 export * from './structure-mode.js';
+export * from './viewport-space.js';
