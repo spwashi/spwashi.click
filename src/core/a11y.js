@@ -8,8 +8,10 @@
  */
 
 // Cache for nav links to avoid repeated DOM queries.
-// Note: querySelectorAll returns a static NodeList, so cached results won't reflect
-// dynamically added/removed links. This is acceptable because nav links are static in this site.
+// WeakMap key: rootElement, Value: static NodeList from querySelectorAll.
+// Note: querySelectorAll returns a static NodeList (not live), so cached results won't reflect
+// dynamically added/removed links. This is acceptable because nav links are static in this site
+// and the rootElement (site-shell component) is a singleton that doesn't get replaced.
 const navLinksCache = new WeakMap();
 
 export function installAccessibilityEnhancements(doc = globalThis.document) {
