@@ -13,10 +13,15 @@
   @shelves: ~"./shelves.spw"
   @topology: ~"./topology.spw"
   @editing: ~"./editing.spw"
+  @runtime_module: ~"../src/runtime/index.js"
+  @runtime_config: ~"../src/core/runtime-config.js"
+  @medium_flow: ~"../src/core/medium-flow.js"
   @command_surface: ~"../src/core/spw-command-surface.js"
   @pwa_runtime: ~"../src/core/pwa.js"
   @manifest: ~"../manifest.webmanifest"
   @service_worker: ~"../sw.js"
+  @assets_manifest: ~"../assets.manifest.json"
+  @assets_export_script: ~"../scripts/export-assets.js"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
   @workbench: ~"../seed/extern/spw-workbench"
@@ -39,7 +44,7 @@
   pragmatics: {
     #:layer #!use_time
     owns: "runtime control, editor integration, crawler traversal, release arcs"
-    surfaces: [@repo/src/core/runtime-control.js, @command_surface, @pwa_runtime, @manifest, @service_worker, @topology, @editing]
+    surfaces: [@runtime_module, @runtime_config, @medium_flow, @repo/src/core/runtime-control.js, @command_surface, @pwa_runtime, @manifest, @service_worker, @assets_manifest, @assets_export_script, @topology, @editing]
     invariant: "Pragmatic behavior projects into terminals, editors, and static site surfaces."
   }
 }
@@ -56,9 +61,14 @@
   topology: @topology
   editing: @editing
   command_surface: @command_surface
+  runtime_module: @runtime_module
+  runtime_config: @runtime_config
+  medium_flow: @medium_flow
   pwa_runtime: @pwa_runtime
   pwa_manifest: @manifest
   pwa_service_worker: @service_worker
+  assets_manifest: @assets_manifest
+  assets_export_script: @assets_export_script
   crawler_manifest_json: @crawler_json
   crawler_manifest_spw: @crawler_spw
 }

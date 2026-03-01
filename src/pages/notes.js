@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Compose the notes route as a readable sequence of thematic fragments with clear replacement slots.
- * Invariants:
- * Note entries keep title/date/excerpt structure for scanability and future expansion.
- * How this composes with neighbors:
- * Uses shared hydration helpers while preserving the same shell and route-aware styling model.
+ * ^intent:
+ * ^intent[module]{ id:pages.notes mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { applySlots, clearElementChildren } from './shared.js';

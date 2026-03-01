@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Accept compact Spw command forms and map them to runtime control operations so language expressions can mutate the site directly.
- * Invariants:
- * Command parsing is deterministic, command-to-method mapping is explicit, and unsupported forms fail with structured errors.
- * How this composes with neighbors:
- * Runtime control delegates `evalSpw`/`run('spw', ...)` to this module; parser bridge remains the single parser entrypoint.
+ * ^intent:
+ * ^intent[module]{ id:core.spw-command-surface mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { parseSpwForm } from './spwlang-parser.js';

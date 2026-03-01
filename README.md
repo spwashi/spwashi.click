@@ -9,6 +9,7 @@ Static multi-page website built with vanilla ES modules, Web Components, and CSS
 - State model: immutable app store in `src/core/store.js`
 - Ecology model: lifecycle ledger in `src/core/ecology.js`
 - Iterative enhancement loader: `src/core/iterative-enhancement.js`
+- Medium flow cadence controller: `src/core/medium-flow.js`
 - Software literature marginalia: `src/core/literature.js`
 - Interaction contracts: typed custom events in `src/core/events.js`
 - Components:
@@ -39,6 +40,7 @@ git submodule update --init --recursive
 - `npm run lint`: checks source modules for code-as-literature headers and named exports only.
 - `npm run test`: runs unit and static e2e scenario tests.
 - `npm run build`: outputs deployable static artifacts into `dist/`.
+- `npm run export:assets -- --target <path> [--mode copy|symlink] [--clean]`: exports runtime/assets/contracts for host repos.
 
 ## Deploy
 
@@ -64,6 +66,7 @@ This keeps behavior contracts explicit and reviewable.
 - `docs/iterative-enhancement.md`
 - `docs/spwlang-parser-bridge.md`
 - `docs/llm-crawler-contract.md`
+- `docs/embed-package.md`
 
 These docs intentionally mirror the layered, waypointed thinking found in `seed/extern/spw-workbench` while keeping this repository independently shippable.
 
@@ -74,12 +77,19 @@ Crawler-visible index surfaces:
 - `spw.index.json`
 - `spw.index.spw`
 - `.spw/workspace.spw`
+- `assets.manifest.json`
 
 Runtime exposure:
 
 - `window.__SPW_RUNTIME__.getCatalog()`
 - `window.__SPW_RUNTIME__.run('catalog', { summaryOnly: true })`
 - `window.__SPW_RUNTIME__.evalSpw('!top{ route:notes clicks:8 profile:maximal llm:true }')`
+
+Package/embedded runtime entry:
+
+- `src/runtime/index.js`
+- `package.json` export: `./runtime`
+- runtime modes: `standalone | embedded | assets-only`
 
 ## Release and Cache Policy
 

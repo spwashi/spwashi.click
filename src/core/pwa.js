@@ -1,13 +1,15 @@
 /**
- * Intent:
- * Register and monitor service worker + online state so the static site behaves as a release-aware installable PWA.
- * Invariants:
- * Registration is optional, state projection is explicit on <html>, and failures degrade gracefully without blocking page boot.
- * How this composes with neighbors:
- * Boot installs this once, marginalia logs transitions, and service worker handles release-tagged caching at the network edge.
+ * ^intent:
+ * ^intent[module]{ id:core.pwa mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { EVENT_PWA_STATE_CHANGED, dispatchTypedEvent } from './events.js';
+import { resolveRuntimeAssetUrl } from './runtime-config.js';
 
 function isServiceWorkerSupported(win = globalThis.window) {
   return Boolean(win?.navigator?.serviceWorker);
@@ -30,6 +32,25 @@ function networkState(win = globalThis.window) {
   return win.navigator.onLine ? 'online' : 'offline';
 }
 
+function serviceWorkerScope(runtimeConfig = {}) {
+  const baseUrl = String(runtimeConfig.baseUrl ?? '/').trim();
+  if (/^https?:\/\//i.test(baseUrl)) {
+    try {
+      const pathname = new URL(baseUrl).pathname;
+      return pathname.endsWith('/') ? pathname : `${pathname}/`;
+    } catch {
+      return '/';
+    }
+  }
+
+  if (!baseUrl) {
+    return '/';
+  }
+
+  const normalized = baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`;
+  return normalized.endsWith('/') ? normalized : `${normalized}/`;
+}
+
 function setRootState(doc, nextState, details = {}) {
   const root = doc?.documentElement;
   if (!root) {
@@ -48,7 +69,13 @@ function setRootState(doc, nextState, details = {}) {
   }
 }
 
-export function installPwaSupport({ document: doc, window: win, releaseMeta, onStateChange } = {}) {
+export function installPwaSupport({
+  document: doc,
+  window: win,
+  releaseMeta,
+  runtimeConfig = {},
+  onStateChange
+} = {}) {
   if (!doc || !win) {
     return {
       supported: false,
@@ -62,9 +89,9 @@ export function installPwaSupport({ document: doc, window: win, releaseMeta, onS
     };
   }
 
-  const root = doc.documentElement;
   const assetVersion = releaseMeta?.assetVersion ?? 'dev';
-  const workerUrl = `/sw.js?v=${encodeURIComponent(assetVersion)}`;
+  const workerUrl = resolveRuntimeAssetUrl('/sw.js', runtimeConfig, { assetVersion });
+  const scope = serviceWorkerScope(runtimeConfig);
   const snapshot = {
     state: 'idle',
     network: networkState(win),
@@ -122,7 +149,7 @@ export function installPwaSupport({ document: doc, window: win, releaseMeta, onS
 
   (async () => {
     try {
-      registration = await win.navigator.serviceWorker.register(workerUrl, { scope: '/' });
+      registration = await win.navigator.serviceWorker.register(workerUrl, { scope });
       emit('ready', {
         reason: 'service-worker:registered',
         scope: registration.scope

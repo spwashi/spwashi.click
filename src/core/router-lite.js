@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide predictable route parsing for multi-page static navigation under a custom-domain root.
- * Invariants:
- * Only home/work/notes are public routes and every route has a canonical href.
- * How this composes with neighbors:
- * Boot derives activeRoute from pathname and site-shell highlights navigation using these helpers.
+ * ^intent:
+ * ^intent[module]{ id:core.router-lite mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const ROUTE_TO_HREF = Object.freeze({

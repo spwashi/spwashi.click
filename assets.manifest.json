@@ -1,0 +1,46 @@
+{
+  "schema": "spw-assets/v1",
+  "assetVersion": "__ASSET_VERSION__",
+  "release": {
+    "date": "__RELEASE_DATE__",
+    "id": "__RELEASE_ID__",
+    "arc": "__RELEASE_ARC__",
+    "vibe": "__RELEASE_VIBE__"
+  },
+  "runtime": {
+    "module": "/src/runtime/index.js?v=__ASSET_VERSION__",
+    "boot": "/src/core/boot.js?v=__ASSET_VERSION__",
+    "config_meta": [
+      "spw:embed-mode",
+      "spw:base-url",
+      "spw:sw-enabled",
+      "spw:auto-mount"
+    ],
+    "modes": [
+      "standalone",
+      "embedded",
+      "assets-only"
+    ]
+  },
+  "styles": [
+    "/src/styles/tokens.css?v=__ASSET_VERSION__",
+    "/src/styles/base.css?v=__ASSET_VERSION__",
+    "/src/styles/layout.css?v=__ASSET_VERSION__",
+    "/src/styles/components.css?v=__ASSET_VERSION__"
+  ],
+  "contracts": [
+    "/spw.index.json",
+    "/spw.index.spw",
+    "/.spw/workspace.spw"
+  ],
+  "assets": [
+    "/favicon.svg",
+    "/manifest.webmanifest?v=__ASSET_VERSION__",
+    "/sw.js?v=__ASSET_VERSION__"
+  ],
+  "optional": [
+    "/seed/site/enhancements.manifest.json?v=__ASSET_VERSION__",
+    "/seed/images/"
+  ]
+}
+

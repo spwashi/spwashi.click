@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide a compact machine-readable feature catalog so runtime agents can inspect current capabilities before proposing changes.
- * Invariants:
- * Catalog entries are pointer-first (id + files + spw contract) and avoid speculative future claims.
- * How this composes with neighbors:
- * Runtime control exposes this catalog; docs and crawler manifests mirror the same feature ids for cross-surface consistency.
+ * ^intent:
+ * ^intent[module]{ id:content.feature-catalog mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 export const SPW_FEATURE_CATALOG = Object.freeze({
@@ -70,6 +71,16 @@ export const SPW_FEATURE_CATALOG = Object.freeze({
         'sw.js',
         'manifest.webmanifest',
         'scripts/build-static.js'
+      ])
+    }),
+    Object.freeze({
+      id: 'medium-flow',
+      route: 'global',
+      spw: '^feature[medium-flow]{ cadence:autoplay facets:layout-region controls:arrow+space+home }',
+      files: Object.freeze([
+        'src/core/medium-flow.js',
+        'src/core/runtime.js',
+        'src/styles/components.css'
       ])
     })
   ])

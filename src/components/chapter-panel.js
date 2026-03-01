@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Reveal narrative chapters progressively so content rhythm tracks interaction phase progression.
- * Invariants:
- * unlock-at phase gates visual/semantic locked state and never mutates chapter content.
- * How this composes with neighbors:
- * Store phase changes flow through this component via subscription and data attributes.
+ * ^intent:
+ * ^intent[module]{ id:components.chapter-panel mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { phaseWeight } from '../core/motion.js';

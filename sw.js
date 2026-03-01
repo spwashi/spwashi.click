@@ -21,6 +21,7 @@ const CORE_URLS = Object.freeze([
   '/src/styles/base.css?v=__ASSET_VERSION__',
   '/src/styles/layout.css?v=__ASSET_VERSION__',
   '/src/styles/components.css?v=__ASSET_VERSION__',
+  '/src/runtime/index.js?v=__ASSET_VERSION__',
   '/src/core/boot.js?v=__ASSET_VERSION__'
 ]);
 
@@ -30,7 +31,7 @@ async function cacheUrls(cacheName, urls) {
     try {
       await cache.add(url);
     } catch {
-      // Skip any URL that fails to cache so install can still succeed.
+      // ^fallback[cache-add]{ miss:ignore install:continue }
     }
   }
 }
@@ -163,4 +164,3 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-

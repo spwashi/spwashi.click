@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide tiny DOM utilities for page modules so slot hydration and list rendering stay consistent.
- * Invariants:
- * Slot hydration only touches elements that explicitly opt in with data-slot attributes.
- * How this composes with neighbors:
- * Route-specific page initializers reuse these helpers to map content manifests to static templates.
+ * ^intent:
+ * ^intent[module]{ id:pages.shared mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { isLikelySpwForm, parseSpwForm } from '../core/spwlang-parser.js';

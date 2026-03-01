@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Compose the work route as structured project cards with explicit placeholder slots for later case studies.
- * Invariants:
- * Every project card keeps a stable id anchor and consistent semantic structure.
- * How this composes with neighbors:
- * Shares shell/component system with other routes while hydrating work-specific manifest content.
+ * ^intent:
+ * ^intent[module]{ id:pages.work mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { applySlots, clearElementChildren } from './shared.js';

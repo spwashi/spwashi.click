@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Render a live ecology snapshot so component relationships and lifecycle activity are legible in the UI.
- * Invariants:
- * Ecology map reads from app.ecology snapshots only and never mutates app state.
- * How this composes with neighbors:
- * Boot initializes ecology and this component subscribes to it; CSS consumes data attributes for phase-aware styling.
+ * ^intent:
+ * ^intent[module]{ id:components.ecology-map mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { noteComponentLifecycle } from '../core/ecology.js';

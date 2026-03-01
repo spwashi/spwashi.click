@@ -43,6 +43,16 @@ The component writes global runtime flags on `<html>`:
 
 This means symbolic navigation is not isolated to the lab; it can reframe page layout and component presentation coherently.
 
+## Medium Flow
+
+`src/core/medium-flow.js` installs an optional cadence controller:
+
+- Treats `[data-layout-region]` sections as facets in a continuous medium.
+- Advances click-phase state over time (`medium:auto`) to keep composition moving.
+- Uses keyboard controls as language controls (`ArrowUp/ArrowDown`, `Space`, `ArrowRight`, `Home`).
+
+The console overlay is descriptive, not decorative; it exposes current facet, phase, and cadence reason in Spw form.
+
 ## Runtime Command Surface
 
 `src/core/spw-command-surface.js` maps compact Spw forms into runtime API calls:

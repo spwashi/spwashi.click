@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Render a compact SVG rhythm field that makes interaction intensity visible without textual explanation.
- * Invariants:
- * Intensity is constrained to 0..3 and maps to deterministic active cell counts.
- * How this composes with neighbors:
- * Click-stage updates the intensity attribute and CSS animates active SVG cells via data-state hooks.
+ * ^intent:
+ * ^intent[module]{ id:components.rhythm-grid mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { noteComponentLifecycle } from '../core/ecology.js';

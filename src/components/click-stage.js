@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Host the signature click interaction and project phase/layer state into visible SVG and text artifacts.
- * Invariants:
- * UI reflects store state exclusively and click intent is emitted as an event, not by direct store mutation.
- * How this composes with neighbors:
- * Boot listens for click intent events; chapter panels and shell react to resulting phase transitions.
+ * ^intent:
+ * ^intent[module]{ id:components.click-stage mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';

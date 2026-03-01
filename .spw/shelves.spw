@@ -19,10 +19,15 @@
   @scripts: ~"../scripts"
   @workbench: ~"../seed/extern/spw-workbench"
   @runtime: ~"../src/core/runtime-control.js"
+  @runtime_module: ~"../src/runtime/index.js"
+  @runtime_config: ~"../src/core/runtime-config.js"
+  @runtime_medium: ~"../src/core/medium-flow.js"
   @runtime_spw_command: ~"../src/core/spw-command-surface.js"
   @runtime_pwa: ~"../src/core/pwa.js"
   @manifest: ~"../manifest.webmanifest"
   @service_worker: ~"../sw.js"
+  @assets_manifest: ~"../assets.manifest.json"
+  @export_script: ~"../scripts/export-assets.js"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
 }
@@ -31,7 +36,7 @@
   macro: [@core, @components, @content, @styles]
   measurement: [@tests, @scripts]
   prose: [@docs, @crawler_json, @crawler_spw]
-  runtime: [@runtime, @runtime_spw_command, @runtime_pwa, @manifest, @service_worker, @seed]
+  runtime: [@runtime_module, @runtime_config, @runtime_medium, @runtime, @runtime_spw_command, @runtime_pwa, @manifest, @service_worker, @assets_manifest, @export_script, @seed]
   north_star: @workbench
 }
 

@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Own global shell state projection so route, phase, and navigation affordances stay consistent across pages.
- * Invariants:
- * Route links are annotated with aria-current for the active route and host dataset mirrors store state.
- * How this composes with neighbors:
- * Boot provides the app store; this component subscribes and emits navigation intent events.
+ * ^intent:
+ * ^intent[module]{ id:components.site-shell mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { ensureAriaCurrent } from '../core/a11y.js';

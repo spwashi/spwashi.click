@@ -16,6 +16,10 @@ test('all pages include shared boot module and viewport metadata', async () => {
     assert.match(html, /<meta name="spw:release-arc" content="__RELEASE_ARC__"\s*\/>/);
     assert.match(html, /<meta name="spw:release-vibe" content="__RELEASE_VIBE__"\s*\/>/);
     assert.match(html, /<meta name="spw:asset-version" content="__ASSET_VERSION__"\s*\/>/);
+    assert.match(html, /<meta name="spw:embed-mode" content="standalone"\s*\/>/);
+    assert.match(html, /<meta name="spw:base-url" content="\/"\s*\/>/);
+    assert.match(html, /<meta name="spw:sw-enabled" content="true"\s*\/>/);
+    assert.match(html, /<meta name="spw:auto-mount" content="true"\s*\/>/);
     assert.match(html, /<meta name="spw:texture-cache-origin" content="https:\/\/tealstripesvibes\.com"\s*\/>/);
     assert.match(html, /<meta name="spw:feature-index" content="\/spw\.index\.json"\s*\/>/);
     assert.match(html, /<meta name="spw:feature-index-spw" content="\/spw\.index\.spw"\s*\/>/);
@@ -74,9 +78,12 @@ test('styles include responsive and reduced-motion constraints', async () => {
 test('pwa assets exist with release-aware placeholders and install handlers', async () => {
   const manifest = await readFile(new URL('../../manifest.webmanifest', import.meta.url), 'utf8');
   const serviceWorker = await readFile(new URL('../../sw.js', import.meta.url), 'utf8');
+  const assetsManifest = await readFile(new URL('../../assets.manifest.json', import.meta.url), 'utf8');
 
   assert.match(manifest, /"start_url": "\/\?source=pwa"/);
   assert.match(manifest, /__ASSET_VERSION__/);
+  assert.match(assetsManifest, /"schema": "spw-assets\/v1"/);
+  assert.match(assetsManifest, /"runtime":/);
   assert.match(serviceWorker, /const RELEASE_TAG = '__ASSET_VERSION__'/);
   assert.match(serviceWorker, /self\.addEventListener\('install'/);
   assert.match(serviceWorker, /self\.addEventListener\('fetch'/);

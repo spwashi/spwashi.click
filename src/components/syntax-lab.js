@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Prototype spw exploratory interaction grammar with clickable braces, swappable operators, and geometric navigation.
- * Invariants:
- * Operator swaps are explicit two-step actions and facet resolution stays deterministic for the same operator ordering.
- * How this composes with neighbors:
- * Home route mounts this component; it mutates only local state while delegating page scroll/navigation to route anchors.
+ * ^intent:
+ * ^intent[module]{ id:components.syntax-lab mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { noteComponentLifecycle } from '../core/ecology.js';

@@ -15,6 +15,7 @@ const REQUIRED_COPY_TARGETS = [
   'sitemap.xml',
   'manifest.webmanifest',
   'sw.js',
+  'assets.manifest.json',
   'favicon.svg',
   'spw.index.json',
   'spw.index.spw',
@@ -25,7 +26,7 @@ const REQUIRED_COPY_TARGETS = [
 ];
 const OPTIONAL_COPY_TARGETS = ['seed/site', 'seed/images', '.spw'];
 const DIST_HTML_FILES = ['index.html', '404.html', 'work/index.html', 'notes/index.html'];
-const DIST_TEMPLATE_FILES = ['manifest.webmanifest', 'sw.js'];
+const DIST_TEMPLATE_FILES = ['manifest.webmanifest', 'sw.js', 'assets.manifest.json'];
 
 async function copyTarget(target) {
   const sourcePath = path.join(ROOT_DIR, target);

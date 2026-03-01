@@ -15,7 +15,7 @@
   subagent: explorer
   cache_tree: @spw/cache/core
   cache_key_prefix: core
-  topology_refs: [@core/boot.js, @core/store.js, @core/events.js, @core/spw-command-surface.js, @core/pwa.js, @repo/sw.js]
+  topology_refs: [@core/boot.js, @core/runtime.js, @core/runtime-config.js, @core/medium-flow.js, @core/store.js, @core/events.js, @core/spw-command-surface.js, @core/pwa.js, @repo/sw.js, @repo/assets.manifest.json, @scripts/export-assets.js]
 }
 
 ^subroot[content]{

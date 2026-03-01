@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Centralize release metadata and cache-busting URL behavior so asset freshness is deterministic per release.
- * Invariants:
- * Asset version strings are stable for a release and URL rewriting preserves existing query parameters.
- * How this composes with neighbors:
- * Build populates release placeholders in HTML; boot and enhancement loader read metadata from document-level release tags.
+ * ^intent:
+ * ^intent[module]{ id:core.release mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const DEFAULT_RELEASE_DATE = new Date().toISOString().slice(0, 10);

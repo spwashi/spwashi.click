@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Expose tunable performance/motion profiles so exploratory visuals can scale from low-cost seed mode to maximal atmosphere.
- * Invariants:
- * Profile application is deterministic, persisted per user, and reflected as both dataset flags and CSS variables.
- * How this composes with neighbors:
- * Boot installs this controller once; CSS consumes the fx variables; atmosphere drift reads active profile frame budgets.
+ * ^intent:
+ * ^intent[module]{ id:core.performance-tuning mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const STORAGE_KEY = 'spw:settings:performance-profile';
@@ -98,7 +99,7 @@ function saveProfile(win, profile) {
   try {
     win.localStorage.setItem(STORAGE_KEY, profile);
   } catch {
-    // Storage writes are optional.
+    // ^fallback[persist]{ localstorage:optional mode:session-only }
   }
 }
 

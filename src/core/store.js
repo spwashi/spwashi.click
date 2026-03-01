@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Hold app state transitions in one immutable store so UI behavior remains deterministic and testable.
- * Invariants:
- * State snapshots are frozen and clickCount drives phase/layer derivation without side effects.
- * How this composes with neighbors:
- * Boot owns the store lifecycle; components subscribe and dispatch intent events rather than mutating directly.
+ * ^intent:
+ * ^intent[module]{ id:core.store mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { phaseFromClickCount, unlockedLayersFromPhase } from './motion.js';

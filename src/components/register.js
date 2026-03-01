@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Register all custom elements from one place so boot order is explicit and deterministic.
- * Invariants:
- * Each element is defined at most once and keeps a stable tag name contract.
- * How this composes with neighbors:
- * Boot calls defineAllComponents after store creation so upgraded elements can subscribe immediately.
+ * ^intent:
+ * ^intent[module]{ id:components.register mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { CORE_SPECIES } from '../core/ecology.js';

@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Hold authored content in plain objects so page modules stay focused on composition, not copywriting.
- * Invariants:
- * Slot keys are stable IDs referenced by data-slot attributes in HTML templates.
- * How this composes with neighbors:
- * Page initializers consume these manifests and hydrate placeholder slots consistently.
+ * ^intent:
+ * ^intent[module]{ id:content.manifests mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 export const SITE_MANIFEST = Object.freeze({

@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Render a lightweight shader-like canvas field that turns pointer/keyboard input into visible harmonic motion.
- * Invariants:
- * Rendering adapts to route phase + performance profile and never mutates store directly; interaction emits click intent events.
- * How this composes with neighbors:
- * Home route mounts this component, boot listens for emitted click intent, and global tuning variables influence its animation cost.
+ * ^intent:
+ * ^intent[module]{ id:components.shader-field mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { noteComponentLifecycle } from '../core/ecology.js';

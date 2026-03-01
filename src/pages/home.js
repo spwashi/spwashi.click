@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Compose the home route with click-stage narrative, selected work previews, and progressive chapter panels.
- * Invariants:
- * Home route always exposes core copy even before any interaction occurs.
- * How this composes with neighbors:
- * Boot calls this initializer after store setup; shared helpers hydrate content slots and preview lists.
+ * ^intent:
+ * ^intent[module]{ id:pages.home mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { applySlots, clearElementChildren } from './shared.js';

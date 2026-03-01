@@ -19,10 +19,14 @@
   @editing: ~"./editing.spw"
   @src: ~"../src"
   @core: ~"../src/core"
+  @runtime_module: ~"../src/runtime/index.js"
+  @runtime_config: ~"../src/core/runtime-config.js"
+  @medium_flow: ~"../src/core/medium-flow.js"
   @command_surface: ~"../src/core/spw-command-surface.js"
   @pwa_runtime: ~"../src/core/pwa.js"
   @manifest: ~"../manifest.webmanifest"
   @service_worker: ~"../sw.js"
+  @assets_manifest: ~"../assets.manifest.json"
   @components: ~"../src/components"
   @content: ~"../src/content"
   @styles: ~"../src/styles"
@@ -30,6 +34,7 @@
   @seed: ~"../seed"
   @tests: ~"../tests"
   @scripts: ~"../scripts"
+  @export_script: ~"../scripts/export-assets.js"
   @workbench: ~"../seed/extern/spw-workbench"
   @crawler_json: ~"../spw.index.json"
   @crawler_spw: ~"../spw.index.spw"
@@ -43,11 +48,16 @@
   crawler_json: @crawler_json
   crawler_spw: @crawler_spw
   runtime_boot: @core/boot.js
+  runtime_module: @runtime_module
+  runtime_config: @runtime_config
+  runtime_medium_flow: @medium_flow
   runtime_control: @core/runtime-control.js
   runtime_spw_command_surface: @command_surface
   runtime_pwa: @pwa_runtime
   pwa_manifest: @manifest
   pwa_service_worker: @service_worker
+  assets_manifest: @assets_manifest
+  assets_export_script: @export_script
   parser_bridge: @core/spwlang-parser.js
 }
 

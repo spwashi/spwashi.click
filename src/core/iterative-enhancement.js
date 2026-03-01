@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Load optional, seed-driven enhancements in deterministic stages without compromising baseline static behavior.
- * Invariants:
- * Missing or invalid enhancement manifests never break page rendering and each loaded enhancement gets isolated error handling.
- * How this composes with neighbors:
- * Boot runs this after page initialization; enhancements can subscribe to app state and render into explicit target zones.
+ * ^intent:
+ * ^intent[module]{ id:core.iterative-enhancement mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import {
@@ -12,7 +13,8 @@ import {
   EVENT_ENHANCEMENT_LOADED,
   dispatchTypedEvent
 } from './events.js';
-import { appendAssetVersion, readReleaseMeta } from './release.js';
+import { readReleaseMeta } from './release.js';
+import { readRuntimeConfig, resolveRuntimeAssetUrl } from './runtime-config.js';
 
 const DEFAULT_MANIFEST_PATH = '/seed/site/enhancements.manifest.json';
 
@@ -52,14 +54,16 @@ async function importEnhancementModule(modulePath) {
 export async function loadEnhancementManifest({
   fetchImpl = globalThis.fetch,
   manifestPath = DEFAULT_MANIFEST_PATH,
-  assetVersion = ''
+  assetVersion = '',
+  runtimeConfig = readRuntimeConfig()
 } = {}) {
   if (typeof fetchImpl !== 'function') {
     return createFallbackManifest('fetch-unavailable');
   }
 
   try {
-    const response = await fetchImpl(appendAssetVersion(manifestPath, assetVersion), { cache: 'no-store' });
+    const manifestUrl = resolveRuntimeAssetUrl(manifestPath, runtimeConfig, { assetVersion });
+    const response = await fetchImpl(manifestUrl, { cache: 'no-store' });
     if (!response.ok) {
       return createFallbackManifest('manifest-not-found');
     }
@@ -81,13 +85,15 @@ export async function runIterativeEnhancements({
   route,
   document,
   fetchImpl = globalThis.fetch,
-  manifestPath = DEFAULT_MANIFEST_PATH
+  manifestPath = DEFAULT_MANIFEST_PATH,
+  runtimeConfig = readRuntimeConfig({ documentRef: document })
 }) {
   const releaseMeta = readReleaseMeta(document);
   const manifest = await loadEnhancementManifest({
     fetchImpl,
     manifestPath,
-    assetVersion: releaseMeta.assetVersion
+    assetVersion: releaseMeta.assetVersion,
+    runtimeConfig
   });
   const activeEnhancements = manifest.enhancements.filter(
     (entry) => entry.enabled !== false && enhancementAppliesToRoute(entry, route)
@@ -101,7 +107,9 @@ export async function runIterativeEnhancements({
 
   for (const entry of activeEnhancements) {
     const enhancementId = entry.id ?? 'unknown-enhancement';
-    const modulePath = appendAssetVersion(entry.module, releaseMeta.assetVersion);
+    const modulePath = resolveRuntimeAssetUrl(entry.module, runtimeConfig, {
+      assetVersion: releaseMeta.assetVersion
+    });
 
     try {
       const installer = await importEnhancementModule(modulePath);

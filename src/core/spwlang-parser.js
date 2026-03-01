@@ -1,13 +1,14 @@
 /**
- * Intent:
- * Parse Spw-style copy as executable form, with optional delegation to a workbench-provided parser adapter.
- * Invariants:
- * Parser results are structured objects and fallback parsing is deterministic for the supported sigil-form subset.
- * How this composes with neighbors:
- * Pages annotate slot content validity and boot optionally installs a workbench parser adapter from seed enhancements.
+ * ^intent:
+ * ^intent[module]{ id:core.spwlang-parser mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
-import { appendAssetVersion } from './release.js';
+import { readRuntimeConfig, resolveRuntimeAssetUrl } from './runtime-config.js';
 
 const SPW_SIGIL_PATTERN = /^[~!%^@#?&*.^]/;
 const FALLBACK_FORM_PATTERN = /^([~!%^@#?&*.])([a-z0-9_-]+)?(?:\[([a-z0-9_.:+-]+)\])?\{([\s\S]*)\}$/;
@@ -104,10 +105,14 @@ export function parseSpwForm(input) {
   return fallbackParse(normalizedInput);
 }
 
-export async function installWorkbenchParserAdapter({ assetVersion = '' } = {}) {
-  const adapterPath = appendAssetVersion(
+export async function installWorkbenchParserAdapter({
+  assetVersion = '',
+  runtimeConfig = readRuntimeConfig()
+} = {}) {
+  const adapterPath = resolveRuntimeAssetUrl(
     '/seed/site/enhancements/workbench-parser-adapter.js',
-    assetVersion
+    runtimeConfig,
+    { assetVersion }
   );
 
   try {

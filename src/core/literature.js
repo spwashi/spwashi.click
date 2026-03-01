@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Keep an in-memory marginalia ledger so architecture decisions and state shifts read like an executable narrative.
- * Invariants:
- * Entries are immutable, ordered by insertion, and bounded to avoid unbounded growth.
- * How this composes with neighbors:
- * Boot writes milestone entries while features/components can append notes through the shared ledger API.
+ * ^intent:
+ * ^intent[module]{ id:core.literature mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const DEFAULT_LIMIT = 160;

@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide a toggleable low-noise structure-label mode that enriches ARIA descriptions for machine and assistive parsing.
- * Invariants:
- * Structure mode only annotates elements explicitly marked with data-structure-label and never changes layout semantics.
- * How this composes with neighbors:
- * Boot installs this once; pages/components opt in by adding data-structure-label and optional toggle controls.
+ * ^intent:
+ * ^intent[module]{ id:core.structure-mode mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const STORAGE_KEY = 'spw:settings:llm-readable-structure';
@@ -31,7 +32,7 @@ function persistMode(enabled, win = globalThis.window) {
   try {
     win.localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
   } catch {
-    // Storage is optional for this setting.
+    // ^fallback[persist]{ localstorage:optional mode:ephemeral-ok }
   }
 }
 

@@ -1,17 +1,15 @@
 /**
- * Intent:
- * Install baseline accessibility behavior so keyboard and reduced-motion users get first-class interaction.
- * Invariants:
- * Input modality is represented on the body element and remains synchronized with current interaction mode.
- * How this composes with neighbors:
- * Boot calls setup once; component styles respond to data-input-modality and aria attributes.
+ * ^intent:
+ * ^intent[module]{ id:core.a11y mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
-// Cache for nav links to avoid repeated DOM queries.
-// WeakMap key: rootElement, Value: static NodeList from querySelectorAll.
-// Note: querySelectorAll returns a static NodeList (not live), so cached results won't reflect
-// dynamically added/removed links. This is acceptable because nav links are static in this site
-// and the rootElement (site-shell component) is a singleton that doesn't get replaced.
+// ^memo[nav-links]{ cache:weakmap key:root-element value:static-nodelist strategy:query-once }
+// ^invariant[memo]{ nav-links:mostly-static root:singleton replacement:none }
 const navLinksCache = new WeakMap();
 
 export function installAccessibilityEnhancements(doc = globalThis.document) {
@@ -55,7 +53,7 @@ export function ensureAriaCurrent(rootElement, activeRoute) {
     return;
   }
 
-  // Use cached nav links if available, otherwise query and cache
+  // ^branch[memo]{ hit:reuse miss:query+cache }
   let navLinks = navLinksCache.get(rootElement);
   if (!navLinks) {
     navLinks = rootElement.querySelectorAll('[data-route]');

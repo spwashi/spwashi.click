@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide an explicit runtime control API so LLM agents can manipulate top-level state, regions, components, and CSS variables.
- * Invariants:
- * Control operations are deterministic, bounded to requested selectors, and return snapshots after every mutation.
- * How this composes with neighbors:
- * Boot installs this API once; store/controllers remain authoritative while control methods proxy into their public interfaces.
+ * ^intent:
+ * ^intent[module]{ id:core.runtime-control mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
@@ -81,6 +82,8 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       textureTunerState: root.dataset.textureTunerState ?? 'unknown',
       pwaState: root.dataset.pwaState ?? 'unknown',
       networkState: root.dataset.networkState ?? 'unknown',
+      embedMode: app.runtimeConfig?.embedMode ?? 'standalone',
+      baseUrl: app.runtimeConfig?.baseUrl ?? '/',
       catalogVersion: SPW_FEATURE_CATALOG.version
     };
   }

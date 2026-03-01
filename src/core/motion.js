@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Encode deterministic motion and phase logic so interaction rhythm stays consistent across components.
- * Invariants:
- * Click count uniquely determines phase, and phase uniquely determines unlocked visual layers.
- * How this composes with neighbors:
- * Store uses these pure functions for state transitions; components consume intensity and phase weights.
+ * ^intent:
+ * ^intent[module]{ id:core.motion mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 export const PHASE_ORDER = Object.freeze(['seed', 'pulse', 'counterpoint', 'chorus']);

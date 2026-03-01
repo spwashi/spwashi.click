@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Model the site's web-component ecology as a first-class runtime ledger so relationships and health stay observable.
- * Invariants:
- * Species metadata is immutable, and lifecycle notes are append-only counters keyed by component tag names.
- * How this composes with neighbors:
- * Boot owns the ledger lifecycle, component classes emit lifecycle notes, and ecology-map renders snapshots.
+ * ^intent:
+ * ^intent[module]{ id:core.ecology mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const INITIAL_LIFECYCLE_COUNTS = Object.freeze({

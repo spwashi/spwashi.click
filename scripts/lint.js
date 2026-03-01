@@ -5,11 +5,7 @@ import path from 'node:path';
 
 const ROOT_DIR = process.cwd();
 const SRC_DIR = path.join(ROOT_DIR, 'src');
-const REQUIRED_HEADER_LINES = [
-  'Intent:',
-  'Invariants:',
-  'How this composes with neighbors:'
-];
+const REQUIRED_HEADER_LINES = ['^intent:', '^invariants:', '^compose:'];
 
 async function walkFiles(directoryPath) {
   const entries = await readdir(directoryPath, { withFileTypes: true });
@@ -36,7 +32,7 @@ function checkModuleHeader(filePath, fileContents) {
     return [];
   }
 
-  return [`Missing module header line(s): ${missing.join(', ')}`];
+  return [`Missing Spw header line(s): ${missing.join(', ')}`];
 }
 
 function checkNoDefaultExport(filePath, fileContents) {

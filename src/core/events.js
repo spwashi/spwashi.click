@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Centralize event names and typed event helpers so component communication is explicit and inspectable.
- * Invariants:
- * Every dispatched app event is listed in KNOWN_EVENT_NAMES and carries a frozen detail payload.
- * How this composes with neighbors:
- * Boot, store bridges, and components import these symbols to avoid ad hoc string contracts.
+ * ^intent:
+ * ^intent[module]{ id:core.events mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 export const EVENT_INTENT_CLICK = 'spw:intent:click';

@@ -1,10 +1,11 @@
 /**
- * Intent:
- * Provide low-frequency element space sampling so components can adapt to their local geometry without heavy layout thrash.
- * Invariants:
- * Samples are normalized and banded deterministically, and cleanup always detaches observers/timers.
- * How this composes with neighbors:
- * Components and optional enhancements consume these helpers to project size bands into data attributes and CSS variables.
+ * ^intent:
+ * ^intent[module]{ id:core.space-metrics mode:spwlang surface:web }
+ * ^invariants:
+ * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
+ * ^invariant[state]{ mutation:public-api projection:data+aria }
+ * ^compose:
+ * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
  */
 
 const INLINE_BREAKPOINTS = Object.freeze([360, 560, 800, 1100]);

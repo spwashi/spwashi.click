@@ -951,6 +951,45 @@
     cursor: pointer;
   }
 
+  .medium-console {
+    position: fixed;
+    left: max(1rem, env(safe-area-inset-left));
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 60;
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    background: color-mix(in srgb, #071116 82%, var(--color-ink) 18%);
+    color: color-mix(in srgb, var(--color-accent-soft) 74%, white);
+    font-family: var(--font-mono);
+    pointer-events: none;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 34px rgba(6, 18, 22, 0.44);
+  }
+
+  .medium-console__line {
+    margin: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+
+  .medium-console__line--meta {
+    color: color-mix(in srgb, var(--color-brass) 72%, white);
+  }
+
+  [data-layout-region][data-medium-active='true'] {
+    outline: 2px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+    outline-offset: 5px;
+  }
+
+  html[data-medium-playing='false'] .medium-console {
+    border-style: dashed;
+    opacity: 0.86;
+  }
+
   .structure-toggle {
     border: 1px solid var(--color-border);
     background: transparent;
