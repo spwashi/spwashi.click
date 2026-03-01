@@ -1,0 +1,63 @@
+@layer reset, tokens, base, layout, components, utilities;
+
+@layer tokens {
+  :root {
+    --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+    --font-body: 'Literata', 'Iowan Old Style', 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', 'Menlo', monospace;
+
+    --color-bg: #f4ead8;
+    --color-surface: #f8f1e5;
+    --color-ink: #1f2a2f;
+    --color-muted: #5b6468;
+    --color-accent: #00b8d9;
+    --color-accent-soft: #76dce8;
+    --color-brass: #be8f2f;
+    --color-border: rgba(31, 42, 47, 0.2);
+    --color-focus: #0d8da7;
+
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.5rem;
+    --spacing-6: 2rem;
+    --spacing-7: 3rem;
+    --spacing-8: 4rem;
+
+    --radius-sm: 0.4rem;
+    --radius-md: 0.9rem;
+    --radius-lg: 1.6rem;
+
+    --shadow-soft: 0 10px 40px rgba(31, 42, 47, 0.1);
+    --shadow-hard: 0 4px 0 rgba(31, 42, 47, 0.2);
+
+    --duration-fast: 140ms;
+    --duration-base: 280ms;
+    --duration-slow: 500ms;
+    --ease-jazz: cubic-bezier(0.32, 0.94, 0.6, 1);
+
+    --container-max: 72rem;
+
+    --fx-motion-gain: 0.56;
+    --fx-light-depth: 0.68;
+    --fx-texture-gain: 0.42;
+    --fx-blur-px: 18;
+    --fx-shadow-gain: 1;
+    --fx-grain-alpha: 0.06;
+    --fx-drift-x: 0px;
+    --fx-drift-y: 0px;
+    --fx-lumen-angle: 128deg;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --color-bg: #f8f4ec;
+      --color-surface: #ffffff;
+      --color-ink: #111111;
+      --color-muted: #2f2f2f;
+      --color-border: rgba(0, 0, 0, 0.45);
+      --color-focus: #005c6f;
+    }
+  }
+}

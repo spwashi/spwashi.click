@@ -1,0 +1,215 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import { installRuntimeControl } from '../../src/core/runtime-control.js';
+
+function createStoreStub() {
+  let state = {
+    clickCount: 0,
+    phase: 'seed',
+    unlockedLayers: ['geometry'],
+    reducedMotion: false,
+    activeRoute: 'home',
+    lastClickSource: 'bootstrap'
+  };
+
+  return {
+    getState() {
+      return state;
+    },
+    setRoute(route) {
+      state = { ...state, activeRoute: route };
+      return state;
+    },
+    setReducedMotion(value) {
+      state = { ...state, reducedMotion: Boolean(value) };
+      return state;
+    },
+    resetClickCount() {
+      state = { ...state, clickCount: 0 };
+      return state;
+    },
+    update(recipe) {
+      const draft = { ...state, unlockedLayers: [...state.unlockedLayers] };
+      const next = recipe(draft) ?? draft;
+      state = {
+        ...state,
+        ...next,
+        clickCount: Number.isFinite(next.clickCount) ? next.clickCount : state.clickCount
+      };
+      return state;
+    }
+  };
+}
+
+function createNodeStub() {
+  const attributes = new Map();
+  const styleMap = new Map();
+
+  return {
+    dataset: {},
+    textContent: '',
+    style: {
+      setProperty(name, value) {
+        styleMap.set(name, String(value));
+      },
+      removeProperty(name) {
+        styleMap.delete(name);
+      },
+      getPropertyValue(name) {
+        return styleMap.get(name) ?? '';
+      }
+    },
+    setAttribute(name, value) {
+      attributes.set(name, String(value));
+    },
+    removeAttribute(name) {
+      attributes.delete(name);
+    },
+    getAttribute(name) {
+      return attributes.get(name) ?? null;
+    }
+  };
+}
+
+function createDocumentStub() {
+  const root = createNodeStub();
+  const regionNode = createNodeStub();
+
+  return {
+    documentElement: root,
+    querySelectorAll(selector) {
+      if (selector === '.region') {
+        return [regionNode];
+      }
+
+      return [];
+    }
+  };
+}
+
+function createWindowStub() {
+  const events = [];
+  return {
+    events,
+    dispatchEvent(event) {
+      events.push(event.type);
+      return true;
+    }
+  };
+}
+
+test('runtime control setTopLevel and setRegion mutate state and nodes', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+
+  const app = {
+    store,
+    ecology: { getSnapshot: () => ({ species: {} }) },
+    releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {}
+  });
+
+  const snapshot = win.__SPW_RUNTIME__.setTopLevel({
+    route: 'notes',
+    clickCount: 6,
+    performanceProfile: 'maximal',
+    llmReadableStructure: true
+  });
+
+  assert.equal(snapshot.state.activeRoute, 'notes');
+  assert.equal(snapshot.state.clickCount, 6);
+  assert.equal(snapshot.performanceProfile, 'maximal');
+  assert.equal(snapshot.llmReadableStructure, true);
+
+  const regionResult = win.__SPW_RUNTIME__.setRegion({
+    selector: '.region',
+    params: {
+      attributes: { 'data-mode': 'active' },
+      dataset: { state: 'hot' },
+      style: { '--fx-custom': '0.9' },
+      text: '^region{ tuned }'
+    }
+  });
+
+  assert.equal(regionResult.matched, 1);
+  assert.equal(doc.querySelectorAll('.region')[0].getAttribute('data-mode'), 'active');
+  assert.equal(doc.querySelectorAll('.region')[0].dataset.state, 'hot');
+  assert.equal(doc.querySelectorAll('.region')[0].style.getPropertyValue('--fx-custom'), '0.9');
+
+  cleanup();
+  assert.equal(typeof win.__SPW_RUNTIME__, 'undefined');
+});
+
+test('runtime control reset and rebind methods are available', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+  let rebindCalls = 0;
+
+  const app = {
+    store,
+    ecology: { getSnapshot: () => ({ species: {} }) },
+    releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {
+      rebindCalls += 1;
+    }
+  });
+
+  win.__SPW_RUNTIME__.setTopLevel({ clickCount: 9, route: 'work' });
+  const resetSnapshot = win.__SPW_RUNTIME__.run('reset', { route: 'home' });
+  assert.equal(resetSnapshot.state.clickCount, 0);
+  assert.equal(resetSnapshot.state.activeRoute, 'home');
+
+  const rebindSnapshot = win.__SPW_RUNTIME__.run('rebind');
+  assert.equal(rebindCalls, 1);
+  assert.equal(rebindSnapshot.state.activeRoute, 'home');
+  assert.ok(win.events.includes('spw:runtime:rebind'));
+
+  cleanup();
+});

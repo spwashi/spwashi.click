@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" data-route="home">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Spwashi site; language-as-ui; spw physics; structured interactive states."
+    />
+    <meta name="spw:release-date" content="__RELEASE_DATE__" />
+    <meta name="spw:release-id" content="__RELEASE_ID__" />
+    <meta name="spw:release-arc" content="__RELEASE_ARC__" />
+    <meta name="spw:release-vibe" content="__RELEASE_VIBE__" />
+    <meta name="spw:asset-version" content="__ASSET_VERSION__" />
+    <meta name="spw:texture-cache-origin" content="https://tealstripesvibes.com" />
+    <title>spwashi.click</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:opsz,wght@7..72,400;7..72,600&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/tokens.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/base.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/layout.css?v=__ASSET_VERSION__" />
+    <link rel="stylesheet" href="/src/styles/components.css?v=__ASSET_VERSION__" />
+  </head>
+  <body data-page="home">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <spw-site-shell route="home" aria-label="Site shell" data-structure-label="Site shell with route-aware header, main content, and footer">
+      <header class="site-header" role="banner">
+        <a class="site-brand" href="/" data-route="home">
+          <span class="site-brand__mark">spwashi.click</span>
+          <span class="site-brand__meta">mathematical jazz</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="/" data-route="home">Home</a>
+          <a href="/work/" data-route="work">Work</a>
+          <a href="/notes/" data-route="notes">Notes</a>
+        </nav>
+      </header>
+
+      <main id="main-content" class="site-main" role="main">
+        <section class="hero" aria-labelledby="hero-title" data-structure-label="Hero composition with identity copy and interactive click stage">
+          <div class="hero__copy">
+            <p class="page-section__eyebrow">^profile</p>
+            <h1 id="hero-title" class="hero__title" data-slot="hero_title">Spwashi</h1>
+            <p class="hero__tagline" data-slot="hero_tagline_slot">
+              ^identity[spwashi]{ physics: spw surface: web }
+            </p>
+            <p class="hero__subline" data-slot="hero_subline_slot">
+              ^state-model{ seed>pulse>counterpoint>chorus ui: language }
+            </p>
+            <p data-slot="intro_body_slot">
+              ^profile-slot{ ~summary: replace }
+            </p>
+          </div>
+
+          <spw-click-stage
+            class="hero__stage"
+            phase="seed"
+            clicks="0"
+            aria-label="Build the scene interaction"
+            data-state="interactive"
+            data-structure-label="Primary interaction component with trigger, status narration, SVG score, and rhythm grid"
+          >
+            <button type="button" class="click-stage__trigger" data-role="click-trigger" aria-controls="click-stage-status">
+              Click to build the scene
+            </button>
+            <p id="click-stage-status" class="click-stage__status" data-role="status" aria-live="polite">
+              ^phase[seed]{ model: geometry-init learn: click=>state } clicks: 0.
+            </p>
+
+            <svg viewBox="0 0 320 120" class="click-stage__score" data-role="svg-score" aria-hidden="true">
+              <path d="M 10 70 C 60 20, 120 95, 170 40 S 260 20, 310 65" fill="none" stroke="currentColor" stroke-width="3" data-layer="motion" data-unlocked="false"></path>
+              <circle cx="70" cy="60" r="18" data-layer="geometry" data-unlocked="true"></circle>
+              <rect x="210" y="35" width="70" height="50" rx="8" data-layer="highlights" data-unlocked="false"></rect>
+            </svg>
+
+            <spw-rhythm-grid intensity="0"></spw-rhythm-grid>
+
+            <p data-layer="fragments" data-unlocked="false">
+              ^fragment-layer{ unlock: phase-threshold combinatorics: active }
+            </p>
+          </spw-click-stage>
+        </section>
+
+        <section class="page-section" aria-labelledby="selected-work-title" data-structure-label="Selected work preview cards linking into deeper route pages">
+          <p class="page-section__eyebrow">^index[collections]</p>
+          <h2 id="selected-work-title">Preview</h2>
+          <ul class="selected-work-list" data-role="selected-work-list">
+            <li class="work-preview">
+              <a class="work-preview__link" href="/work/#project-one">
+                <h3 class="work-preview__title">^item{ id: drop_01 }</h3>
+                <p class="work-preview__summary">~summary{ replace }</p>
+              </a>
+            </li>
+            <li class="work-preview">
+              <a class="work-preview__link" href="/work/#project-two">
+                <h3 class="work-preview__title">^item{ id: editorial_02 }</h3>
+                <p class="work-preview__summary">~summary{ replace }</p>
+              </a>
+            </li>
+            <li class="work-preview">
+              <a class="work-preview__link" href="/work/#project-three">
+                <h3 class="work-preview__title">^item{ id: performance_03 }</h3>
+                <p class="work-preview__summary">~summary{ replace }</p>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section
+          class="page-section surface-panel"
+          aria-labelledby="syntax-lab-title"
+          data-structure-label="Exploratory syntax lab with clickable braces, swappable operators, and geometric navigation"
+        >
+          <h2 id="syntax-lab-title" class="visually-hidden">Syntax Lab</h2>
+          <spw-syntax-lab data-state="exploratory"></spw-syntax-lab>
+        </section>
+
+        <section class="page-section" aria-labelledby="chapter-title" data-structure-label="Progressive chapter panels that unlock by interaction phase">
+          <p class="page-section__eyebrow">^layer-map</p>
+          <h2 id="chapter-title">Modules</h2>
+          <div class="chapter-grid" data-role="chapter-panels">
+            <spw-chapter-panel chapter="identity" unlock-at="seed" data-chapter="identity">
+              <h2>^module{ physics }</h2>
+              <p>~body{ replace_existence_frame }</p>
+            </spw-chapter-panel>
+            <spw-chapter-panel chapter="systems" unlock-at="pulse" data-chapter="systems">
+              <h2>^module{ disposition }</h2>
+              <p>~body{ replace_disposition_vectors }</p>
+            </spw-chapter-panel>
+            <spw-chapter-panel chapter="improv" unlock-at="counterpoint" data-chapter="improv">
+              <h2>^module{ geometry }</h2>
+              <p>~body{ replace_combinatoric_crystal_model }</p>
+            </spw-chapter-panel>
+          </div>
+        </section>
+
+        <section class="page-section surface-panel" aria-labelledby="ecology-title" data-structure-label="Live ecology map summarizing component roles and lifecycle activity">
+          <h2 id="ecology-title" class="visually-hidden">Web component ecology</h2>
+          <spw-ecology-map data-state="observing"></spw-ecology-map>
+        </section>
+
+        <section class="page-section surface-panel" aria-labelledby="seed-atlas-title" data-enhancement-zone="seed-atlas" data-structure-label="Optional seed atlas enhancement zone for iterative visuals and behavior">
+          <p class="page-section__eyebrow">Iterative enhancement</p>
+          <h2 id="seed-atlas-title">Seed Atlas</h2>
+          <p>
+            This zone is enhancement-ready. If `seed/site/enhancements.manifest.json` is present, seed visuals are hydrated progressively.
+          </p>
+          <div class="seed-atlas" data-role="seed-atlas" data-atlas-state="dormant" aria-live="polite">
+            <p class="seed-atlas__fallback">
+              Baseline mode active. Add or evolve seed enhancements to grow this atlas without changing core pages.
+            </p>
+          </div>
+        </section>
+
+        <section class="page-section surface-panel" aria-labelledby="contact-title" data-structure-label="Contact call-to-action and collaboration entrypoint">
+          <p class="page-section__eyebrow">^contact</p>
+          <h2 id="contact-title">Channels</h2>
+          <p>
+            !channel[primary]{ href:
+            <a href="mailto:hello@spwashi.click" data-slot="contact_cta_slot">hello@spwashi.click</a>.
+            }
+          </p>
+          <p>
+            !channel[sister]{ href:
+            <a href="https://tealstripesvibes.com" rel="external noopener">tealstripesvibes.com</a>
+            }
+          </p>
+        </section>
+      </main>
+
+      <footer class="site-footer" role="contentinfo">
+        <p><a href="mailto:hello@spwashi.click">hello@spwashi.click</a></p>
+        <p>!texture-cache{ origin: <a href="https://tealstripesvibes.com" rel="external noopener">tealstripesvibes.com</a> mode: tuner }</p>
+        <p>^system{ mode: web-components profile: spwashi syntax: spwlang }</p>
+        <p>
+          <button type="button" class="performance-toggle" data-role="performance-toggle" aria-label="Cycle performance profile">
+            ^perf{ profile: field }
+          </button>
+        </p>
+        <p>
+          <button type="button" class="structure-toggle" data-role="structure-toggle" aria-pressed="false">
+            Structure Labels: Off
+          </button>
+        </p>
+      </footer>
+    </spw-site-shell>
+
+    <noscript>
+      <p class="surface-panel" style="width: min(100% - 2rem, 48rem); margin: 1rem auto;">
+        JavaScript is disabled. Core content and navigation still work, but the interactive scene progression is unavailable.
+      </p>
+    </noscript>
+
+    <script type="module" src="/src/core/boot.js?v=__ASSET_VERSION__"></script>
+  </body>
+</html>
