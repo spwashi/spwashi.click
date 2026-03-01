@@ -4,6 +4,7 @@ export * from './ecology.js';
 export * from './events.js';
 export * from './host-manifest.js';
 export * from './host-theme.js';
+export * from './intent-kit.js';
 export * from './iterative-enhancement.js';
 export * from './literature.js';
 export * from './medium-flow.js';

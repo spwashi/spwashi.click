@@ -39,6 +39,7 @@
       0 calc(12px * var(--fx-shadow-gain)) calc(34px * var(--fx-shadow-gain)) rgba(31, 42, 47, 0.16),
       var(--shadow-soft);
     backdrop-filter: blur(calc(var(--fx-blur-px) * 0.3px)) saturate(calc(0.9 + var(--fx-light-depth) * 0.5));
+    touch-action: manipulation;
   }
 
   spw-click-stage::before,
@@ -111,9 +112,12 @@
     background: var(--stage-accent);
     color: #0b1a1d;
     font-family: var(--font-display);
+    font-size: 1rem;
     letter-spacing: 0.01em;
     padding: 0.7rem 1.1rem;
+    min-height: 48px;
     cursor: pointer;
+    touch-action: manipulation;
     box-shadow: var(--shadow-hard);
     transition: transform var(--duration-fast) var(--ease-jazz);
   }
@@ -130,6 +134,7 @@
     min-height: 1.8rem;
     font-family: var(--font-mono);
     font-size: 0.86rem;
+    line-height: 1.45;
     color: var(--color-muted);
   }
 
@@ -898,6 +903,7 @@
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.04),
       0 12px 40px rgba(13, 23, 27, 0.24);
+    touch-action: manipulation;
   }
 
   .shader-field__surface::before {
@@ -949,6 +955,7 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     cursor: pointer;
+    touch-action: manipulation;
   }
 
   .medium-console {
@@ -1131,6 +1138,22 @@
   }
 
   @media (max-width: 720px) {
+    spw-click-stage {
+      padding: var(--spacing-4);
+    }
+
+    .click-stage__trigger,
+    spw-click-stage [data-role='click-trigger'] {
+      justify-self: stretch;
+      width: 100%;
+      text-align: center;
+    }
+
+    .click-stage__status,
+    spw-click-stage [data-role='status'] {
+      font-size: 0.8rem;
+    }
+
     .ecology-map__species-row {
       grid-template-columns: 1fr;
     }
@@ -1156,6 +1179,11 @@
     .shader-field__hud {
       flex-direction: column;
       align-items: flex-start;
+    }
+
+    .shader-field__inject {
+      width: 100%;
+      min-height: 46px;
     }
   }
 

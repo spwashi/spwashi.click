@@ -1,4 +1,4 @@
-import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/runtime/js/events.js';
+import { emitIntentClick, createTapTracker } from '../core/runtime/js/intent-kit.js';
 import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
 import { intensityFromPhase } from '../core/runtime/js/motion.js';
 import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
@@ -8,6 +8,13 @@ const PHASE_COPY = Object.freeze({
   pulse: '^phase[pulse]{ model: motion-entry learn: state=>tempo }',
   counterpoint: '^phase[counterpoint]{ model: fragment-weave learn: relation=>meaning }',
   chorus: '^phase[chorus]{ model: full-combinatorics learn: system=>presence }'
+});
+
+const PHASE_STATUS_COPY = Object.freeze({
+  seed: 'Seed phase: establish structure.',
+  pulse: 'Pulse phase: motion starts to lock in.',
+  counterpoint: 'Counterpoint phase: layers synchronize.',
+  chorus: 'Chorus phase: full scene unlocked.'
 });
 
 function isTextEntryTarget(target) {
@@ -37,6 +44,7 @@ class SpwClickStage extends HTMLElement {
     });
 
     this.ensureScaffolding();
+    this.tapTracker = createTapTracker();
     this.bindIntents();
     this.installSpaceSampler();
     this.attachStoreSubscription();
@@ -50,6 +58,9 @@ class SpwClickStage extends HTMLElement {
     if (this.triggerButton && this.onClickIntent) {
       this.triggerButton.removeEventListener('click', this.onClickIntent);
     }
+    this.removeEventListener('pointerdown', this.onPointerDown);
+    this.removeEventListener('pointerup', this.onPointerUp);
+    this.removeEventListener('pointercancel', this.onPointerCancel);
     this.removeEventListener('keydown', this.onKeyIntent);
     this.cleanupSpaceSampler?.();
     this.cleanupSpaceSampler = null;
@@ -74,7 +85,7 @@ class SpwClickStage extends HTMLElement {
       button.dataset.role = 'click-trigger';
       button.setAttribute('aria-controls', 'click-stage-status');
       button.setAttribute('aria-keyshortcuts', 'Enter Space ArrowRight');
-      button.textContent = 'Click to build the scene';
+      button.textContent = 'Tap to evolve scene';
       this.prepend(button);
     }
 
@@ -158,13 +169,41 @@ class SpwClickStage extends HTMLElement {
       }
     };
 
+    this.onPointerDown = (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      this.tapTracker.start(event);
+    };
+
+    this.onPointerUp = (event) => {
+      const onTriggerButton =
+        event.target instanceof Element &&
+        Boolean(event.target.closest('[data-role=\"click-trigger\"]'));
+
+      if (onTriggerButton || !this.tapTracker.isTap(event)) {
+        return;
+      }
+
+      this.emitClickIntent('click-stage:tap');
+    };
+
+    this.onPointerCancel = () => {
+      this.tapTracker.reset();
+    };
+
     this.triggerButton.addEventListener('click', this.onClickIntent);
+    this.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+    this.addEventListener('pointerup', this.onPointerUp);
+    this.addEventListener('pointercancel', this.onPointerCancel);
     this.addEventListener('keydown', this.onKeyIntent);
   }
 
   emitClickIntent(source) {
-    dispatchTypedEvent(this, EVENT_INTENT_CLICK, { source });
-    noteComponentLifecycle('spw-click-stage', 'intent', { source });
+    emitIntentClick(this, {
+      source,
+      lifecycleTag: 'spw-click-stage'
+    });
   }
 
   installSpaceSampler() {
@@ -223,7 +262,8 @@ class SpwClickStage extends HTMLElement {
     this.dataset.clicks = String(state.clickCount);
 
     if (this.statusNode) {
-      this.statusNode.textContent = `${PHASE_COPY[state.phase]} Clicks: ${state.clickCount}.`;
+      const statusCopy = PHASE_STATUS_COPY[state.phase] ?? PHASE_COPY[state.phase];
+      this.statusNode.textContent = `${statusCopy} Taps: ${state.clickCount}.`;
     }
 
     if (this.rhythmGrid) {

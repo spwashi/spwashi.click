@@ -1,0 +1,52 @@
+~#module{
+  @source: ~"../js/intent-kit.js"
+  @path: ~"src/core/runtime/js/intent-kit.js"
+
+  ^scan{
+    @id: core.intent-kit
+    @axis: interaction-utility
+    @output: consistent-tap-and-intent-dispatch
+    @hotspots: intent-kit.js
+  }
+
+  ^intent[module]{ id:core.intent-kit axis:interaction-utility output:consistent-tap-and-intent-dispatch }
+
+  ^prefix-utility{
+    !:: role:emit-intent-click with:event+optional-lifecycle+haptics
+    @:: role:track-tap gestures with duration+distance thresholds
+    ~:: role:reduce duplicate interaction boilerplate
+  }
+
+  ^postfix-utility{
+    state~{ read:pointer events + component context }
+    view!{ write:typed click intent events }
+    bind@{ bridge:click-stage+shader-field+future interaction components }
+  }
+
+  ^state-embed{
+    @reads: pointer events + component context
+    @writes: typed click intent events
+    @bridge: click-stage+shader-field+future interaction components
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_intent_kit_scan]{
+      input: pointer stream
+      flow: capture->classify(tap)->emit
+      output: consistent-tap-and-intent-dispatch
+    }
+    ^macro[core_intent_kit_patch]{
+      input: gesture thresholds
+      flow: adjust->validate->emit
+      output: typed click intent events
+    }
+  }
+
+  ^invariants{
+    ^invariant[tap]{ tap requires bounded duration and travel distance }
+    ^invariant[event]{ click intent event shape remains source-first }
+  }
+
+  ^compose[neighbors]{ ingress:pointer events + component context egress:typed click intent events bridge:click-stage+shader-field+future interaction components }
+}

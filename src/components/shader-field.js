@@ -1,5 +1,5 @@
 import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
-import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/runtime/js/events.js';
+import { createTapTracker, emitIntentClick } from '../core/runtime/js/intent-kit.js';
 import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
 
 const PROFILE_FRAME_RATE = Object.freeze({
@@ -89,6 +89,7 @@ class SpwShaderField extends HTMLElement {
     this.lastFrameMs = 0;
 
     this.renderScaffold();
+    this.tapTracker = createTapTracker();
     this.bindIntents();
     this.attachStoreSubscription();
     this.installSpaceSampler();
@@ -104,6 +105,8 @@ class SpwShaderField extends HTMLElement {
   disconnectedCallback() {
     this.removeEventListener('pointermove', this.onPointerMove);
     this.removeEventListener('pointerdown', this.onPointerDown);
+    this.removeEventListener('pointerup', this.onPointerUp);
+    this.removeEventListener('pointercancel', this.onPointerCancel);
     this.removeEventListener('keydown', this.onKeydown);
     this.injectNode?.removeEventListener('click', this.onInjectClick);
     this.unsubscribe?.();
@@ -130,7 +133,7 @@ class SpwShaderField extends HTMLElement {
       <div class="shader-field__hud" data-structure-label="Shader controls and state telemetry">
         <p class="shader-field__status" data-role="status" aria-live="polite"></p>
         <button type="button" class="shader-field__inject" data-role="inject" aria-label="Inject click intent from shader field">
-          !inject[phase]{ source:shader-field }
+          Inject Tap
         </button>
       </div>
     `;
@@ -153,8 +156,35 @@ class SpwShaderField extends HTMLElement {
       this.renderStatus('pointer');
     };
 
-    this.onPointerDown = () => {
-      this.emitClickIntent('shader-field:pointer');
+    this.onPointerDown = (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      const onInjectButton =
+        event.target instanceof Element &&
+        Boolean(event.target.closest('[data-role="inject"]'));
+      if (onInjectButton) {
+        return;
+      }
+
+      this.tapTracker.start(event);
+    };
+
+    this.onPointerUp = (event) => {
+      const onInjectButton =
+        event.target instanceof Element &&
+        Boolean(event.target.closest('[data-role="inject"]'));
+
+      if (onInjectButton || !this.tapTracker.isTap(event)) {
+        return;
+      }
+
+      this.emitClickIntent('shader-field:tap');
+    };
+
+    this.onPointerCancel = () => {
+      this.tapTracker.reset();
     };
 
     this.onKeydown = (event) => {
@@ -215,6 +245,8 @@ class SpwShaderField extends HTMLElement {
 
     this.addEventListener('pointermove', this.onPointerMove, { passive: true });
     this.addEventListener('pointerdown', this.onPointerDown);
+    this.addEventListener('pointerup', this.onPointerUp);
+    this.addEventListener('pointercancel', this.onPointerCancel);
     this.addEventListener('keydown', this.onKeydown);
     this.injectNode?.addEventListener('click', this.onInjectClick);
   }
@@ -270,11 +302,13 @@ class SpwShaderField extends HTMLElement {
   }
 
   emitClickIntent(source) {
-    dispatchTypedEvent(this, EVENT_INTENT_CLICK, { source });
-    noteComponentLifecycle('spw-shader-field', 'intent', {
+    emitIntentClick(this, {
       source,
-      phase: this.state.phase,
-      clickCount: this.state.clickCount
+      lifecycleTag: 'spw-shader-field',
+      detail: {
+        phase: this.state.phase,
+        clickCount: this.state.clickCount
+      }
     });
   }
 
@@ -285,8 +319,12 @@ class SpwShaderField extends HTMLElement {
 
     const pointerX = this.state.pointerX.toFixed(2);
     const pointerY = this.state.pointerY.toFixed(2);
+    const reasonHint =
+      this.dataset.verboseStatus === 'true'
+        ? ` | source:${reason}`
+        : '';
     this.statusNode.textContent =
-      `^shader{ phase:${this.state.phase} profile:${this.state.profile} focus:${pointerX}|${pointerY} clicks:${this.state.clickCount} reason:${reason} }`;
+      `Phase ${this.state.phase} | Profile ${this.state.profile} | Focus ${pointerX}/${pointerY} | Taps ${this.state.clickCount}${reasonHint}`;
   }
 
   drawFrame(timeMs) {
@@ -411,4 +449,3 @@ export function defineShaderField() {
     customElements.define('spw-shader-field', SpwShaderField);
   }
 }
-
