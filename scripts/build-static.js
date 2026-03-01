@@ -13,12 +13,14 @@ const REQUIRED_COPY_TARGETS = [
   'CNAME',
   'robots.txt',
   'sitemap.xml',
+  'spw.index.json',
+  'spw.index.spw',
   'release.manifest.json',
   'work',
   'notes',
   'src'
 ];
-const OPTIONAL_COPY_TARGETS = ['seed/site', 'seed/images'];
+const OPTIONAL_COPY_TARGETS = ['seed/site', 'seed/images', '.spw'];
 const DIST_HTML_FILES = ['index.html', '404.html', 'work/index.html', 'notes/index.html'];
 
 async function copyTarget(target) {

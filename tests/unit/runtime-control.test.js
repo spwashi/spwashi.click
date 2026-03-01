@@ -213,3 +213,112 @@ test('runtime control reset and rebind methods are available', () => {
 
   cleanup();
 });
+
+test('runtime control exposes feature catalog for agents', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+
+  const app = {
+    store,
+    ecology: { getSnapshot: () => ({ species: {} }) },
+    releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {}
+  });
+
+  const summary = win.__SPW_RUNTIME__.run('catalog', { summaryOnly: true });
+  assert.equal(typeof summary.featureCount, 'number');
+  assert.ok(summary.featureCount > 0);
+  assert.ok(Array.isArray(summary.routes));
+
+  const fullCatalog = win.__SPW_RUNTIME__.getCatalog();
+  assert.equal(Array.isArray(fullCatalog.features), true);
+  assert.ok(fullCatalog.features.length > 0);
+
+  cleanup();
+});
+
+test('runtime control evaluates Spw command forms for top-level and region operations', () => {
+  const store = createStoreStub();
+  const doc = createDocumentStub();
+  const win = createWindowStub();
+
+  const app = {
+    store,
+    ecology: { getSnapshot: () => ({ species: {} }) },
+    releaseMeta: { releaseDate: '2026-02-28', releaseId: 'r1' },
+    performanceController: {
+      profile: 'field',
+      getProfile() {
+        return this.profile;
+      },
+      setProfile(nextProfile) {
+        this.profile = nextProfile;
+      }
+    },
+    structureController: {
+      enabled: false,
+      setEnabled(nextEnabled) {
+        this.enabled = nextEnabled;
+      }
+    },
+    marginalia: { write() {} }
+  };
+
+  const cleanup = installRuntimeControl({
+    app,
+    document: doc,
+    window: win,
+    rebindPage() {}
+  });
+
+  const topCommandResult = win.__SPW_RUNTIME__.run(
+    'spw',
+    '!top{ route:notes clicks:11 profile:maximal llm:true }'
+  );
+  assert.equal(topCommandResult.ok, true);
+  assert.equal(topCommandResult.method, 'setTopLevel');
+  assert.equal(topCommandResult.result.state.activeRoute, 'notes');
+  assert.equal(topCommandResult.result.state.clickCount, 11);
+  assert.equal(topCommandResult.result.performanceProfile, 'maximal');
+  assert.equal(topCommandResult.result.llmReadableStructure, true);
+
+  const regionCommandResult = win.__SPW_RUNTIME__.evalSpw(
+    '!region{ selector:.region attr.data-mode:active data.state:hot style.--fx-custom:0.75 text:"^region{ tuned }" }'
+  );
+  assert.equal(regionCommandResult.ok, true);
+  assert.equal(regionCommandResult.method, 'setRegion');
+  assert.equal(regionCommandResult.result.matched, 1);
+  assert.equal(doc.querySelectorAll('.region')[0].getAttribute('data-mode'), 'active');
+  assert.equal(doc.querySelectorAll('.region')[0].dataset.state, 'hot');
+  assert.equal(doc.querySelectorAll('.region')[0].style.getPropertyValue('--fx-custom'), '0.75');
+  assert.equal(doc.querySelectorAll('.region')[0].textContent, '^region{ tuned }');
+
+  const invalidCommandResult = win.__SPW_RUNTIME__.evalSpw('!unknown{ route:home }');
+  assert.equal(invalidCommandResult.ok, false);
+  assert.match(invalidCommandResult.error, /Unsupported Spw runtime symbol/i);
+
+  cleanup();
+});

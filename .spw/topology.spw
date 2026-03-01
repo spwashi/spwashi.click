@@ -1,0 +1,61 @@
+# Topology
+#
+# Subroot routing for source analysis, feature grouping, and cache ownership.
+
+#>spwashi_click_topology
+#:topology #!routing
+
+^"intent"{
+  ~#goal: "Route files into stable subroots for crawlers, editor lenses, and runtime diagnosis."
+}
+
+^subroot[core]{
+  path: @core
+  subtree: [@core, @components]
+  subagent: explorer
+  cache_tree: @spw/cache/core
+  cache_key_prefix: core
+  topology_refs: [@core/boot.js, @core/store.js, @core/events.js, @core/spw-command-surface.js]
+}
+
+^subroot[content]{
+  path: @content
+  subtree: [@content, @styles]
+  subagent: explorer
+  cache_tree: @spw/cache/content
+  cache_key_prefix: content
+  topology_refs: [@content/manifests.js]
+}
+
+^subroot[docs]{
+  path: @docs
+  subtree: [@docs]
+  subagent: worker
+  cache_tree: @spw/cache/docs
+  cache_key_prefix: docs
+  topology_refs: [@docs/software-literature.md, @docs/component-ecology.md]
+}
+
+^subroot[seed]{
+  path: @seed
+  subtree: [@seed/site, @seed/images, @workbench]
+  subagent: worker
+  cache_tree: @spw/cache/seed
+  cache_key_prefix: seed
+  topology_refs: [@seed/site/enhancements/seed-atlas.js, @workbench/README.md]
+}
+
+^subroot[measure]{
+  path: @tests
+  subtree: [@tests, @scripts]
+  subagent: worker
+  cache_tree: @spw/cache/measure
+  cache_key_prefix: measure
+  topology_refs: [@tests/unit/store.test.js, @scripts/build-static.js]
+}
+
+^"invariant"{
+  "Each subroot owns one cache-key prefix.",
+  "Topology refs should point to concrete implementation surfaces.",
+  "North-star references should remain inside @workbench and never be copied ad hoc.",
+}

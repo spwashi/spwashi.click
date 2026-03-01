@@ -1,0 +1,39 @@
+# Shelves
+#
+# Root-shelf convention for source-reading agents and editor tooling.
+
+#>spwashi_click_shelves
+#:roots #!convention
+
+^"roots"{
+  @repo: ~".."
+  @spw: ~"."
+  @src: ~"../src"
+  @core: ~"../src/core"
+  @components: ~"../src/components"
+  @content: ~"../src/content"
+  @styles: ~"../src/styles"
+  @docs: ~"../docs"
+  @seed: ~"../seed"
+  @tests: ~"../tests"
+  @scripts: ~"../scripts"
+  @workbench: ~"../seed/extern/spw-workbench"
+  @runtime: ~"../src/core/runtime-control.js"
+  @runtime_spw_command: ~"../src/core/spw-command-surface.js"
+  @crawler_json: ~"../spw.index.json"
+  @crawler_spw: ~"../spw.index.spw"
+}
+
+^"orientation"{
+  macro: [@core, @components, @content, @styles]
+  measurement: [@tests, @scripts]
+  prose: [@docs, @crawler_json, @crawler_spw]
+  runtime: [@runtime, @runtime_spw_command, @seed]
+  north_star: @workbench
+}
+
+^"shelf_policy"{
+  "Use @roots for cross-tree references in claims and examples.",
+  "Use ~\"./...\" only for siblings under .spw.",
+  "Keep crawler-visible feature claims mirrored in spw.index.json and spw.index.spw.",
+}

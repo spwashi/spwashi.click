@@ -1,0 +1,97 @@
+# Spw Source Index
+#
+# Public crawler-oriented Spw surface for feature discovery.
+
+#>spwashi_click_source_index
+#:index #!crawler
+
+^"intent"{
+  ~#goal: "Give source crawlers a stable, executable map of what exists now."
+  ~#mode: "feature-inventory + semantics + tooling-care"
+}
+
+^feature[click-stage]{
+  route: "/"
+  contract: "^feature[click-stage]{ input:click|enter|space|arrow-right output:phase+lumen+layers }"
+  files: [src/components/click-stage.js, src/core/store.js, src/core/motion.js]
+}
+
+^feature[syntax-lab]{
+  route: "/"
+  contract: "^feature[syntax-lab]{ braces:layout-view operators:component-view nodes:facet-nav }"
+  files: [src/components/syntax-lab.js, src/core/spwlang-parser.js]
+}
+
+^feature[seed-atlas]{
+  route: "/,/notes/"
+  contract: "^feature[seed-atlas]{ source:seed-manifest behavior:thumb+keyboard+phase-lighting }"
+  files: [seed/site/enhancements/seed-atlas.js, src/core/iterative-enhancement.js]
+}
+
+^feature[runtime-control]{
+  route: "global"
+  contract: "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }"
+  files: [src/core/runtime-control.js, src/core/spw-command-surface.js, src/core/boot.js]
+}
+
+^feature[structure-mode]{
+  route: "global"
+  contract: "^feature[structure-mode]{ toggle:data-llm-readable-structure projection:aria-description }"
+  files: [src/core/structure-mode.js, src/components/syntax-lab.js]
+}
+
+^feature[performance]{
+  route: "global"
+  contract: "^feature[performance]{ profiles:seed|field|maximal source:tealstripesvibes }"
+  files: [src/core/performance-tuning.js, src/styles/tokens.css]
+}
+
+^semantics[operators]{
+  chain: "? ~ @ & * ^ ! = % # ."
+  source: [src/components/syntax-lab.js, seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts]
+}
+
+^semantics[braces]{
+  map: "{ } -> flow, [ ] -> grid, ( ) -> focus, < > -> stack"
+  source: [src/components/syntax-lab.js]
+}
+
+^semantics[phases]{
+  map: "seed(0-2), pulse(3-7), counterpoint(8-15), chorus(16+)"
+  source: [src/core/motion.js, src/components/click-stage.js]
+}
+
+^semantics[runtime-command]{
+  forms: "!top{} !region{} !component{} !vars{} !reset{} !rebind{} !catalog{}"
+  source: [src/core/spw-command-surface.js, src/core/runtime-control.js]
+}
+
+^care[lsp]{
+  entry: seed/extern/spw-workbench/scripts/lsp/stdio-server.ts
+  index: seed/extern/spw-workbench/scripts/lsp/server-index.ts
+  smoke: seed/extern/spw-workbench/scripts/lsp/smoke-navigation.ts
+}
+
+^care[neovim]{
+  plugin: seed/extern/spw-workbench/extensions/neovim-spw
+  lsp_client: seed/extern/spw-workbench/extensions/neovim-spw/lua/spw-lsp.lua
+}
+
+^care[vscode]{
+  extension: seed/extern/spw-workbench/extensions/vscode-spw/src/extension.ts
+  roots: seed/extern/spw-workbench/extensions/vscode-spw/src/roots.ts
+  semantics: seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts
+}
+
+^care[history]{
+  files: [
+    seed/extern/spw-workbench/docs/design/md/history.md,
+    seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md
+  ]
+}
+
+!ask[feature-gap]{
+  input: "project-goal"
+  process: "compare goal against ^feature[] and ^semantics[] entries"
+  output: "ranked add-next-feature list with source pointers"
+}

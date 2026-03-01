@@ -1,0 +1,222 @@
+{
+  "schema": "spw-index/v1",
+  "version": "2026-02-28",
+  "project": {
+    "name": "spwashi.click",
+    "type": "static-web-language-site",
+    "north_star": "seed/extern/spw-workbench"
+  },
+  "entrypoints": {
+    "spw": "spw.index.spw",
+    "workspace": ".spw/workspace.spw",
+    "runtime_boot": "src/core/boot.js",
+    "runtime_control": "src/core/runtime-control.js",
+    "feature_copy": "src/content/manifests.js"
+  },
+  "semantics": {
+    "phases": [
+      {
+        "name": "seed",
+        "click_range": "0-2",
+        "spw": "^phase[seed]{ model:geometry-init learn:click=>state }"
+      },
+      {
+        "name": "pulse",
+        "click_range": "3-7",
+        "spw": "^phase[pulse]{ model:motion-entry learn:state=>tempo }"
+      },
+      {
+        "name": "counterpoint",
+        "click_range": "8-15",
+        "spw": "^phase[counterpoint]{ model:fragment-weave learn:relation=>meaning }"
+      },
+      {
+        "name": "chorus",
+        "click_range": "16+",
+        "spw": "^phase[chorus]{ model:full-combinatorics learn:system=>presence }"
+      }
+    ],
+    "braces": {
+      "{}": {
+        "layout_view": "flow",
+        "nav_step": 0
+      },
+      "[]": {
+        "layout_view": "grid",
+        "nav_step": 2
+      },
+      "()": {
+        "layout_view": "focus",
+        "nav_step": -1
+      },
+      "<>": {
+        "layout_view": "stack",
+        "nav_step": 1
+      }
+    },
+    "operators": {
+      "?": "probe / wonder",
+      "~": "potential / defer",
+      "@": "perspective / observer",
+      "&": "confluence / merge",
+      "*": "value / collapse",
+      "^": "integration / framing",
+      "!": "action / injection",
+      "=": "constraint / bias",
+      "%": "measure / scalar",
+      "#": "annotation / resonance",
+      ".": "ground / access"
+    },
+    "runtime_command_surface": {
+      "forms": [
+        "!top{ route:work clicks:9 profile:maximal llm:true }",
+        "!region{ selector:.chapter-panel attr.data-state:active text:\"^panel{ tuned }\" }",
+        "!component{ selector:spw-syntax-lab style.--facet-glow:1.1 }",
+        "!vars{ --fx-drift-x:12 --fx-drift-y:-8 }",
+        "!reset{ route:home profile:field }",
+        "!rebind{}",
+        "!catalog{ summary:true }"
+      ],
+      "source": [
+        "src/core/spw-command-surface.js",
+        "src/core/runtime-control.js"
+      ]
+    }
+  },
+  "contracts": {
+    "store_shape": {
+      "clickCount": "number",
+      "phase": "seed|pulse|counterpoint|chorus",
+      "unlockedLayers": "string[]",
+      "reducedMotion": "boolean",
+      "activeRoute": "home|work|notes",
+      "lastClickSource": "string"
+    },
+    "events": [
+      "spw:intent:click",
+      "spw:state:changed",
+      "spw:phase:changed",
+      "spw:navigate",
+      "spw:app:ready",
+      "spw:ecology:changed",
+      "spw:enhancement:loaded",
+      "spw:enhancement:failed"
+    ],
+    "runtime_methods": [
+      "getSnapshot",
+      "getCatalog",
+      "setTopLevel",
+      "setRegion",
+      "setComponent",
+      "setWindowVars",
+      "resetRuntime",
+      "rebindRuntime",
+      "evalSpw",
+      "run"
+    ]
+  },
+  "features": [
+    {
+      "id": "click-stage",
+      "route": "/",
+      "spw": "^feature[click-stage]{ input:click|enter|space|arrow-right output:phase+lumen+layers }",
+      "files": [
+        "src/components/click-stage.js",
+        "src/core/store.js",
+        "src/core/motion.js",
+        "src/styles/components.css"
+      ]
+    },
+    {
+      "id": "syntax-lab",
+      "route": "/",
+      "spw": "^feature[syntax-lab]{ braces:layout-view operators:component-view nodes:facet-nav }",
+      "files": [
+        "src/components/syntax-lab.js",
+        "src/core/spwlang-parser.js",
+        "src/styles/components.css",
+        "src/styles/layout.css"
+      ]
+    },
+    {
+      "id": "seed-atlas-enhancement",
+      "route": "/,/notes/",
+      "spw": "^feature[seed-atlas]{ source:seed-manifest behavior:thumb+keyboard+phase-lighting }",
+      "files": [
+        "seed/site/enhancements/seed-atlas.js",
+        "src/core/iterative-enhancement.js",
+        "seed/site/enhancements.manifest.json"
+      ]
+    },
+    {
+      "id": "runtime-control",
+      "route": "global",
+      "spw": "^feature[runtime-control]{ target:llm methods:evalSpw+setTopLevel+setRegion+rebind }",
+      "files": [
+        "src/core/runtime-control.js",
+        "src/core/spw-command-surface.js",
+        "src/core/boot.js"
+      ]
+    },
+    {
+      "id": "structure-mode",
+      "route": "global",
+      "spw": "^feature[structure-mode]{ toggle:data-llm-readable-structure projection:aria-description }",
+      "files": [
+        "src/core/structure-mode.js",
+        "src/components/syntax-lab.js",
+        "src/styles/components.css"
+      ]
+    },
+    {
+      "id": "performance-tuning",
+      "route": "global",
+      "spw": "^feature[performance]{ profiles:seed|field|maximal source:tealstripesvibes }",
+      "files": [
+        "src/core/performance-tuning.js",
+        "src/styles/tokens.css",
+        "src/styles/components.css"
+      ]
+    }
+  ],
+  "tooling_care": {
+    "lsp": {
+      "entry": "seed/extern/spw-workbench/scripts/lsp/stdio-server.ts",
+      "index": "seed/extern/spw-workbench/scripts/lsp/server-index.ts",
+      "smoke": "seed/extern/spw-workbench/scripts/lsp/smoke-navigation.ts",
+      "editor_integration_doc": "seed/extern/spw-workbench/docs/runtime/md/lsp-editor-integration.md"
+    },
+    "neovim": {
+      "plugin": "seed/extern/spw-workbench/extensions/neovim-spw",
+      "lsp_client": "seed/extern/spw-workbench/extensions/neovim-spw/lua/spw-lsp.lua",
+      "readme": "seed/extern/spw-workbench/extensions/neovim-spw/README.md"
+    },
+    "vscode": {
+      "extension": "seed/extern/spw-workbench/extensions/vscode-spw/src/extension.ts",
+      "semantics_table": "seed/extern/spw-workbench/extensions/vscode-spw/src/semantics.ts",
+      "root_map": "seed/extern/spw-workbench/extensions/vscode-spw/src/roots.ts",
+      "concept_tree": "seed/extern/spw-workbench/extensions/vscode-spw/src/views/concepts-tree.ts"
+    },
+    "intellij": {
+      "lsp_provider": "seed/extern/spw-workbench/extensions/intellij-spw/src/main/kotlin/com/spwashi/spw/SpwLspServerSupportProvider.kt",
+      "readme": "seed/extern/spw-workbench/extensions/intellij-spw/README.md"
+    },
+    "history": [
+      "seed/extern/spw-workbench/docs/design/md/history.md",
+      "seed/extern/spw-workbench/docs/archive/status/md/vim-implementation-complete.md",
+      "seed/extern/spw-workbench/docs/audits/md/vim-keybindings-inconsistencies-audit.md"
+    ]
+  },
+  "crawl_protocol": {
+    "order": [
+      "spw.index.json",
+      "spw.index.spw",
+      ".spw/workspace.spw",
+      "src/core/boot.js",
+      "src/core/runtime-control.js",
+      "src/content/manifests.js",
+      "docs/component-ecology.md"
+    ],
+    "feature_question_template": "!ask[feature-gap]{ compare:features wanted:project-goals output:add-next-feature-list }"
+  }
+}

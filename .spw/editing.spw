@@ -1,0 +1,52 @@
+# Editing
+#
+# Category heuristics for LSP/editor lenses and source-reading agents.
+
+#>spwashi_click_editing
+#:editor #!heuristics
+
+^"intent"{
+  ~#goal: "Bias editing and crawl behavior by category so language claims stay operational."
+  ~#source: @spw/shelves.spw
+}
+
+^category[macro]{
+  subroots: [@core, @components, @content, @styles]
+  heuristics: {
+    prefer_symbol_refs: true
+    preserve_event_contracts: true
+    prefer_data_attributes: true
+    auto_quote: false
+  }
+}
+
+^category[measurement]{
+  subroots: [@tests, @scripts]
+  heuristics: {
+    prefer_structured_assertions: true
+    enforce_exit_criteria: true
+    include_perf_budget_checks: true
+    auto_quote: false
+  }
+}
+
+^category[prose]{
+  subroots: [@docs, @crawler_json, @crawler_spw]
+  heuristics: {
+    allow_raw_text: true
+    require_file_pointers: true
+    mirror_claims_in_spw_forms: true
+    auto_quote: selective
+  }
+}
+
+^category[runtime]{
+  subroots: [@runtime, @runtime_spw_command, @seed, @workbench]
+  heuristics: {
+    prioritize_projection_surfaces: true
+    expose_runtime_methods: true
+    prefer_spw_command_examples: true
+    surface_editor_integration_points: true
+    auto_quote: false
+  }
+}

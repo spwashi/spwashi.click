@@ -17,6 +17,9 @@ test('all pages include shared boot module and viewport metadata', async () => {
     assert.match(html, /<meta name="spw:release-vibe" content="__RELEASE_VIBE__"\s*\/>/);
     assert.match(html, /<meta name="spw:asset-version" content="__ASSET_VERSION__"\s*\/>/);
     assert.match(html, /<meta name="spw:texture-cache-origin" content="https:\/\/tealstripesvibes\.com"\s*\/>/);
+    assert.match(html, /<meta name="spw:feature-index" content="\/spw\.index\.json"\s*\/>/);
+    assert.match(html, /<meta name="spw:feature-index-spw" content="\/spw\.index\.spw"\s*\/>/);
+    assert.match(html, /<meta name="spw:workspace-index" content="\/\.spw\/workspace\.spw"\s*\/>/);
     assert.match(html, /<script type="module" src="\/src\/core\/boot\.js\?v=__ASSET_VERSION__"><\/script>/);
   }
 });

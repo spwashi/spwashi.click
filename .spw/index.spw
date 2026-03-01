@@ -1,0 +1,52 @@
+# Spwashi.click Workspace Index
+#
+# Canon root for editor/LSP/crawler orientation inside this repository.
+
+#>spwashi_click_index
+#:index #!workspace
+
+^"intent"{
+  ~#goal: "Expose stable roots, routing, and care surfaces for source-reading agents."
+  ~#mode: "llm-crawler + editor-lsp + runtime-projection"
+}
+
+^"roots"{
+  @spw: ~"."
+  @repo: ~".."
+  @workspace: ~"./workspace.spw"
+  @shelves: ~"./shelves.spw"
+  @topology: ~"./topology.spw"
+  @editing: ~"./editing.spw"
+  @src: ~"../src"
+  @core: ~"../src/core"
+  @command_surface: ~"../src/core/spw-command-surface.js"
+  @components: ~"../src/components"
+  @content: ~"../src/content"
+  @styles: ~"../src/styles"
+  @docs: ~"../docs"
+  @seed: ~"../seed"
+  @tests: ~"../tests"
+  @scripts: ~"../scripts"
+  @workbench: ~"../seed/extern/spw-workbench"
+  @crawler_json: ~"../spw.index.json"
+  @crawler_spw: ~"../spw.index.spw"
+}
+
+^"dispatch"{
+  workspace: @workspace
+  shelves: @shelves
+  topology: @topology
+  editing: @editing
+  crawler_json: @crawler_json
+  crawler_spw: @crawler_spw
+  runtime_boot: @core/boot.js
+  runtime_control: @core/runtime-control.js
+  runtime_spw_command_surface: @command_surface
+  parser_bridge: @core/spwlang-parser.js
+}
+
+^"invariant"{
+  "This index is low-churn and pointer-first.",
+  "Behavior claims should point to concrete source files.",
+  "Feature semantics should be mirrored in spw.index.json and spw.index.spw.",
+}

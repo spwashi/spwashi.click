@@ -61,8 +61,23 @@ This keeps behavior contracts explicit and reviewable.
 - `docs/component-ecology.md`
 - `docs/iterative-enhancement.md`
 - `docs/spwlang-parser-bridge.md`
+- `docs/llm-crawler-contract.md`
 
 These docs intentionally mirror the layered, waypointed thinking found in `seed/extern/spw-workbench` while keeping this repository independently shippable.
+
+## Crawler + Spw Index
+
+Crawler-visible index surfaces:
+
+- `spw.index.json`
+- `spw.index.spw`
+- `.spw/workspace.spw`
+
+Runtime exposure:
+
+- `window.__SPW_RUNTIME__.getCatalog()`
+- `window.__SPW_RUNTIME__.run('catalog', { summaryOnly: true })`
+- `window.__SPW_RUNTIME__.evalSpw('!top{ route:notes clicks:8 profile:maximal llm:true }')`
 
 ## Release and Cache Policy
 
@@ -86,6 +101,7 @@ These docs intentionally mirror the layered, waypointed thinking found in `seed/
 
 - Global API: `window.__SPW_RUNTIME__` (alias: `window.spwRuntime`).
 - Supports:
+  - Spw command execution (`evalSpw`, `run('spw', { expression })`)
   - top-level state control (`setTopLevel`)
   - region/component parameter control (`setRegion`, `setComponent`)
   - CSS variable/window tuning (`setWindowVars`)

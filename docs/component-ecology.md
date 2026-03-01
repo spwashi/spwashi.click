@@ -42,6 +42,21 @@ The component writes global runtime flags on `<html>`:
 
 This means symbolic navigation is not isolated to the lab; it can reframe page layout and component presentation coherently.
 
+## Runtime Command Surface
+
+`src/core/spw-command-surface.js` maps compact Spw forms into runtime API calls:
+
+- `!top{ ... }` -> top-level state/perf/structure
+- `!region{ ... }` -> selector-scoped attribute/data/style/text tuning
+- `!component{ ... }` -> component-level tuning
+- `!vars{ ... }` -> CSS variable writes
+- `!reset{ ... }`, `!rebind{}`, `!catalog{ ... }`
+
+Use through runtime control:
+
+- `window.__SPW_RUNTIME__.evalSpw(form)`
+- `window.__SPW_RUNTIME__.run('spw', { expression: form })`
+
 ## Space-Aware Behavior
 
 `src/core/space-metrics.js` provides a sporadic sampler used by interactive components/enhancements.

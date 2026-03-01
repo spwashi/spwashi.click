@@ -7,6 +7,9 @@
  * Boot installs this API once; store/controllers remain authoritative while control methods proxy into their public interfaces.
  */
 
+import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
+import { runSpwRuntimeCommand } from './spw-command-surface.js';
+
 function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -75,8 +78,21 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
       release: app.releaseMeta,
       performanceProfile: app.performanceController.getProfile(),
       llmReadableStructure: app.structureController.enabled,
-      textureTunerState: root.dataset.textureTunerState ?? 'unknown'
+      textureTunerState: root.dataset.textureTunerState ?? 'unknown',
+      catalogVersion: SPW_FEATURE_CATALOG.version
     };
+  }
+
+  function getCatalog(options = {}) {
+    if (!isObject(options)) {
+      return SPW_FEATURE_CATALOG;
+    }
+
+    if (options.summaryOnly === true) {
+      return summarizeFeatureCatalog();
+    }
+
+    return SPW_FEATURE_CATALOG;
   }
 
   function setTopLevel(config = {}) {
@@ -189,15 +205,24 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
     return getSnapshot();
   }
 
+  function evalSpw(expression = '') {
+    return runSpwRuntimeCommand({
+      expression,
+      runtimeApi
+    });
+  }
+
   const runtimeApi = {
     version: '1.0.0',
     getSnapshot,
+    getCatalog,
     setTopLevel,
     setRegion,
     setComponent,
     setWindowVars,
     resetRuntime,
     rebindRuntime,
+    evalSpw,
     run(method, payload = {}) {
       if (method === 'reset') {
         return resetRuntime(payload);
@@ -221,6 +246,15 @@ export function installRuntimeControl({ app, document, window, rebindPage }) {
 
       if (method === 'setWindowVars') {
         return setWindowVars(payload);
+      }
+
+      if (method === 'spw' || method === 'evalSpw') {
+        const expression = typeof payload === 'string' ? payload : payload.expression;
+        return evalSpw(expression ?? '');
+      }
+
+      if (method === 'catalog' || method === 'getCatalog') {
+        return getCatalog(payload);
       }
 
       return {

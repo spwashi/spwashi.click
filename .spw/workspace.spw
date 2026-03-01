@@ -1,0 +1,58 @@
+# Workspace
+#
+# Kernel declaration for spwashi.click source interpretation.
+
+#>spwashi_click_workspace
+#:manifest
+
+^"roots"{
+  @repo: ~".."
+  @spw: ~"."
+  @index: ~"./index.spw"
+  @workspace: ~"./workspace.spw"
+  @shelves: ~"./shelves.spw"
+  @topology: ~"./topology.spw"
+  @editing: ~"./editing.spw"
+  @command_surface: ~"../src/core/spw-command-surface.js"
+  @crawler_json: ~"../spw.index.json"
+  @crawler_spw: ~"../spw.index.spw"
+  @workbench: ~"../seed/extern/spw-workbench"
+}
+
+^"kernel"{
+  #!ontology #!layers
+  grammar: {
+    #:layer #!parse_time
+    owns: "operators, containers, selectors, events, state contracts"
+    surfaces: [@repo/src, @repo/index.html]
+    invariant: "Grammar claims are verifiable from source artifacts."
+  }
+  semantics: {
+    #:layer #!meaning_time
+    owns: "phase physics, operator roles, brace regimes, combinatoric mappings"
+    surfaces: [@crawler_json, @crawler_spw, @workbench/extensions/vscode-spw/src/semantics.ts]
+    invariant: "Semantic claims map to explicit operator/phase tables."
+  }
+  pragmatics: {
+    #:layer #!use_time
+    owns: "runtime control, editor integration, crawler traversal, release arcs"
+    surfaces: [@repo/src/core/runtime-control.js, @command_surface, @topology, @editing]
+    invariant: "Pragmatic behavior projects into terminals, editors, and static site surfaces."
+  }
+}
+
+^"relationships"{
+  relation: "grammar -> semantics -> pragmatics"
+  physics: "spw frames behavior as constrained projection, not decorative copy"
+  care: "source readability, deterministic contracts, editor parity"
+}
+
+^"dispatch"{
+  workspace_index: @index
+  shelves: @shelves
+  topology: @topology
+  editing: @editing
+  command_surface: @command_surface
+  crawler_manifest_json: @crawler_json
+  crawler_manifest_spw: @crawler_spw
+}

@@ -41,7 +41,7 @@ export const HOME_MANIFEST = Object.freeze({
     }),
     Object.freeze({
       title_slot: '^demo[runtime_control]{ id:editorial_02 }',
-      summary_slot: '~summary[control]{ api:setTopLevel+setRegion+setWindowVars action:llm-tunable }',
+      summary_slot: '~summary[control]{ api:evalSpw+setTopLevel+setRegion+setWindowVars action:llm-tunable }',
       href: '/work/#project-two'
     }),
     Object.freeze({
@@ -90,7 +90,7 @@ export const WORK_MANIFEST = Object.freeze({
       id: 'project-two',
       title_slot: '^project[editorial_02]{ type:runtime-literature }',
       role_slot: '^role[narrative-direction]{ scope:reader+llm }',
-      summary_slot: '~summary[runtime]{ controls:reset+rebind parameters:top-level+region+window-vars }',
+      summary_slot: '~summary[runtime]{ controls:evalSpw+reset+rebind parameters:top-level+region+window-vars }',
       metrics_slot: '%metric[reach]{ channels:notes+work expansion:lore-land-ready }'
     }),
     Object.freeze({
