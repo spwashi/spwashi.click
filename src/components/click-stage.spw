@@ -13,8 +13,9 @@
 
   ^prefix-utility{
     !:: role:emit-click-intent source:pointer|keyboard
-    @:: role:render phase+clicks->status+layers+rhythm
+    @:: role:render phase+clicks->status+layers+rhythm+score-rotation
     ~:: role:sample-space adapt:layout-band
+    $:: role:toggle-layer-selection source:layer-tap
   }
 
   ^postfix-utility{
@@ -53,11 +54,14 @@
     ^invariant[intent]{ component emits events never mutates-store-directly }
     ^invariant[input]{ enter|space|arrow-right parity:pointer }
     ^invariant[layer]{ unlockedLayers -> data-unlocked projection }
+    ^invariant[selection]{ layer tap -> data-selected toggle not phase-advance }
+    ^invariant[score]{ --score-rotation driven by PHASE_SCORE_ROTATION seed:0 pulse:90 counterpoint:180 chorus:270 }
   }
 
   ^potential{
     ^potential[gesture]{ map:multi-click rhythms to:new operators }
-    ^potential[score]{ svg motifs rotate by:arc+vibe }
+    ^potential[score]{ svg motifs rotate by:arc+vibe from release metadata }
+    ^potential[selection-emit]{ selected layer name -> event or register slot }
   }
 
   ^compose[neighbors]{ ingress:store+motion helpers egress:intent events+rendered stage bridge:chapter-panel+shader+medium-flow }

@@ -11,7 +11,7 @@
 
 ^subroot[core_runtime]{
   path: @runtime_js
-  subtree: [@runtime_js, @runtime_spw, @components]
+  subtree: [@runtime_js, @runtime_spw, @components, @shelves]
   subagent: explorer
   cache_tree: @spw/cache/core_runtime
   cache_key_prefix: core_runtime
@@ -23,6 +23,14 @@
     @runtime_parser,
     @runtime_spw_command,
     @runtime_pwa,
+    @runtime_intent_kit,
+    @components/index.js,
+    @content/index.js,
+    @pages/index.js,
+    @shelves/index.js,
+    @shelves/runtime/index.js,
+    @shelves/ui/index.js,
+    @shelves/content/index.js,
     @repo/sw.js,
     @repo/assets.manifest.json,
     @scripts/export-assets.js
@@ -40,11 +48,19 @@
 
 ^subroot[content]{
   path: @content
-  subtree: [@content, @styles]
+  subtree: [@content, @styles, @pages]
   subagent: explorer
   cache_tree: @spw/cache/content
   cache_key_prefix: content
-  topology_refs: [@content/manifests.js, @content/feature-catalog.js]
+  topology_refs: [
+    @content/index.js,
+    @content/manifests.js,
+    @content/feature-catalog.js,
+    @pages/index.js,
+    @pages/home.js,
+    @pages/work.js,
+    @pages/notes.js
+  ]
 }
 
 ^subroot[docs]{

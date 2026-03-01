@@ -1,0 +1,51 @@
+~#module{
+  @source: ~"./index.js"
+  @path: ~"src/pages/index.js"
+
+  ^scan{
+    @id: pages.index
+    @axis: page-barrel
+    @output: page-initializer import surface
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:pages.index axis:page-barrel output:page-initializer import surface }
+
+  ^prefix-utility{
+    !:: role:aggregate route page initializers
+    @:: role:publish PAGE_INITIALIZERS map for runtime route dispatch
+    ~:: role:reduce repeated route map declarations
+  }
+
+  ^postfix-utility{
+    state~{ read:page modules }
+    view!{ write:page barrel + route initializer map }
+    bind@{ bridge:runtime initializePage }
+  }
+
+  ^state-embed{
+    @reads: page modules
+    @writes: page barrel + route initializer map
+    @bridge: runtime initializePage
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[pages_index_scan]{
+      input: page modules
+      flow: collect->map(route)->project
+      output: page-initializer import surface
+    }
+    ^macro[pages_index_patch]{
+      input: route/module delta
+      flow: update->validate->emit
+      output: page barrel + route initializer map
+    }
+  }
+
+  ^invariants{
+    ^invariant[route-map]{ PAGE_INITIALIZERS keys:home|work|notes }
+  }
+
+  ^compose[neighbors]{ ingress:page modules egress:page barrel + route initializer map bridge:runtime initializePage }
+}

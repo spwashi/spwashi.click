@@ -1,0 +1,51 @@
+~#module{
+  @source: ~"./index.js"
+  @path: ~"src/content/index.js"
+
+  ^scan{
+    @id: content.index
+    @axis: content-barrel
+    @output: manifests+catalog import surface
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:content.index axis:content-barrel output:manifests+catalog import surface }
+
+  ^prefix-utility{
+    !:: role:aggregate manifests+feature-catalog exports
+    @:: role:publish CONTENT_MANIFESTS map for runtime routing
+    ~:: role:reduce duplicated manifest map declarations
+  }
+
+  ^postfix-utility{
+    state~{ read:manifests+feature-catalog modules }
+    view!{ write:content barrel + route map }
+    bind@{ bridge:runtime page initialization }
+  }
+
+  ^state-embed{
+    @reads: manifests+feature-catalog modules
+    @writes: content barrel + route map
+    @bridge: runtime page initialization
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[content_index_scan]{
+      input: content modules
+      flow: collect->normalize->project
+      output: manifests+catalog import surface
+    }
+    ^macro[content_index_patch]{
+      input: module delta
+      flow: update->validate->emit
+      output: content barrel + route map
+    }
+  }
+
+  ^invariants{
+    ^invariant[route-map]{ CONTENT_MANIFESTS keys:home|work|notes }
+  }
+
+  ^compose[neighbors]{ ingress:manifests+feature-catalog modules egress:content barrel + route map bridge:runtime page initialization }
+}

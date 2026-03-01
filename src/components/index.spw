@@ -1,0 +1,51 @@
+~#module{
+  @source: ~"./index.js"
+  @path: ~"src/components/index.js"
+
+  ^scan{
+    @id: components.index
+    @axis: component-barrel
+    @output: modular-ui-export-surface
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:components.index axis:component-barrel output:modular-ui-export-surface }
+
+  ^prefix-utility{
+    !:: role:aggregate custom-element definers + registry entrypoint
+    @:: role:stabilize component imports for runtime and host modules
+    ~:: role:reduce redundant deep-path imports
+  }
+
+  ^postfix-utility{
+    state~{ read:component modules }
+    view!{ write:single import barrel }
+    bind@{ bridge:runtime mount + ui shelves }
+  }
+
+  ^state-embed{
+    @reads: component modules
+    @writes: single import barrel
+    @bridge: runtime mount + ui shelves
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_index_scan]{
+      input: module export graph
+      flow: collect->re-export->project
+      output: modular-ui-export-surface
+    }
+    ^macro[components_index_patch]{
+      input: add/remove component module
+      flow: update->validate->emit
+      output: single import barrel
+    }
+  }
+
+  ^invariants{
+    ^invariant[exports]{ named exports only no default export }
+  }
+
+  ^compose[neighbors]{ ingress:component modules egress:single import barrel bridge:runtime mount + ui shelves }
+}

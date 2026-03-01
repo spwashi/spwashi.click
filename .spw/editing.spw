@@ -11,12 +11,13 @@
 }
 
 ^category[macro]{
-  subroots: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @styles]
+  subroots: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @pages, @shelves, @styles]
   heuristics: {
     prefer_symbol_refs: true
     preserve_event_contracts: true
     preserve_runtime_interfaces: true
     prefer_data_attributes: true
+    prefer_barrel_imports: true
     auto_quote: false
   }
 }
@@ -59,6 +60,7 @@
     @runtime_config,
     @runtime_control,
     @runtime_parser,
+    @runtime_intent_kit,
     @runtime_spw_command,
     @runtime_pwa,
     @surfaces,

@@ -1,0 +1,51 @@
+~#module{
+  @source: ~"./index.js"
+  @path: ~"src/shelves/content/index.js"
+
+  ^scan{
+    @id: shelves.content.index
+    @axis: content-shelf
+    @output: content shelf export surface
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:shelves.content.index axis:content-shelf output:content shelf export surface }
+
+  ^prefix-utility{
+    !:: role:forward content barrel exports
+    @:: role:provide stable shelf import for manifests+catalog
+    ~:: role:align content modules with shelf architecture
+  }
+
+  ^postfix-utility{
+    state~{ read:content barrel }
+    view!{ write:content shelf export surface }
+    bind@{ bridge:runtime+crawler tooling }
+  }
+
+  ^state-embed{
+    @reads: content barrel
+    @writes: content shelf export surface
+    @bridge: runtime+crawler tooling
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[shelves_content_index_scan]{
+      input: content exports
+      flow: collect->project
+      output: content shelf export surface
+    }
+    ^macro[shelves_content_index_patch]{
+      input: content delta
+      flow: update->validate->emit
+      output: content shelf export surface
+    }
+  }
+
+  ^invariants{
+    ^invariant[stability]{ content shelf path remains stable for downstream hosts }
+  }
+
+  ^compose[neighbors]{ ingress:content barrel egress:content shelf export surface bridge:runtime+crawler tooling }
+}

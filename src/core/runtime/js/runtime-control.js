@@ -1,4 +1,4 @@
-import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../../../content/feature-catalog.js';
+import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../../../content/index.js';
 import {
   EVENT_REGISTER_CHANGED,
   EVENT_RUNTIME_REBIND,

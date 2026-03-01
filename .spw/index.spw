@@ -47,10 +47,16 @@
   @runtime_control: ~"../src/core/runtime/js/runtime-control.js"
   @runtime_command_surface: ~"../src/core/runtime/js/spw-command-surface.js"
   @runtime_parser: ~"../src/core/runtime/js/spwlang-parser.js"
+  @runtime_intent_kit: ~"../src/core/runtime/js/intent-kit.js"
   @runtime_plugins: ~"../seed/site/enhancements"
 
   @components: ~"../src/components"
   @content: ~"../src/content"
+  @pages: ~"../src/pages"
+  @shelves: ~"../src/shelves"
+  @shelves_runtime: ~"../src/shelves/runtime"
+  @shelves_ui: ~"../src/shelves/ui"
+  @shelves_content: ~"../src/shelves/content"
   @styles: ~"../src/styles"
   @docs: ~"../docs"
   @tests: ~"../tests"
@@ -90,6 +96,13 @@
   runtime_control: @runtime_control
   runtime_command_surface: @runtime_command_surface
   runtime_parser: @runtime_parser
+  runtime_intent_kit: @runtime_intent_kit
+
+  shelves: @shelves
+  shelves_runtime: @shelves_runtime
+  shelves_ui: @shelves_ui
+  shelves_content: @shelves_content
+  pages: @pages
 
   crawler_json: @crawler_json
   crawler_spw: @crawler_spw

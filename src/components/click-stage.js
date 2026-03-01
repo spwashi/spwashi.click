@@ -17,6 +17,13 @@ const PHASE_STATUS_COPY = Object.freeze({
   chorus: '^phase{ state:chorus mode:full-scene }'
 });
 
+const PHASE_SCORE_ROTATION = Object.freeze({
+  seed: 0,
+  pulse: 90,
+  counterpoint: 180,
+  chorus: 270
+});
+
 function isTextEntryTarget(target) {
   if (!(target instanceof Element)) {
     return false;
@@ -111,12 +118,16 @@ class SpwClickStage extends HTMLElement {
       path.setAttribute('stroke', 'currentColor');
       path.setAttribute('stroke-width', '3');
       path.setAttribute('data-layer', 'motion');
+      path.setAttribute('data-selected', 'false');
+      path.style.cursor = 'pointer';
 
       const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       circle.setAttribute('cx', '70');
       circle.setAttribute('cy', '60');
       circle.setAttribute('r', '18');
       circle.setAttribute('data-layer', 'geometry');
+      circle.setAttribute('data-selected', 'false');
+      circle.style.cursor = 'pointer';
 
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       rect.setAttribute('x', '210');
@@ -125,6 +136,8 @@ class SpwClickStage extends HTMLElement {
       rect.setAttribute('height', '50');
       rect.setAttribute('rx', '8');
       rect.setAttribute('data-layer', 'highlights');
+      rect.setAttribute('data-selected', 'false');
+      rect.style.cursor = 'pointer';
 
       score.append(path, circle, rect);
       this.append(score);
@@ -185,6 +198,16 @@ class SpwClickStage extends HTMLElement {
         return;
       }
 
+      const layerEl =
+        event.target instanceof Element
+          ? event.target.closest('[data-layer]')
+          : null;
+
+      if (layerEl) {
+        this.toggleLayerSelection(layerEl);
+        return;
+      }
+
       this.emitClickIntent('click-stage:tap');
     };
 
@@ -197,6 +220,24 @@ class SpwClickStage extends HTMLElement {
     this.addEventListener('pointerup', this.onPointerUp);
     this.addEventListener('pointercancel', this.onPointerCancel);
     this.addEventListener('keydown', this.onKeyIntent);
+  }
+
+  toggleLayerSelection(layerEl) {
+    if (!layerEl) {
+      return;
+    }
+    const isSelected = layerEl.getAttribute('data-selected') === 'true';
+    layerEl.setAttribute('data-selected', isSelected ? 'false' : 'true');
+    this.dataset.selectedLayer = isSelected ? '' : (layerEl.getAttribute('data-layer') ?? '');
+  }
+
+  applyScoreRotation(phase) {
+    const scoreEl = this.querySelector('[data-role="svg-score"]');
+    if (!scoreEl) {
+      return;
+    }
+    const deg = PHASE_SCORE_ROTATION[phase] ?? 0;
+    scoreEl.style.setProperty('--score-rotation', `${deg}deg`);
   }
 
   emitClickIntent(source) {
@@ -269,6 +310,8 @@ class SpwClickStage extends HTMLElement {
     if (this.rhythmGrid) {
       this.rhythmGrid.setAttribute('intensity', String(intensityFromPhase(state.phase)));
     }
+
+    this.applyScoreRotation(state.phase);
 
     for (const layerNode of this.layerNodes ?? []) {
       const layerName = layerNode.getAttribute('data-layer');
