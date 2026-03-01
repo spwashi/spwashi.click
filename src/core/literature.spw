@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./literature.js"
+  @path: ~"src/core/literature.js"
+
+  ^scan{
+    @id: core.literature
+    @axis: marginalia-ledger
+    @output: executable-narrative-memory
+    @hotspots: literature.js
+  }
+
+  ^intent[module]{ id:core.literature axis:marginalia-ledger output:executable-narrative-memory }
+
+  ^prefix-utility{
+    !:: role:write-entry payload:channel+line+meta
+    @:: role:read-ledger mode:ordered-snapshot
+    ~:: role:bound-history strategy:drop-oldest
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime+controllers }
+    view!{ write:marginalia.read }
+    bind@{ bridge:html[data-marginalia-lines]+debug-ui }
+  }
+
+  ^operator-overload{
+    !{ role:write-entry payload:channel+line+meta }
+    @{ role:read-ledger mode:ordered-snapshot }
+    ~{ role:bound-history strategy:drop-oldest }
+  }
+
+  ^state-embed{
+    @reads: runtime+controllers
+    @writes: marginalia.read
+    @bridge: html[data-marginalia-lines]+debug-ui
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_literature_scan]{
+      input: prefix+state
+      flow: read->map(marginalia-ledger)->project
+      output: executable-narrative-memory
+    }
+    ^macro[core_literature_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: marginalia.read
+    }
+  }
+
+  ^invariants{
+    ^invariant[order]{ entries:append-only index:monotonic }
+    ^invariant[shape]{ entry:{id,channel,line,meta,ts} immutable:true }
+    ^invariant[bound]{ max-lines:finite memory:predictable }
+  }
+
+  ^potential{
+    ^potential[story-debug]{ show:why-state-changed not-only:what }
+    ^potential[agent-reading]{ map:marginalia->next-feature-ideas }
+  }
+
+  ^compose[neighbors]{ ingress:runtime+controllers egress:marginalia.read bridge:html[data-marginalia-lines]+debug-ui }
+}

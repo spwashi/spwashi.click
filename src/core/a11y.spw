@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./a11y.js"
+  @path: ~"src/core/a11y.js"
+
+  ^scan{
+    @id: core.a11y
+    @axis: input-modality+nav-aria
+    @output: keyboard-first-surface
+    @hotspots: a11y.js
+  }
+
+  ^intent[module]{ id:core.a11y axis:input-modality+nav-aria output:keyboard-first-surface }
+
+  ^prefix-utility{
+    !:: role:set-modality target:body[data-input-modality]
+    @:: role:mark-active-route target:[data-route] aria:current
+    ~:: role:degrade-gracefully mode:no-js|no-focus-api
+  }
+
+  ^postfix-utility{
+    state~{ read:site-shell+store-route }
+    view!{ write:data-input-modality+aria-current }
+    bind@{ bridge:styles+components }
+  }
+
+  ^operator-overload{
+    !{ role:set-modality target:body[data-input-modality] }
+    @{ role:mark-active-route target:[data-route] aria:current }
+    ~{ role:degrade-gracefully mode:no-js|no-focus-api }
+  }
+
+  ^state-embed{
+    @reads: site-shell+store-route
+    @writes: data-input-modality+aria-current
+    @bridge: styles+components
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_a11y_scan]{
+      input: prefix+state
+      flow: read->map(input-modality+nav-aria)->project
+      output: keyboard-first-surface
+    }
+    ^macro[core_a11y_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: data-input-modality+aria-current
+    }
+  }
+
+  ^invariants{
+    ^invariant[modality]{ keyboard|pointer state:explicit }
+    ^invariant[nav]{ active-route=>aria-current:page }
+    ^invariant[cost]{ nav-query:memoized static-topology:assumed }
+  }
+
+  ^potential{
+    ^potential[teaching]{ path:interaction-literacy via:visible-focus+mode-cues }
+    ^potential[surface-hooks]{ expose:modality-stats for:adaptive-components }
+  }
+
+  ^compose[neighbors]{ ingress:site-shell+store-route egress:data-input-modality+aria-current bridge:styles+components }
+}

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./feature-catalog.js"
+  @path: ~"src/content/feature-catalog.js"
+
+  ^scan{
+    @id: content.feature-catalog
+    @axis: capability-index
+    @output: agent-readable-feature-map
+    @hotspots: feature-catalog.js
+  }
+
+  ^intent[module]{ id:content.feature-catalog axis:capability-index output:agent-readable-feature-map }
+
+  ^prefix-utility{
+    !:: role:declare-feature id+spw+files
+    @:: role:summarize-catalog compact:true
+    ~:: role:avoid-speculation policy:pointer-first
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime-control+docs }
+    view!{ write:catalog snapshots }
+    bind@{ bridge:crawlers+llm tooling }
+  }
+
+  ^operator-overload{
+    !{ role:declare-feature id+spw+files }
+    @{ role:summarize-catalog compact:true }
+    ~{ role:avoid-speculation policy:pointer-first }
+  }
+
+  ^state-embed{
+    @reads: runtime-control+docs
+    @writes: catalog snapshots
+    @bridge: crawlers+llm tooling
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[content_feature_catalog_scan]{
+      input: prefix+state
+      flow: read->map(capability-index)->project
+      output: agent-readable-feature-map
+    }
+    ^macro[content_feature_catalog_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: catalog snapshots
+    }
+  }
+
+  ^invariants{
+    ^invariant[truth]{ features map to shipped files/contracts }
+    ^invariant[ids]{ stable ids for crawler diffs }
+    ^invariant[surface]{ mirrors spw.index surfaces }
+  }
+
+  ^potential{
+    ^potential[diff-feed]{ announce new features per release }
+    ^potential[capability-queries]{ semantic search over spw features }
+  }
+
+  ^compose[neighbors]{ ingress:runtime-control+docs egress:catalog snapshots bridge:crawlers+llm tooling }
+}

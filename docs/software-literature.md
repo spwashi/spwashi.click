@@ -15,11 +15,14 @@ This order mirrors the workbench-style architecture discipline from `seed/extern
 
 ## Module Contract
 
-Every module under `src/` starts with three headings:
+Every module under `src/` has a sidecar contract file (`*.spw`) with:
 
-- `Intent:`
-- `Invariants:`
-- `How this composes with neighbors:`
+- `^scan{ ... }`
+- `^intent[module]{ ... }`
+- `^prefix-utility{ ... }` and `^postfix-utility{ ... }`
+- `^state-embed{ ... }` and `^macro-embed{ ... }`
+- `^invariant[...]`
+- `^compose[neighbors]{ ... }`
 
 The contract is enforced by `scripts/lint.js`.
 

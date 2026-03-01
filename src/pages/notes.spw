@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./notes.js"
+  @path: ~"src/pages/notes.js"
+
+  ^scan{
+    @id: pages.notes
+    @axis: thought-route
+    @output: structured-note-stream
+    @hotspots: notes.js
+  }
+
+  ^intent[module]{ id:pages.notes axis:thought-route output:structured-note-stream }
+
+  ^prefix-utility{
+    !:: role:hydrate-notes list:title+date+excerpt
+    @:: role:apply-slots from:NOTES_MANIFEST
+    ~:: role:preserve-scanability semantic-article-structure
+  }
+
+  ^postfix-utility{
+    state~{ read:NOTES_MANIFEST+shared helpers }
+    view!{ write:notes DOM }
+    bind@{ bridge:shell+route model }
+  }
+
+  ^operator-overload{
+    !{ role:hydrate-notes list:title+date+excerpt }
+    @{ role:apply-slots from:NOTES_MANIFEST }
+    ~{ role:preserve-scanability semantic-article-structure }
+  }
+
+  ^state-embed{
+    @reads: NOTES_MANIFEST+shared helpers
+    @writes: notes DOM
+    @bridge: shell+route model
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[pages_notes_scan]{
+      input: prefix+state
+      flow: read->map(thought-route)->project
+      output: structured-note-stream
+    }
+    ^macro[pages_notes_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: notes DOM
+    }
+  }
+
+  ^invariants{
+    ^invariant[shape]{ note:{title,date,excerpt,id} stable }
+    ^invariant[order]{ manifest order -> render order }
+    ^invariant[compat]{ works with no-js static markup }
+  }
+
+  ^potential{
+    ^potential[semantic-index]{ publish note vectors for agents }
+    ^potential[operator-views]{ same notes through alternate brace regimes }
+  }
+
+  ^compose[neighbors]{ ingress:NOTES_MANIFEST+shared helpers egress:notes DOM bridge:shell+route model }
+}

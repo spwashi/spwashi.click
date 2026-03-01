@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./ecology-map.js"
+  @path: ~"src/components/ecology-map.js"
+
+  ^scan{
+    @id: components.ecology-map
+    @axis: ecology-telemetry
+    @output: species-visibility
+    @hotspots: ecology-map.js
+  }
+
+  ^intent[module]{ id:components.ecology-map axis:ecology-telemetry output:species-visibility }
+
+  ^prefix-utility{
+    !:: role:render-snapshot table:species+counts
+    @:: role:subscribe ecology-ledger
+    ~:: role:phase-style projection:data-phase
+  }
+
+  ^postfix-utility{
+    state~{ read:core.ecology }
+    view!{ write:map-ui }
+    bind@{ bridge:runtime telemetry }
+  }
+
+  ^operator-overload{
+    !{ role:render-snapshot table:species+counts }
+    @{ role:subscribe ecology-ledger }
+    ~{ role:phase-style projection:data-phase }
+  }
+
+  ^state-embed{
+    @reads: core.ecology
+    @writes: map-ui
+    @bridge: runtime telemetry
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_ecology_map_scan]{
+      input: prefix+state
+      flow: read->map(ecology-telemetry)->project
+      output: species-visibility
+    }
+    ^macro[components_ecology_map_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: map-ui
+    }
+  }
+
+  ^invariants{
+    ^invariant[read-only]{ consumes ecology snapshots no-state-mutation }
+    ^invariant[sync]{ redraw on ecology changes only }
+    ^invariant[semantics]{ labels remain crawlable+human-scannable }
+  }
+
+  ^potential{
+    ^potential[topology]{ draw:edge-graph among components }
+    ^potential[health]{ highlight:inactive|overactive species }
+  }
+
+  ^compose[neighbors]{ ingress:core.ecology egress:map-ui bridge:runtime telemetry }
+}

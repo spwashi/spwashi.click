@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./register.js"
+  @path: ~"src/components/register.js"
+
+  ^scan{
+    @id: components.register
+    @axis: definition-order
+    @output: stable-custom-elements
+    @hotspots: register.js
+  }
+
+  ^intent[module]{ id:components.register axis:definition-order output:stable-custom-elements }
+
+  ^prefix-utility{
+    !:: role:define-once each:spw-*
+    @:: role:export defineAllComponents
+    ~:: role:no-op if:already-defined
+  }
+
+  ^postfix-utility{
+    state~{ read:component classes }
+    view!{ write:customElements registry }
+    bind@{ bridge:runtime mount }
+  }
+
+  ^operator-overload{
+    !{ role:define-once each:spw-* }
+    @{ role:export defineAllComponents }
+    ~{ role:no-op if:already-defined }
+  }
+
+  ^state-embed{
+    @reads: component classes
+    @writes: customElements registry
+    @bridge: runtime mount
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_register_scan]{
+      input: prefix+state
+      flow: read->map(definition-order)->project
+      output: stable-custom-elements
+    }
+    ^macro[components_register_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: customElements registry
+    }
+  }
+
+  ^invariants{
+    ^invariant[tag]{ names stable across releases }
+    ^invariant[idempotence]{ repeated registration safe }
+    ^invariant[order]{ deterministic define sequence }
+  }
+
+  ^potential{
+    ^potential[lazy]{ route-scoped element registration }
+    ^potential[manifest]{ auto-generate component registry surface }
+  }
+
+  ^compose[neighbors]{ ingress:component classes egress:customElements registry bridge:runtime mount }
+}

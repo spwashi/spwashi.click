@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./click-stage.js"
+  @path: ~"src/components/click-stage.js"
+
+  ^scan{
+    @id: components.click-stage
+    @axis: signature-interaction
+    @output: phase-scene-builder
+    @hotspots: click-stage.js
+  }
+
+  ^intent[module]{ id:components.click-stage axis:signature-interaction output:phase-scene-builder }
+
+  ^prefix-utility{
+    !:: role:emit-click-intent source:pointer|keyboard
+    @:: role:render phase+clicks->status+layers+rhythm
+    ~:: role:sample-space adapt:layout-band
+  }
+
+  ^postfix-utility{
+    state~{ read:store+motion helpers }
+    view!{ write:intent events+rendered stage }
+    bind@{ bridge:chapter-panel+shader+medium-flow }
+  }
+
+  ^operator-overload{
+    !{ role:emit-click-intent source:pointer|keyboard }
+    @{ role:render phase+clicks->status+layers+rhythm }
+    ~{ role:sample-space adapt:layout-band }
+  }
+
+  ^state-embed{
+    @reads: store+motion helpers
+    @writes: intent events+rendered stage
+    @bridge: chapter-panel+shader+medium-flow
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_click_stage_scan]{
+      input: prefix+state
+      flow: read->map(signature-interaction)->project
+      output: phase-scene-builder
+    }
+    ^macro[components_click_stage_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: intent events+rendered stage
+    }
+  }
+
+  ^invariants{
+    ^invariant[intent]{ component emits events never mutates-store-directly }
+    ^invariant[input]{ enter|space|arrow-right parity:pointer }
+    ^invariant[layer]{ unlockedLayers -> data-unlocked projection }
+  }
+
+  ^potential{
+    ^potential[gesture]{ map:multi-click rhythms to:new operators }
+    ^potential[score]{ svg motifs rotate by:arc+vibe }
+  }
+
+  ^compose[neighbors]{ ingress:store+motion helpers egress:intent events+rendered stage bridge:chapter-panel+shader+medium-flow }
+}

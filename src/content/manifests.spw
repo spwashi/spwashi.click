@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./manifests.js"
+  @path: ~"src/content/manifests.js"
+
+  ^scan{
+    @id: content.manifests
+    @axis: authored-copy-objects
+    @output: slot-hydration-source
+    @hotspots: manifests.js
+  }
+
+  ^intent[module]{ id:content.manifests axis:authored-copy-objects output:slot-hydration-source }
+
+  ^prefix-utility{
+    !:: role:declare-slots route-scoped
+    @:: role:provide-lists selectedWork|projects|notes|chapters
+    ~:: role:favor-spw-forms over prose-copy
+  }
+
+  ^postfix-utility{
+    state~{ read:authors+release edits }
+    view!{ write:page manifests }
+    bind@{ bridge:pages/shared+lint copy parser }
+  }
+
+  ^operator-overload{
+    !{ role:declare-slots route-scoped }
+    @{ role:provide-lists selectedWork|projects|notes|chapters }
+    ~{ role:favor-spw-forms over prose-copy }
+  }
+
+  ^state-embed{
+    @reads: authors+release edits
+    @writes: page manifests
+    @bridge: pages/shared+lint copy parser
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[content_manifests_scan]{
+      input: prefix+state
+      flow: read->map(authored-copy-objects)->project
+      output: slot-hydration-source
+    }
+    ^macro[content_manifests_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: page manifests
+    }
+  }
+
+  ^invariants{
+    ^invariant[keys]{ slot ids stable and explicit }
+    ^invariant[forms]{ copy strings parseable as spw }
+    ^invariant[ownership]{ manifests contain content not DOM logic }
+  }
+
+  ^potential{
+    ^potential[localized-dialects]{ per-route operator vocab }
+    ^potential[generated-copy]{ crawler-proposed slots workflow }
+  }
+
+  ^compose[neighbors]{ ingress:authors+release edits egress:page manifests bridge:pages/shared+lint copy parser }
+}

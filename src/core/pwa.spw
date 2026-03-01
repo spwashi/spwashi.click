@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./pwa.js"
+  @path: ~"src/core/pwa.js"
+
+  ^scan{
+    @id: core.pwa
+    @axis: release+network
+    @output: installable-static-state
+    @hotspots: pwa.js
+  }
+
+  ^intent[module]{ id:core.pwa axis:release+network output:installable-static-state }
+
+  ^prefix-utility{
+    !:: role:register-sw url:resolveRuntimeAssetUrl(/sw.js)
+    @:: role:emit-pwa-state event:spw:pwa:state:changed
+    ~:: role:project-network html:data-network-state
+  }
+
+  ^postfix-utility{
+    state~{ read:release+runtime-config }
+    view!{ write:pwa-snapshot }
+    bind@{ bridge:runtime+sw }
+  }
+
+  ^operator-overload{
+    !{ role:register-sw url:resolveRuntimeAssetUrl(/sw.js) }
+    @{ role:emit-pwa-state event:spw:pwa:state:changed }
+    ~{ role:project-network html:data-network-state }
+  }
+
+  ^state-embed{
+    @reads: release+runtime-config
+    @writes: pwa-snapshot
+    @bridge: runtime+sw
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_pwa_scan]{
+      input: prefix+state
+      flow: read->map(release+network)->project
+      output: installable-static-state
+    }
+    ^macro[core_pwa_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: pwa-snapshot
+    }
+  }
+
+  ^invariants{
+    ^invariant[scope]{ sw-url:runtime-resolved scope:base-url-derived }
+    ^invariant[projection]{ html:data-pwa-state+data-network-state event:spw:pwa:state:changed }
+    ^invariant[fallback]{ unsupported|register-fail => boot-continues }
+  }
+
+  ^potential{
+    ^potential[arc-cache]{ prefetch by:release-arc+vibe }
+    ^potential[offline-scenes]{ map:facet-fallback narratives }
+  }
+
+  ^compose[neighbors]{ ingress:release+runtime-config egress:pwa-snapshot bridge:runtime+sw }
+}

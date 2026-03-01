@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.a11y mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 // ^memo[nav-links]{ cache:weakmap key:root-element value:static-nodelist strategy:query-once }
 // ^invariant[memo]{ nav-links:mostly-static root:singleton replacement:none }
 const navLinksCache = new WeakMap();

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./boot.js"
+  @path: ~"src/core/boot.js"
+
+  ^scan{
+    @id: core.boot
+    @axis: standalone-entry
+    @output: auto-mount-wrapper
+    @hotspots: boot.js
+  }
+
+  ^intent[module]{ id:core.boot axis:standalone-entry output:auto-mount-wrapper }
+
+  ^prefix-utility{
+    !:: role:mount-if-enabled gate:spw:auto-mount
+    @:: role:re-export runtime:create+mount+failure
+    ~:: role:no-op-when-embedded mode:host-controlled
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime+runtime-config }
+    view!{ write:mountSpwRuntime }
+    bind@{ bridge:html<script type=module> }
+  }
+
+  ^operator-overload{
+    !{ role:mount-if-enabled gate:spw:auto-mount }
+    @{ role:re-export runtime:create+mount+failure }
+    ~{ role:no-op-when-embedded mode:host-controlled }
+  }
+
+  ^state-embed{
+    @reads: runtime+runtime-config
+    @writes: mountSpwRuntime
+    @bridge: html<script type=module>
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_boot_scan]{
+      input: prefix+state
+      flow: read->map(standalone-entry)->project
+      output: auto-mount-wrapper
+    }
+    ^macro[core_boot_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: mountSpwRuntime
+    }
+  }
+
+  ^invariants{
+    ^invariant[autonomy]{ standalone:auto-mount default:true }
+    ^invariant[respect]{ embedded-host retains:lifecycle-control }
+    ^invariant[exports]{ named-only default-export:none }
+  }
+
+  ^potential{
+    ^potential[entry-modes]{ branch:preview|bench|embed via:meta }
+    ^potential[handoff]{ boot->host telemetry handshake }
+  }
+
+  ^compose[neighbors]{ ingress:runtime+runtime-config egress:mountSpwRuntime bridge:html<script type=module> }
+}

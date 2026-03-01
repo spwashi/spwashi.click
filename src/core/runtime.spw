@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./runtime.js"
+  @path: ~"src/core/runtime.js"
+
+  ^scan{
+    @id: core.runtime
+    @axis: mount+bridge
+    @output: app-kernel
+    @hotspots: runtime.js
+  }
+
+  ^intent[module]{ id:core.runtime axis:mount+bridge output:app-kernel }
+
+  ^prefix-utility{
+    !:: role:create-runtime seeds:store+controllers+components
+    @:: role:bridge-store->events->datasets
+    ~:: role:cleanup-on-destroy listeners+timers+controllers
+  }
+
+  ^postfix-utility{
+    state~{ read:core-controllers }
+    view!{ write:window.__SPW_RUNTIME__ }
+    bind@{ bridge:events+components+pages }
+  }
+
+  ^operator-overload{
+    !{ role:create-runtime seeds:store+controllers+components }
+    @{ role:bridge-store->events->datasets }
+    ~{ role:cleanup-on-destroy listeners+timers+controllers }
+  }
+
+  ^state-embed{
+    @reads: core-controllers
+    @writes: window.__SPW_RUNTIME__
+    @bridge: events+components+pages
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_runtime_scan]{
+      input: prefix+state
+      flow: read->map(mount+bridge)->project
+      output: app-kernel
+    }
+    ^macro[core_runtime_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: window.__SPW_RUNTIME__
+    }
+  }
+
+  ^invariants{
+    ^invariant[lifecycle]{ mount:idempotent destroy:full-cleanup }
+    ^invariant[state]{ store:single-source phase:click-derived }
+    ^invariant[mode]{ standalone|embedded|assets-only => explicit-branches }
+  }
+
+  ^potential{
+    ^potential[host-api]{ embed-controls for:downstream repos }
+    ^potential[runtime-scenes]{ route-level orchestration by:operators }
+  }
+
+  ^compose[neighbors]{ ingress:core-controllers egress:window.__SPW_RUNTIME__ bridge:events+components+pages }
+}

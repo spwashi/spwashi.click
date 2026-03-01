@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.motion mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 export const PHASE_ORDER = Object.freeze(['seed', 'pulse', 'counterpoint', 'chorus']);
 const PHASE_WEIGHTS = Object.freeze({ seed: 0, pulse: 1, counterpoint: 2, chorus: 3 });
 

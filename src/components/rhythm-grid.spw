@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./rhythm-grid.js"
+  @path: ~"src/components/rhythm-grid.js"
+
+  ^scan{
+    @id: components.rhythm-grid
+    @axis: svg-intensity-visualization
+    @output: tempo-cells
+    @hotspots: rhythm-grid.js
+  }
+
+  ^intent[module]{ id:components.rhythm-grid axis:svg-intensity-visualization output:tempo-cells }
+
+  ^prefix-utility{
+    !:: role:set-intensity attr:0..3
+    @:: role:render-cells active-count:deterministic
+    ~:: role:animate-by-css data-state hooks
+  }
+
+  ^postfix-utility{
+    state~{ read:click-stage phase/intensity }
+    view!{ write:svg rhythm cells }
+    bind@{ bridge:styles motion }
+  }
+
+  ^operator-overload{
+    !{ role:set-intensity attr:0..3 }
+    @{ role:render-cells active-count:deterministic }
+    ~{ role:animate-by-css data-state hooks }
+  }
+
+  ^state-embed{
+    @reads: click-stage phase/intensity
+    @writes: svg rhythm cells
+    @bridge: styles motion
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_rhythm_grid_scan]{
+      input: prefix+state
+      flow: read->map(svg-intensity-visualization)->project
+      output: tempo-cells
+    }
+    ^macro[components_rhythm_grid_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: svg rhythm cells
+    }
+  }
+
+  ^invariants{
+    ^invariant[bounds]{ intensity clamped 0..3 }
+    ^invariant[count]{ same-intensity => same-active-cells }
+    ^invariant[fallback]{ no-js leaves-static-svg legible }
+  }
+
+  ^potential{
+    ^potential[polyrhythm]{ multi-lane grids tied:operators }
+    ^potential[audio-bridge]{ map-grid-state -> sonification }
+  }
+
+  ^compose[neighbors]{ ingress:click-stage phase/intensity egress:svg rhythm cells bridge:styles motion }
+}

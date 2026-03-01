@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./shared.js"
+  @path: ~"src/pages/shared.js"
+
+  ^scan{
+    @id: pages.shared
+    @axis: tiny-dom-primitives
+    @output: stable-page-hydration
+    @hotspots: shared.js
+  }
+
+  ^intent[module]{ id:pages.shared axis:tiny-dom-primitives output:stable-page-hydration }
+
+  ^prefix-utility{
+    !:: role:apply-slots map:data-slot->text
+    @:: role:clear-children deterministic-reset
+    ~:: role:avoid-ad-hoc-page-dom-logic duplication
+  }
+
+  ^postfix-utility{
+    state~{ read:page modules }
+    view!{ write:shared DOM ops }
+    bind@{ bridge:content manifests }
+  }
+
+  ^operator-overload{
+    !{ role:apply-slots map:data-slot->text }
+    @{ role:clear-children deterministic-reset }
+    ~{ role:avoid-ad-hoc-page-dom-logic duplication }
+  }
+
+  ^state-embed{
+    @reads: page modules
+    @writes: shared DOM ops
+    @bridge: content manifests
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[pages_shared_scan]{
+      input: prefix+state
+      flow: read->map(tiny-dom-primitives)->project
+      output: stable-page-hydration
+    }
+    ^macro[pages_shared_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: shared DOM ops
+    }
+  }
+
+  ^invariants{
+    ^invariant[targeting]{ mutations scoped to passed node/slot selectors }
+    ^invariant[minimal]{ helpers remain small+pure-ish }
+    ^invariant[reuse]{ same helper behavior across routes }
+  }
+
+  ^potential{
+    ^potential[typed-slots]{ slot contract validation at runtime }
+    ^potential[render-profiler]{ helper-level mutation metrics }
+  }
+
+  ^compose[neighbors]{ ingress:page modules egress:shared DOM ops bridge:content manifests }
+}

@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:components.shader-field mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { noteComponentLifecycle } from '../core/ecology.js';
 import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
 import { installSporadicSpaceSampler } from '../core/space-metrics.js';

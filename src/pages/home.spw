@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./home.js"
+  @path: ~"src/pages/home.js"
+
+  ^scan{
+    @id: pages.home
+    @axis: route-composition
+    @output: hero+stage+chapters
+    @hotspots: home.js
+  }
+
+  ^intent[module]{ id:pages.home axis:route-composition output:hero+stage+chapters }
+
+  ^prefix-utility{
+    !:: role:hydrate-slots from:HOME_MANIFEST
+    @:: role:render-selected-work deterministic-order
+    ~:: role:render-chapters unlock-at preserved
+  }
+
+  ^postfix-utility{
+    state~{ read:content manifests+shared helpers }
+    view!{ write:hydrated home DOM }
+    bind@{ bridge:runtime route init }
+  }
+
+  ^operator-overload{
+    !{ role:hydrate-slots from:HOME_MANIFEST }
+    @{ role:render-selected-work deterministic-order }
+    ~{ role:render-chapters unlock-at preserved }
+  }
+
+  ^state-embed{
+    @reads: content manifests+shared helpers
+    @writes: hydrated home DOM
+    @bridge: runtime route init
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[pages_home_scan]{
+      input: prefix+state
+      flow: read->map(route-composition)->project
+      output: hero+stage+chapters
+    }
+    ^macro[pages_home_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: hydrated home DOM
+    }
+  }
+
+  ^invariants{
+    ^invariant[fallback]{ route-readable before-interaction }
+    ^invariant[slots]{ only:data-slot targets mutated }
+    ^invariant[ids]{ chapter/work anchors stable }
+  }
+
+  ^potential{
+    ^potential[home-variants]{ arc-specific compositions }
+    ^potential[crawl-cues]{ region-level intent metadata generation }
+  }
+
+  ^compose[neighbors]{ ingress:content manifests+shared helpers egress:hydrated home DOM bridge:runtime route init }
+}

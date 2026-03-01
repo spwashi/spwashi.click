@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./index.js"
+  @path: ~"src/runtime/index.js"
+
+  ^scan{
+    @id: runtime.index
+    @axis: public-package-entry
+    @output: host-import-surface
+    @hotspots: index.js
+  }
+
+  ^intent[module]{ id:runtime.index axis:public-package-entry output:host-import-surface }
+
+  ^prefix-utility{
+    !:: role:export runtime APIs create|mount|config helpers
+    @:: role:side-effect-free imports safe-for-host-bundles
+    ~:: role:align-with-package-exports contracts
+  }
+
+  ^postfix-utility{
+    state~{ read:core.runtime+runtime-config }
+    view!{ write:package public API }
+    bind@{ bridge:downstream repos }
+  }
+
+  ^operator-overload{
+    !{ role:export runtime APIs create|mount|config helpers }
+    @{ role:side-effect-free imports safe-for-host-bundles }
+    ~{ role:align-with-package-exports contracts }
+  }
+
+  ^state-embed{
+    @reads: core.runtime+runtime-config
+    @writes: package public API
+    @bridge: downstream repos
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[runtime_index_scan]{
+      input: prefix+state
+      flow: read->map(public-package-entry)->project
+      output: host-import-surface
+    }
+    ^macro[runtime_index_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: package public API
+    }
+  }
+
+  ^invariants{
+    ^invariant[api]{ named exports only stable entry ids }
+    ^invariant[sidefx]{ import does-not-auto-mount }
+    ^invariant[compat]{ supports standalone+embedded hosts }
+  }
+
+  ^potential{
+    ^potential[typed-contract]{ publish d.ts or schema for host tools }
+    ^potential[micro-runtime]{ minimal mount preset for submodule use }
+  }
+
+  ^compose[neighbors]{ ingress:core.runtime+runtime-config egress:package public API bridge:downstream repos }
+}

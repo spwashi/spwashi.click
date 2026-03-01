@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:components.site-shell mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { ensureAriaCurrent } from '../core/a11y.js';
 import { noteComponentLifecycle } from '../core/ecology.js';
 import { EVENT_NAVIGATE, dispatchTypedEvent } from '../core/events.js';

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./work.js"
+  @path: ~"src/pages/work.js"
+
+  ^scan{
+    @id: pages.work
+    @axis: project-route
+    @output: case-card-grid
+    @hotspots: work.js
+  }
+
+  ^intent[module]{ id:pages.work axis:project-route output:case-card-grid }
+
+  ^prefix-utility{
+    !:: role:render-project-cards from:WORK_MANIFEST
+    @:: role:hydrate-page-slots intro+meta
+    ~:: role:keep-card-anchors stable-for-deep-links
+  }
+
+  ^postfix-utility{
+    state~{ read:WORK_MANIFEST+shared helpers }
+    view!{ write:work card DOM }
+    bind@{ bridge:shell nav }
+  }
+
+  ^operator-overload{
+    !{ role:render-project-cards from:WORK_MANIFEST }
+    @{ role:hydrate-page-slots intro+meta }
+    ~{ role:keep-card-anchors stable-for-deep-links }
+  }
+
+  ^state-embed{
+    @reads: WORK_MANIFEST+shared helpers
+    @writes: work card DOM
+    @bridge: shell nav
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[pages_work_scan]{
+      input: prefix+state
+      flow: read->map(project-route)->project
+      output: case-card-grid
+    }
+    ^macro[pages_work_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: work card DOM
+    }
+  }
+
+  ^invariants{
+    ^invariant[card-shape]{ title+role+summary+metrics preserved }
+    ^invariant[id]{ project ids stable across refresh }
+    ^invariant[placeholder]{ explicit slots mark future replacement }
+  }
+
+  ^potential{
+    ^potential[case-arcs]{ progressive reveal by phase/profile }
+    ^potential[export]{ project snippets for downstream embeds }
+  }
+
+  ^compose[neighbors]{ ingress:WORK_MANIFEST+shared helpers egress:work card DOM bridge:shell nav }
+}

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./router-lite.js"
+  @path: ~"src/core/router-lite.js"
+
+  ^scan{
+    @id: core.router-lite
+    @axis: pathname-normalization
+    @output: stable-route-contract
+    @hotspots: router-lite.js
+  }
+
+  ^intent[module]{ id:core.router-lite axis:pathname-normalization output:stable-route-contract }
+
+  ^prefix-utility{
+    !:: role:pathname->route domain:home|work|notes
+    @:: role:route->href canonical:true
+    ~:: role:unknown->home fallback-safe:true
+  }
+
+  ^postfix-utility{
+    state~{ read:window.location+nav-events }
+    view!{ write:activeRoute+href helpers }
+    bind@{ bridge:site-shell+runtime }
+  }
+
+  ^operator-overload{
+    !{ role:pathname->route domain:home|work|notes }
+    @{ role:route->href canonical:true }
+    ~{ role:unknown->home fallback-safe:true }
+  }
+
+  ^state-embed{
+    @reads: window.location+nav-events
+    @writes: activeRoute+href helpers
+    @bridge: site-shell+runtime
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_router_lite_scan]{
+      input: prefix+state
+      flow: read->map(pathname-normalization)->project
+      output: stable-route-contract
+    }
+    ^macro[core_router_lite_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: activeRoute+href helpers
+    }
+  }
+
+  ^invariants{
+    ^invariant[domain]{ public-routes finite+explicit }
+    ^invariant[canonical]{ each-route single-href }
+    ^invariant[origin]{ href-parse accepts-relative|absolute }
+  }
+
+  ^potential{
+    ^potential[facet-routes]{ operator-brace permutations as:view-keys }
+    ^potential[trace]{ navigation-intent timeline for:analysis }
+  }
+
+  ^compose[neighbors]{ ingress:window.location+nav-events egress:activeRoute+href helpers bridge:site-shell+runtime }
+}

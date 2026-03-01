@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.space-metrics mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const INLINE_BREAKPOINTS = Object.freeze([360, 560, 800, 1100]);
 const INLINE_BANDS = Object.freeze(['nano', 'compact', 'medium', 'wide', 'immersive']);
 

@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.literature mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const DEFAULT_LIMIT = 160;
 
 function freezeEntry(entry) {

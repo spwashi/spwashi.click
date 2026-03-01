@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./syntax-lab.js"
+  @path: ~"src/components/syntax-lab.js"
+
+  ^scan{
+    @id: components.syntax-lab
+    @axis: spw-exploration
+    @output: brace+operator+facet-navigation
+    @hotspots: syntax-lab.js
+  }
+
+  ^intent[module]{ id:components.syntax-lab axis:spw-exploration output:brace+operator+facet-navigation }
+
+  ^prefix-utility{
+    !:: role:swap-operators action:two-step
+    @:: role:resolve-facet via:active-operator transform
+    ~:: role:rotate-braces map:layout+component views
+  }
+
+  ^postfix-utility{
+    state~{ read:spw-parser+layout anchors }
+    view!{ write:facet-nav+expression output }
+    bind@{ bridge:home sections+structure-mode }
+  }
+
+  ^operator-overload{
+    !{ role:swap-operators action:two-step }
+    @{ role:resolve-facet via:active-operator transform }
+    ~{ role:rotate-braces map:layout+component views }
+  }
+
+  ^state-embed{
+    @reads: spw-parser+layout anchors
+    @writes: facet-nav+expression output
+    @bridge: home sections+structure-mode
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_syntax_lab_scan]{
+      input: prefix+state
+      flow: read->map(spw-exploration)->project
+      output: brace+operator+facet-navigation
+    }
+    ^macro[components_syntax_lab_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: facet-nav+expression output
+    }
+  }
+
+  ^invariants{
+    ^invariant[determinism]{ same-operator-order => same-facet-resolution }
+    ^invariant[controls]{ keyboard+pointer parity for lab actions }
+    ^invariant[parse]{ expression line validated by parser bridge }
+  }
+
+  ^potential{
+    ^potential[lsp]{ mirror-lab transforms into editor commands }
+    ^potential[grammar-planes]{ multi-axis facet spaces }
+  }
+
+  ^compose[neighbors]{ ingress:spw-parser+layout anchors egress:facet-nav+expression output bridge:home sections+structure-mode }
+}

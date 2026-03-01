@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:content.manifests mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 export const SITE_MANIFEST = Object.freeze({
   siteName: 'spwashi.click',
   baseTitle: 'spwashi.click',

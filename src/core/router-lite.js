@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.router-lite mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const ROUTE_TO_HREF = Object.freeze({
   home: '/',
   work: '/work/',

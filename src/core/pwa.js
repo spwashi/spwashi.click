@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.pwa mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { EVENT_PWA_STATE_CHANGED, dispatchTypedEvent } from './events.js';
 import { resolveRuntimeAssetUrl } from './runtime-config.js';
 

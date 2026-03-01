@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:content.feature-catalog mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 export const SPW_FEATURE_CATALOG = Object.freeze({
   version: '2026-02-28',
   entrypoints: Object.freeze({

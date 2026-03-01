@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./spw-command-surface.js"
+  @path: ~"src/core/spw-command-surface.js"
+
+  ^scan{
+    @id: core.spw-command-surface
+    @axis: spw-expression=>runtime-call
+    @output: deterministic-command-map
+    @hotspots: spw-command-surface.js
+  }
+
+  ^intent[module]{ id:core.spw-command-surface axis:spw-expression=>runtime-call output:deterministic-command-map }
+
+  ^prefix-utility{
+    !:: role:run-command expression:spw-form
+    @:: role:map-symbol->runtime-method table:explicit
+    ~:: role:coerce-values bool|num|list|string
+  }
+
+  ^postfix-utility{
+    state~{ read:parseSpwForm+runtime-api }
+    view!{ write:runSpwRuntimeCommand }
+    bind@{ bridge:runtime-control.evalSpw }
+  }
+
+  ^operator-overload{
+    !{ role:run-command expression:spw-form }
+    @{ role:map-symbol->runtime-method table:explicit }
+    ~{ role:coerce-values bool|num|list|string }
+  }
+
+  ^state-embed{
+    @reads: parseSpwForm+runtime-api
+    @writes: runSpwRuntimeCommand
+    @bridge: runtime-control.evalSpw
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_spw_command_surface_scan]{
+      input: prefix+state
+      flow: read->map(spw-expression=>runtime-call)->project
+      output: deterministic-command-map
+    }
+    ^macro[core_spw_command_surface_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: runSpwRuntimeCommand
+    }
+  }
+
+  ^invariants{
+    ^invariant[parse]{ parser:adapter-or-fallback unsupported:structured-error }
+    ^invariant[mapping]{ symbol=>method explicit no-ad-hoc-dispatch:true }
+    ^invariant[payload]{ scalar-coercion typed selector/vars payloads:normalized }
+  }
+
+  ^potential{
+    ^potential[operator-overrides]{ per-module command dialects }
+    ^potential[batch]{ transaction-style multi-command scenes }
+  }
+
+  ^compose[neighbors]{ ingress:parseSpwForm+runtime-api egress:runSpwRuntimeCommand bridge:runtime-control.evalSpw }
+}

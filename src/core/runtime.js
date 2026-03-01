@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.runtime mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { installAccessibilityEnhancements } from './a11y.js';
 import { createEcologyLedger } from './ecology.js';
 import {

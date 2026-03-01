@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.events mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 export const EVENT_INTENT_CLICK = 'spw:intent:click';
 export const EVENT_STATE_CHANGED = 'spw:state:changed';
 export const EVENT_PHASE_CHANGED = 'spw:phase:changed';

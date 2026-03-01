@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.runtime-control mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { SPW_FEATURE_CATALOG, summarizeFeatureCatalog } from '../content/feature-catalog.js';
 import { runSpwRuntimeCommand } from './spw-command-surface.js';
 

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./chapter-panel.js"
+  @path: ~"src/components/chapter-panel.js"
+
+  ^scan{
+    @id: components.chapter-panel
+    @axis: phase-gated-content
+    @output: unlockable-panels
+    @hotspots: chapter-panel.js
+  }
+
+  ^intent[module]{ id:components.chapter-panel axis:phase-gated-content output:unlockable-panels }
+
+  ^prefix-utility{
+    !:: role:project-unlock state:phase>=unlock-at
+    @:: role:subscribe store-phase-stream
+    ~:: role:label-locked-state aria+dataset
+  }
+
+  ^postfix-utility{
+    state~{ read:store.phase }
+    view!{ write:data-locked+aria }
+    bind@{ bridge:home-chapter-grid }
+  }
+
+  ^operator-overload{
+    !{ role:project-unlock state:phase>=unlock-at }
+    @{ role:subscribe store-phase-stream }
+    ~{ role:label-locked-state aria+dataset }
+  }
+
+  ^state-embed{
+    @reads: store.phase
+    @writes: data-locked+aria
+    @bridge: home-chapter-grid
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_chapter_panel_scan]{
+      input: prefix+state
+      flow: read->map(phase-gated-content)->project
+      output: unlockable-panels
+    }
+    ^macro[components_chapter_panel_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: data-locked+aria
+    }
+  }
+
+  ^invariants{
+    ^invariant[gating]{ unlock-at controls visibility/semantics not-copy }
+    ^invariant[heading]{ panel heading id drives:aria-labelledby }
+    ^invariant[phase]{ deterministic unlock per phaseWeight }
+  }
+
+  ^potential{
+    ^potential[chords]{ chapter-unlocks trigger:cross-panel harmonics }
+    ^potential[education]{ expose:why-unlocked traces }
+  }
+
+  ^compose[neighbors]{ ingress:store.phase egress:data-locked+aria bridge:home-chapter-grid }
+}

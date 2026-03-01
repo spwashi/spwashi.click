@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.runtime-config mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { appendAssetVersion } from './release.js';
 
 const DEFAULT_EMBED_MODE = 'standalone';

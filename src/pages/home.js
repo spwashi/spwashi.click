@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:pages.home mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { applySlots, clearElementChildren } from './shared.js';
 
 function renderSelectedWorkList(doc, selectedWorkItems) {

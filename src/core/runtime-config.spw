@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./runtime-config.js"
+  @path: ~"src/core/runtime-config.js"
+
+  ^scan{
+    @id: core.runtime-config
+    @axis: embed-normalization
+    @output: stable-asset-addressing
+    @hotspots: runtime-config.js
+  }
+
+  ^intent[module]{ id:core.runtime-config axis:embed-normalization output:stable-asset-addressing }
+
+  ^prefix-utility{
+    !:: role:read-config source:meta+overrides
+    @:: role:resolve-asset-url base:embed-aware
+    ~:: role:coerce-bool+mode values:robust
+  }
+
+  ^postfix-utility{
+    state~{ read:meta-tags+overrides }
+    view!{ write:runtime-config+resolved-urls }
+    bind@{ bridge:runtime+pwa+enhancements }
+  }
+
+  ^operator-overload{
+    !{ role:read-config source:meta+overrides }
+    @{ role:resolve-asset-url base:embed-aware }
+    ~{ role:coerce-bool+mode values:robust }
+  }
+
+  ^state-embed{
+    @reads: meta-tags+overrides
+    @writes: runtime-config+resolved-urls
+    @bridge: runtime+pwa+enhancements
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_runtime_config_scan]{
+      input: prefix+state
+      flow: read->map(embed-normalization)->project
+      output: stable-asset-addressing
+    }
+    ^macro[core_runtime_config_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: runtime-config+resolved-urls
+    }
+  }
+
+  ^invariants{
+    ^invariant[embed]{ mode-in:{standalone,embedded,assets-only} default:standalone }
+    ^invariant[url]{ base-url:normalized resolve:root-safe external:passthrough }
+    ^invariant[release]{ asset-version:append preserve:existing-query }
+  }
+
+  ^potential{
+    ^potential[multi-host]{ mount-same-runtime under:different-base-prefixes }
+    ^potential[policy]{ host-level config gating:sw+enhancements }
+  }
+
+  ^compose[neighbors]{ ingress:meta-tags+overrides egress:runtime-config+resolved-urls bridge:runtime+pwa+enhancements }
+}

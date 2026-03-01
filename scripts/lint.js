@@ -5,7 +5,16 @@ import path from 'node:path';
 
 const ROOT_DIR = process.cwd();
 const SRC_DIR = path.join(ROOT_DIR, 'src');
-const REQUIRED_HEADER_LINES = ['^intent:', '^invariants:', '^compose:'];
+const REQUIRED_SIDECAR_LINES = [
+  '^scan{',
+  '^intent[module]{',
+  '^prefix-utility{',
+  '^postfix-utility{',
+  '^state-embed{',
+  '^macro-embed{',
+  '^invariant[',
+  '^compose[neighbors]{'
+];
 
 async function walkFiles(directoryPath) {
   const entries = await readdir(directoryPath, { withFileTypes: true });
@@ -22,17 +31,32 @@ async function walkFiles(directoryPath) {
   return files.flat();
 }
 
-function checkModuleHeader(filePath, fileContents) {
+function sidecarPathForModule(filePath) {
+  return filePath.replace(/\.js$/, '.spw');
+}
+
+async function checkModuleSidecar(filePath) {
   if (!filePath.endsWith('.js')) {
     return [];
   }
 
-  const missing = REQUIRED_HEADER_LINES.filter((line) => !fileContents.includes(line));
+  const sidecarPath = sidecarPathForModule(filePath);
+  let sidecarContents = '';
+
+  try {
+    sidecarContents = await readFile(sidecarPath, 'utf8');
+  } catch {
+    return [
+      `Missing sidecar file: ${path.relative(ROOT_DIR, sidecarPath)}`
+    ];
+  }
+
+  const missing = REQUIRED_SIDECAR_LINES.filter((line) => !sidecarContents.includes(line));
   if (missing.length === 0) {
     return [];
   }
 
-  return [`Missing Spw header line(s): ${missing.join(', ')}`];
+  return [`Missing sidecar Spw line(s): ${missing.join(', ')}`];
 }
 
 function checkNoDefaultExport(filePath, fileContents) {
@@ -104,7 +128,7 @@ async function runLint() {
 
   for (const filePath of files.sort()) {
     const contents = await readFile(filePath, 'utf8');
-    const moduleHeaderIssues = checkModuleHeader(filePath, contents);
+    const moduleHeaderIssues = await checkModuleSidecar(filePath);
     const defaultExportIssues = checkNoDefaultExport(filePath, contents);
 
     for (const issue of [...moduleHeaderIssues, ...defaultExportIssues]) {

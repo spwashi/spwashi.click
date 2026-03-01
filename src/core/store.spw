@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./store.js"
+  @path: ~"src/core/store.js"
+
+  ^scan{
+    @id: core.store
+    @axis: immutable-state-machine
+    @output: deterministic-app-transitions
+    @hotspots: store.js
+  }
+
+  ^intent[module]{ id:core.store axis:immutable-state-machine output:deterministic-app-transitions }
+
+  ^prefix-utility{
+    !:: role:update draft->next reason:required
+    @:: role:subscribe next+prev+reason
+    ~:: role:derive phase+layers from:click-count
+  }
+
+  ^postfix-utility{
+    state~{ read:intents+runtime-control }
+    view!{ write:state-stream }
+    bind@{ bridge:components+events+medium-flow }
+  }
+
+  ^operator-overload{
+    !{ role:update draft->next reason:required }
+    @{ role:subscribe next+prev+reason }
+    ~{ role:derive phase+layers from:click-count }
+  }
+
+  ^state-embed{
+    @reads: intents+runtime-control
+    @writes: state-stream
+    @bridge: components+events+medium-flow
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_store_scan]{
+      input: prefix+state
+      flow: read->map(immutable-state-machine)->project
+      output: deterministic-app-transitions
+    }
+    ^macro[core_store_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: state-stream
+    }
+  }
+
+  ^invariants{
+    ^invariant[immutability]{ snapshots:frozen mutation:path:store-only }
+    ^invariant[determinism]{ clickCount -> phase+layers unique }
+    ^invariant[subscriptions]{ unsubscribe detaches-cleanly }
+  }
+
+  ^potential{
+    ^potential[time-travel]{ record/replay reasons for:debug+teaching }
+    ^potential[branching]{ what-if scenes for:design exploration }
+  }
+
+  ^compose[neighbors]{ ingress:intents+runtime-control egress:state-stream bridge:components+events+medium-flow }
+}

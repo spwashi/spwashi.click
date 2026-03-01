@@ -37,7 +37,7 @@ git submodule update --init --recursive
 
 ### Scripts
 
-- `npm run lint`: checks source modules for code-as-literature headers and named exports only.
+- `npm run lint`: checks source modules for sidecar Spw contracts and named exports only.
 - `npm run test`: runs unit and static e2e scenario tests.
 - `npm run build`: outputs deployable static artifacts into `dist/`.
 - `npm run export:assets -- --target <path> [--mode copy|symlink] [--clean]`: exports runtime/assets/contracts for host repos.
@@ -51,13 +51,16 @@ git submodule update --init --recursive
 
 ## Code as Literature Convention
 
-Every source module under `src/` starts with:
+Every source module under `src/` has a sibling sidecar file (`*.spw`) that declares:
 
-- `Intent:`
-- `Invariants:`
-- `How this composes with neighbors:`
+- `^scan{ ... }` (fast module index for crawlers/readers)
+- `^intent[module]{ ... }`
+- `^prefix-utility{ ... }` and `^postfix-utility{ ... }`
+- `^state-embed{ ... }` and `^macro-embed{ ... }`
+- `^invariant[...]`
+- `^compose[neighbors]{ ... }`
 
-This keeps behavior contracts explicit and reviewable.
+This keeps behavior contracts explicit without adding inline prose noise to runtime modules.
 
 ## Software Literature and Waypoints
 

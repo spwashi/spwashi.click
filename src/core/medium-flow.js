@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.medium-flow mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const DEFAULT_STEP_MS = 5200;
 
 function shouldIgnoreKeyEvent(event) {

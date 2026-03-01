@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.structure-mode mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const STORAGE_KEY = 'spw:settings:llm-readable-structure';
 
 function coerceBooleanFlag(value) {

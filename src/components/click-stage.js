@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:components.click-stage mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 import { EVENT_INTENT_CLICK, dispatchTypedEvent } from '../core/events.js';
 import { noteComponentLifecycle } from '../core/ecology.js';
 import { intensityFromPhase } from '../core/motion.js';

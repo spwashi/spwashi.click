@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./ecology.js"
+  @path: ~"src/core/ecology.js"
+
+  ^scan{
+    @id: core.ecology
+    @axis: component-species-ledger
+    @output: live-relationship-map
+    @hotspots: ecology.js
+  }
+
+  ^intent[module]{ id:core.ecology axis:component-species-ledger output:live-relationship-map }
+
+  ^prefix-utility{
+    !:: role:note-lifecycle event:connected|rendered|disconnected|intent
+    @:: role:subscribe snapshot:species+counts
+    ~:: role:derive-health from:activity+route+phase
+  }
+
+  ^postfix-utility{
+    state~{ read:component-lifecycle-notes }
+    view!{ write:ecology-snapshots }
+    bind@{ bridge:ecology-map+runtime-events }
+  }
+
+  ^operator-overload{
+    !{ role:note-lifecycle event:connected|rendered|disconnected|intent }
+    @{ role:subscribe snapshot:species+counts }
+    ~{ role:derive-health from:activity+route+phase }
+  }
+
+  ^state-embed{
+    @reads: component-lifecycle-notes
+    @writes: ecology-snapshots
+    @bridge: ecology-map+runtime-events
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_ecology_scan]{
+      input: prefix+state
+      flow: read->map(component-species-ledger)->project
+      output: live-relationship-map
+    }
+    ^macro[core_ecology_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: ecology-snapshots
+    }
+  }
+
+  ^invariants{
+    ^invariant[species]{ registry:immutable ids:stable }
+    ^invariant[counters]{ append-only lifecycle-counts }
+    ^invariant[snapshot]{ read:immutable write:controller-only }
+  }
+
+  ^potential{
+    ^potential[facet-graph]{ project:component-dependencies to:syntax-lab }
+    ^potential[care-signals]{ detect:orphaned-components|hot-loops }
+  }
+
+  ^compose[neighbors]{ ingress:component-lifecycle-notes egress:ecology-snapshots bridge:ecology-map+runtime-events }
+}

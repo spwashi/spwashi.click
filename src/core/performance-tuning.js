@@ -1,13 +1,3 @@
-/**
- * ^intent:
- * ^intent[module]{ id:core.performance-tuning mode:spwlang surface:web }
- * ^invariants:
- * ^invariant[form]{ determinism:locked contracts:explicit sidefx:bounded }
- * ^invariant[state]{ mutation:public-api projection:data+aria }
- * ^compose:
- * ^compose[neighbors]{ ingress:imports egress:exports bridge:event+store }
- */
-
 const STORAGE_KEY = 'spw:settings:performance-profile';
 const QUERY_KEY = 'perf';
 const TEXTURE_CACHE_FALLBACK_ORIGIN = 'https://tealstripesvibes.com';

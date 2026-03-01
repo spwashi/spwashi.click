@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./release.js"
+  @path: ~"src/core/release.js"
+
+  ^scan{
+    @id: core.release
+    @axis: release-metadata
+    @output: date-arc-vibe-cache-keys
+    @hotspots: release.js
+  }
+
+  ^intent[module]{ id:core.release axis:release-metadata output:date-arc-vibe-cache-keys }
+
+  ^prefix-utility{
+    !:: role:read-release-meta source:meta-tags
+    @:: role:stamp-asset-url fn:appendAssetVersion
+    ~:: role:preserve-query while:appending-version
+  }
+
+  ^postfix-utility{
+    state~{ read:html-meta+build-stamps }
+    view!{ write:releaseMeta+versioned-urls }
+    bind@{ bridge:pwa+enhancements+runtime-config }
+  }
+
+  ^operator-overload{
+    !{ role:read-release-meta source:meta-tags }
+    @{ role:stamp-asset-url fn:appendAssetVersion }
+    ~{ role:preserve-query while:appending-version }
+  }
+
+  ^state-embed{
+    @reads: html-meta+build-stamps
+    @writes: releaseMeta+versioned-urls
+    @bridge: pwa+enhancements+runtime-config
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_release_scan]{
+      input: prefix+state
+      flow: read->map(release-metadata)->project
+      output: date-arc-vibe-cache-keys
+    }
+    ^macro[core_release_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: releaseMeta+versioned-urls
+    }
+  }
+
+  ^invariants{
+    ^invariant[version]{ asset-version stable-per-release }
+    ^invariant[fallback]{ missing-meta => dev-safe-values }
+    ^invariant[url]{ existing-search-params preserved }
+  }
+
+  ^potential{
+    ^potential[channel]{ route:release-streams per:arc }
+    ^potential[seasonality]{ vibe-calendar driven-fresh-paint }
+  }
+
+  ^compose[neighbors]{ ingress:html-meta+build-stamps egress:releaseMeta+versioned-urls bridge:pwa+enhancements+runtime-config }
+}

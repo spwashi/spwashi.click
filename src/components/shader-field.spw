@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./shader-field.js"
+  @path: ~"src/components/shader-field.js"
+
+  ^scan{
+    @id: components.shader-field
+    @axis: canvas-harmonics
+    @output: pointer+keyboard-reactive-field
+    @hotspots: shader-field.js
+  }
+
+  ^intent[module]{ id:components.shader-field axis:canvas-harmonics output:pointer+keyboard-reactive-field }
+
+  ^prefix-utility{
+    !:: role:emit-intent source:canvas+button+keyboard
+    @:: role:render-frame budget:performance-profile
+    ~:: role:steer-field pointer|keys->harmonic-state
+  }
+
+  ^postfix-utility{
+    state~{ read:store+perf-profile }
+    view!{ write:canvas state+intent events }
+    bind@{ bridge:runtime+styles }
+  }
+
+  ^operator-overload{
+    !{ role:emit-intent source:canvas+button+keyboard }
+    @{ role:render-frame budget:performance-profile }
+    ~{ role:steer-field pointer|keys->harmonic-state }
+  }
+
+  ^state-embed{
+    @reads: store+perf-profile
+    @writes: canvas state+intent events
+    @bridge: runtime+styles
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_shader_field_scan]{
+      input: prefix+state
+      flow: read->map(canvas-harmonics)->project
+      output: pointer+keyboard-reactive-field
+    }
+    ^macro[components_shader_field_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: canvas state+intent events
+    }
+  }
+
+  ^invariants{
+    ^invariant[budget]{ profile controls frame-cost+quality }
+    ^invariant[input]{ keyboard parity with pointer available }
+    ^invariant[store]{ no direct store mutation emits events only }
+  }
+
+  ^potential{
+    ^potential[lights]{ route-phase drives dynamic lighting rigs }
+    ^potential[texture-cache]{ remote maps from tealstripesvibes }
+  }
+
+  ^compose[neighbors]{ ingress:store+perf-profile egress:canvas state+intent events bridge:runtime+styles }
+}

@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./site-shell.js"
+  @path: ~"src/components/site-shell.js"
+
+  ^scan{
+    @id: components.site-shell
+    @axis: global-chrome
+    @output: route-aware-shell
+    @hotspots: site-shell.js
+  }
+
+  ^intent[module]{ id:components.site-shell axis:global-chrome output:route-aware-shell }
+
+  ^prefix-utility{
+    !:: role:dispatch-navigate href:anchor-intent
+    @:: role:subscribe store route+phase
+    ~:: role:project-state data-route+data-phase+aria-current
+  }
+
+  ^postfix-utility{
+    state~{ read:store+nav anchors }
+    view!{ write:navigate intents+projected attrs }
+    bind@{ bridge:router-lite+a11y }
+  }
+
+  ^operator-overload{
+    !{ role:dispatch-navigate href:anchor-intent }
+    @{ role:subscribe store route+phase }
+    ~{ role:project-state data-route+data-phase+aria-current }
+  }
+
+  ^state-embed{
+    @reads: store+nav anchors
+    @writes: navigate intents+projected attrs
+    @bridge: router-lite+a11y
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[components_site_shell_scan]{
+      input: prefix+state
+      flow: read->map(global-chrome)->project
+      output: route-aware-shell
+    }
+    ^macro[components_site_shell_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: navigate intents+projected attrs
+    }
+  }
+
+  ^invariants{
+    ^invariant[navigation]{ active route mirrored in aria-current }
+    ^invariant[state]{ shell reflects store snapshots }
+    ^invariant[scope]{ handles internal links leaves external/mailto untouched }
+  }
+
+  ^potential{
+    ^potential[cube-nav]{ braces/operators as route controls }
+    ^potential[shell-themes]{ vibe-driven chrome variants }
+  }
+
+  ^compose[neighbors]{ ingress:store+nav anchors egress:navigate intents+projected attrs bridge:router-lite+a11y }
+}

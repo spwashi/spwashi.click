@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./spwlang-parser.js"
+  @path: ~"src/core/spwlang-parser.js"
+
+  ^scan{
+    @id: core.spwlang-parser
+    @axis: spw-form-parse
+    @output: structured-copy-semantics
+    @hotspots: spwlang-parser.js
+  }
+
+  ^intent[module]{ id:core.spwlang-parser axis:spw-form-parse output:structured-copy-semantics }
+
+  ^prefix-utility{
+    !:: role:parse-form returns:{ok,kind,sigil,name,fields}
+    @:: role:register-adapter source:spw-workbench
+    ~:: role:fallback-parser subset:sigil+braces
+  }
+
+  ^postfix-utility{
+    state~{ read:copy+command-surface }
+    view!{ write:parsed-forms }
+    bind@{ bridge:manifests+runtime-control+lab }
+  }
+
+  ^operator-overload{
+    !{ role:parse-form returns:{ok,kind,sigil,name,fields} }
+    @{ role:register-adapter source:spw-workbench }
+    ~{ role:fallback-parser subset:sigil+braces }
+  }
+
+  ^state-embed{
+    @reads: copy+command-surface
+    @writes: parsed-forms
+    @bridge: manifests+runtime-control+lab
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_spwlang_parser_scan]{
+      input: prefix+state
+      flow: read->map(spw-form-parse)->project
+      output: structured-copy-semantics
+    }
+    ^macro[core_spwlang_parser_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: parsed-forms
+    }
+  }
+
+  ^invariants{
+    ^invariant[result]{ parse-return shape:stable }
+    ^invariant[adapter]{ adapter-fail => fallback-parse }
+    ^invariant[subset]{ unsupported-form => reason:explicit }
+  }
+
+  ^potential{
+    ^potential[lsp-bridge]{ parser-ast alignment:editor-tools }
+    ^potential[semantic-color]{ parse-kind drives:syntax-lab rendering }
+  }
+
+  ^compose[neighbors]{ ingress:copy+command-surface egress:parsed-forms bridge:manifests+runtime-control+lab }
+}

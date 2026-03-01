@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./runtime-control.js"
+  @path: ~"src/core/runtime-control.js"
+
+  ^scan{
+    @id: core.runtime-control
+    @axis: llm-manipulation
+    @output: bounded-runtime-api
+    @hotspots: runtime-control.js
+  }
+
+  ^intent[module]{ id:core.runtime-control axis:llm-manipulation output:bounded-runtime-api }
+
+  ^prefix-utility{
+    !:: role:setTopLevel route|clicks|profile|structure
+    @:: role:setRegion|setComponent selector-scoped
+    ~:: role:setWindowVars css-var projection
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime-app+catalog }
+    view!{ write:window.__SPW_RUNTIME__ }
+    bind@{ bridge:spw-command-surface }
+  }
+
+  ^operator-overload{
+    !{ role:setTopLevel route|clicks|profile|structure }
+    @{ role:setRegion|setComponent selector-scoped }
+    ~{ role:setWindowVars css-var projection }
+  }
+
+  ^state-embed{
+    @reads: runtime-app+catalog
+    @writes: window.__SPW_RUNTIME__
+    @bridge: spw-command-surface
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_runtime_control_scan]{
+      input: prefix+state
+      flow: read->map(llm-manipulation)->project
+      output: bounded-runtime-api
+    }
+    ^macro[core_runtime_control_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: window.__SPW_RUNTIME__
+    }
+  }
+
+  ^invariants{
+    ^invariant[mutation]{ selector-bounded all:false-default snapshot:returned }
+    ^invariant[state]{ top-level updates route-through-store reason:tagged }
+    ^invariant[reset]{ reset-runtime clears-clicks+fx-vars keeps-contract-surface }
+  }
+
+  ^potential{
+    ^potential[macro]{ compose:Spw command macros for live-direction }
+    ^potential[safety]{ policy-layer around selectors+vars }
+  }
+
+  ^compose[neighbors]{ ingress:runtime-app+catalog egress:window.__SPW_RUNTIME__ bridge:spw-command-surface }
+}

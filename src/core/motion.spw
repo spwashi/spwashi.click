@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"./motion.js"
+  @path: ~"src/core/motion.js"
+
+  ^scan{
+    @id: core.motion
+    @axis: phase-math
+    @output: deterministic-rhythm
+    @hotspots: motion.js
+  }
+
+  ^intent[module]{ id:core.motion axis:phase-math output:deterministic-rhythm }
+
+  ^prefix-utility{
+    !:: role:click->phase transform:count-thresholds
+    @:: role:phase->layers map:seed|pulse|counterpoint|chorus
+    ~:: role:intensity-weight map:phase->0..3
+  }
+
+  ^postfix-utility{
+    state~{ read:store updates }
+    view!{ write:intensity+phase helpers }
+    bind@{ bridge:click-stage+chapter-panel+shader }
+  }
+
+  ^operator-overload{
+    !{ role:click->phase transform:count-thresholds }
+    @{ role:phase->layers map:seed|pulse|counterpoint|chorus }
+    ~{ role:intensity-weight map:phase->0..3 }
+  }
+
+  ^state-embed{
+    @reads: store updates
+    @writes: intensity+phase helpers
+    @bridge: click-stage+chapter-panel+shader
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_motion_scan]{
+      input: prefix+state
+      flow: read->map(phase-math)->project
+      output: deterministic-rhythm
+    }
+    ^macro[core_motion_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: intensity+phase helpers
+    }
+  }
+
+  ^invariants{
+    ^invariant[phase]{ click-count unique->phase }
+    ^invariant[layers]{ phase unique->unlocked-layers }
+    ^invariant[purity]{ no-dom-sidefx pure-functions-only }
+  }
+
+  ^potential{
+    ^potential[alt-scales]{ swap:threshold-curves by:profile }
+    ^potential[teaching]{ expose:phase-math in syntax-lab }
+  }
+
+  ^compose[neighbors]{ ingress:store updates egress:intensity+phase helpers bridge:click-stage+chapter-panel+shader }
+}
