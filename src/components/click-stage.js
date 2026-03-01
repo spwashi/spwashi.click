@@ -11,10 +11,10 @@ const PHASE_COPY = Object.freeze({
 });
 
 const PHASE_STATUS_COPY = Object.freeze({
-  seed: 'Seed phase: establish structure.',
-  pulse: 'Pulse phase: motion starts to lock in.',
-  counterpoint: 'Counterpoint phase: layers synchronize.',
-  chorus: 'Chorus phase: full scene unlocked.'
+  seed: '^phase{ state:seed mode:structure }',
+  pulse: '^phase{ state:pulse mode:motion }',
+  counterpoint: '^phase{ state:counterpoint mode:layering }',
+  chorus: '^phase{ state:chorus mode:full-scene }'
 });
 
 function isTextEntryTarget(target) {
@@ -263,7 +263,7 @@ class SpwClickStage extends HTMLElement {
 
     if (this.statusNode) {
       const statusCopy = PHASE_STATUS_COPY[state.phase] ?? PHASE_COPY[state.phase];
-      this.statusNode.textContent = `${statusCopy} Taps: ${state.clickCount}.`;
+      this.statusNode.textContent = `${statusCopy} taps:${state.clickCount}.`;
     }
 
     if (this.rhythmGrid) {

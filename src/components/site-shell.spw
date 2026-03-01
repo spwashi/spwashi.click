@@ -14,7 +14,7 @@
   ^prefix-utility{
     !:: role:dispatch-navigate href:anchor-intent
     @:: role:subscribe store route+phase
-    ~:: role:project-state data-route+data-phase+aria-current
+    ~:: role:project-state data-route+data-phase+aria-current + operator-rail twinkle
   }
 
   ^postfix-utility{
@@ -53,6 +53,7 @@
     ^invariant[navigation]{ active route mirrored in aria-current }
     ^invariant[state]{ shell reflects store snapshots }
     ^invariant[scope]{ handles internal links leaves external/mailto untouched }
+    ^invariant[operators]{ route changes morph/twinkle operator rail while content components remain static }
   }
 
   ^potential{

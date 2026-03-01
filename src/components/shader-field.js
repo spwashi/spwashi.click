@@ -321,10 +321,10 @@ class SpwShaderField extends HTMLElement {
     const pointerY = this.state.pointerY.toFixed(2);
     const reasonHint =
       this.dataset.verboseStatus === 'true'
-        ? ` | source:${reason}`
+        ? ` source:${reason}`
         : '';
     this.statusNode.textContent =
-      `Phase ${this.state.phase} | Profile ${this.state.profile} | Focus ${pointerX}/${pointerY} | Taps ${this.state.clickCount}${reasonHint}`;
+      `^shader{ phase:${this.state.phase} profile:${this.state.profile} focus:${pointerX}|${pointerY} taps:${this.state.clickCount}${reasonHint} }`;
   }
 
   drawFrame(timeMs) {

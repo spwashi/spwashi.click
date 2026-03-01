@@ -58,6 +58,44 @@
     text-transform: uppercase;
   }
 
+  .site-operator-rail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+    padding: 0.24rem 0.56rem;
+    border-radius: 999px;
+    border: 1px dashed color-mix(in srgb, var(--color-accent) 36%, var(--color-border));
+    background: color-mix(in srgb, var(--color-surface) 88%, white 12%);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    letter-spacing: 0.02em;
+    min-height: 2.2rem;
+  }
+
+  .site-operator-token {
+    display: inline-flex;
+    min-width: 0.72ch;
+    justify-content: center;
+    transform: translateY(0) scale(1);
+    opacity: 0.74;
+    transition:
+      color var(--duration-fast) var(--ease-jazz),
+      opacity var(--duration-fast) var(--ease-jazz);
+  }
+
+  .site-operator-token[data-state='morphing'] {
+    color: color-mix(in srgb, var(--color-accent) 70%, var(--color-brass));
+    opacity: 0.96;
+    animation: operator-morph 220ms var(--ease-jazz);
+  }
+
+  .site-operator-token[data-state='twinkle'] {
+    color: color-mix(in srgb, var(--color-brass) 76%, var(--color-accent));
+    opacity: 1;
+    animation: operator-twinkle 320ms var(--ease-jazz);
+  }
+
   .site-nav a {
     display: inline-flex;
     align-items: center;
@@ -278,6 +316,12 @@
       flex-wrap: wrap;
       gap: var(--spacing-2);
     }
+
+    .site-operator-rail {
+      width: 100%;
+      justify-content: center;
+      order: 3;
+    }
   }
 
   @media (max-width: 1240px) {
@@ -307,6 +351,35 @@
   @media (max-width: 900px) {
     body[data-page] .site-main > [data-layout-region] {
       grid-column: 1 / -1;
+    }
+  }
+
+  @keyframes operator-morph {
+    0% {
+      transform: translateY(1px) scale(0.9);
+      opacity: 0.4;
+    }
+
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 0.96;
+    }
+  }
+
+  @keyframes operator-twinkle {
+    0% {
+      text-shadow: 0 0 0 transparent;
+      transform: translateY(0) scale(1);
+    }
+
+    45% {
+      text-shadow: 0 0 9px color-mix(in srgb, var(--color-accent) 52%, transparent);
+      transform: translateY(-1px) scale(1.06);
+    }
+
+    100% {
+      text-shadow: 0 0 0 transparent;
+      transform: translateY(0) scale(1);
     }
   }
 }
