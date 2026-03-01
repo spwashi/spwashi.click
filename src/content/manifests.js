@@ -19,45 +19,45 @@ export const HOME_MANIFEST = Object.freeze({
   metaTitle: 'spwashi.click',
   slots: Object.freeze({
     hero_title: 'Spwashi',
-    hero_tagline_slot: '^identity[spwashi]{ physics:spw role:internet-persona medium:web-language }',
-    hero_subline_slot: '^state-model[scene]{ seed>pulse>counterpoint>chorus loop:click->phase }',
-    intro_body_slot: '^profile[spw-workbench]{ function:language-kernel claim:executable-copy demo:spwashi.click }',
-    contact_cta_slot: '!contact[primary]{ channel:bookings+collabs mode:runtime-open }'
+    hero_tagline_slot: '^identity{ role:web-language system:interactive-runtime }',
+    hero_subline_slot: '^phase{ seed>pulse>counterpoint>chorus via:taps }',
+    intro_body_slot: '^workbench{ parser+runtime+components aligned:mobile-first }',
+    contact_cta_slot: '!contact{ hello@spwashi.click }'
   }),
   selectedWork: Object.freeze([
     Object.freeze({
-      title_slot: '^demo[facet_nav]{ id:drop_01 }',
-      summary_slot: '~summary[workbench]{ module:syntax-lab signal:brace+operator navigation:facet-graph }',
+      title_slot: '^demo{ syntax-lab }',
+      summary_slot: '~summary{ brace+operator navigation in one view }',
       href: '/work/#project-one'
     }),
     Object.freeze({
-      title_slot: '^demo[runtime_control]{ id:editorial_02 }',
-      summary_slot: '~summary[control]{ api:evalSpw+setTopLevel+setRegion+setWindowVars action:llm-tunable }',
+      title_slot: '^demo{ runtime-control }',
+      summary_slot: '~summary{ composable runtime api with host-safe controls }',
       href: '/work/#project-two'
     }),
     Object.freeze({
-      title_slot: '^demo[texture_tuner]{ id:performance_03 }',
-      summary_slot: '~summary[pwa]{ shader-field+sw cache:release-arc-vibe source:tealstripesvibes.com }',
+      title_slot: '^demo{ shader+pwa }',
+      summary_slot: '~summary{ canvas interaction + release-aware caching }',
       href: '/work/#project-three'
     })
   ]),
   chapters: Object.freeze([
     Object.freeze({
       chapter: 'identity',
-      heading: '^module[physics]{ source:spw }',
-      body: '~body[kernel]{ seed:spw-workbench output:interaction-grammar }',
+      heading: '^module{ physics }',
+      body: '~body{ spw grammar + runtime baseline }',
       unlockAt: 'seed'
     }),
     Object.freeze({
       chapter: 'systems',
-      heading: '^module[disposition]{ vectors:operators }',
-      body: '~body[systems]{ braces:layout-view operators:component-view route:combinatoric }',
+      heading: '^module{ systems }',
+      body: '~body{ route + state + host compatibility }',
       unlockAt: 'pulse'
     }),
     Object.freeze({
       chapter: 'improv',
-      heading: '^module[geometry]{ medium:facet-nav }',
-      body: '~body[improv]{ click->state->lighting result:learnable-abstraction }',
+      heading: '^module{ improv }',
+      body: '~body{ interaction tuning + responsive lighting }',
       unlockAt: 'counterpoint'
     })
   ])
