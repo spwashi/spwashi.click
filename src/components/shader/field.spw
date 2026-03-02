@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./shader-field.js"
-  @path: ~"src/components/shader-field.js"
+  @source: ~"./field.js"
+  @path: ~"src/components/shader/field.js"
 
   ^scan{
-    @id: components.shader-field
+    @id: components.shader.field
     @axis: canvas-harmonics
     @output: pointer+keyboard-reactive-field
-    @hotspots: shader-field.js
+    @hotspots: shader/field.js
   }
 
-  ^intent[module]{ id:components.shader-field axis:canvas-harmonics output:pointer+keyboard-reactive-field }
+  ^intent[module]{ id:components.shader.field axis:canvas-harmonics output:pointer+keyboard-reactive-field }
 
   ^prefix-utility{
     !:: role:emit-intent source:canvas+button+keyboard

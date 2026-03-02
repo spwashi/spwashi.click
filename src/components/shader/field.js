@@ -1,6 +1,6 @@
-import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
-import { createTapTracker, emitIntentClick } from '../core/runtime/js/intent-kit.js';
-import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
+import { noteComponentLifecycle } from '../../core/runtime/js/ecology.js';
+import { createTapTracker, emitIntentClick } from '../../core/runtime/js/intent/kit.js';
+import { installSporadicSpaceSampler } from '../../core/runtime/js/space/metrics.js';
 
 const PROFILE_FRAME_RATE = Object.freeze({
   seed: 12,

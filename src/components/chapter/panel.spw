@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./chapter-panel.js"
-  @path: ~"src/components/chapter-panel.js"
+  @source: ~"./panel.js"
+  @path: ~"src/components/chapter/panel.js"
 
   ^scan{
-    @id: components.chapter-panel
+    @id: components.chapter.panel
     @axis: phase-gated-content
     @output: unlockable-panels
-    @hotspots: chapter-panel.js
+    @hotspots: chapter/panel.js
   }
 
-  ^intent[module]{ id:components.chapter-panel axis:phase-gated-content output:unlockable-panels }
+  ^intent[module]{ id:components.chapter.panel axis:phase-gated-content output:unlockable-panels }
 
   ^prefix-utility{
     !:: role:project-unlock state:phase>=unlock-at

@@ -1,5 +1,5 @@
 import { EVENT_PWA_STATE_CHANGED, dispatchTypedEvent } from './events.js';
-import { resolveRuntimeAssetUrl } from './runtime-config.js';
+import { resolveRuntimeAssetUrl } from './runtime/config.js';
 
 function isServiceWorkerSupported(win = globalThis.window) {
   return Boolean(win?.navigator?.serviceWorker);

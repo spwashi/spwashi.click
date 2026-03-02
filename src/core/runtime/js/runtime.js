@@ -14,27 +14,27 @@ import {
   dispatchTypedEvent,
   subscribeTypedEvent
 } from './events.js';
-import { createFallbackHostManifest, loadHostManifest } from './host-manifest.js';
-import { installHostThemeCombinatorics } from './host-theme.js';
-import { runIterativeEnhancements } from './iterative-enhancement.js';
+import { createFallbackHostManifest, loadHostManifest } from './host/manifest.js';
+import { installHostThemeCombinatorics } from './host/theme.js';
+import { runIterativeEnhancements } from './iterative/enhancement.js';
 import { createMarginaliaLedger } from './literature.js';
 import { detectReducedMotionPreference, watchReducedMotionPreference } from './motion.js';
-import { installAtmosphereDrift, installPerformanceTuning } from './performance-tuning.js';
+import { installAtmosphereDrift, installPerformanceTuning } from './performance/tuning.js';
 import { installPwaSupport } from './pwa.js';
 import { readReleaseMeta } from './release.js';
-import { resolveRuntimeAssetUrl, readRuntimeConfig } from './runtime-config.js';
-import { routeFromHref, routeFromPathname } from './router-lite.js';
-import { installRuntimeControl } from './runtime-control.js';
-import { installWorkbenchParserAdapter } from './spwlang-parser.js';
+import { resolveRuntimeAssetUrl, readRuntimeConfig } from './runtime/config.js';
+import { routeFromHref, routeFromPathname } from './router/lite.js';
+import { installRuntimeControl } from './runtime/control.js';
+import { installWorkbenchParserAdapter } from './spwlang/parser.js';
 import { createStore } from './store.js';
-import { installStructureMode } from './structure-mode.js';
-import { installMediumFlow } from './medium-flow.js';
-import { createRuntimeApiContract } from './runtime-contract.js';
+import { installStructureMode } from './structure/mode.js';
+import { installMediumFlow } from './medium/flow.js';
+import { createRuntimeApiContract } from './runtime/contract.js';
 import {
   DEFAULT_SPACE_MODE,
   DEFAULT_VIEWPORT_MODE,
   resolveViewportSpace
-} from './viewport-space.js';
+} from './viewport/space.js';
 import { defineAllComponents } from '../../../components/index.js';
 import { CONTENT_MANIFESTS } from '../../../content/index.js';
 import { PAGE_INITIALIZERS } from '../../../pages/index.js';

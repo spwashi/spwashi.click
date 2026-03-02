@@ -1,7 +1,7 @@
-import { emitIntentClick, createTapTracker } from '../core/runtime/js/intent-kit.js';
-import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
-import { intensityFromPhase } from '../core/runtime/js/motion.js';
-import { installSporadicSpaceSampler } from '../core/runtime/js/space-metrics.js';
+import { emitIntentClick, createTapTracker } from '../../core/runtime/js/intent/kit.js';
+import { noteComponentLifecycle } from '../../core/runtime/js/ecology.js';
+import { intensityFromPhase } from '../../core/runtime/js/motion.js';
+import { installSporadicSpaceSampler } from '../../core/runtime/js/space/metrics.js';
 
 const PHASE_COPY = Object.freeze({
   seed: '^phase[seed]{ model: geometry-init learn: click=>state }',

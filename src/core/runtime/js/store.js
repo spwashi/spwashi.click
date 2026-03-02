@@ -1,5 +1,5 @@
 import { phaseFromClickCount, unlockedLayersFromPhase } from './motion.js';
-import { coerceRoute } from './router-lite.js';
+import { coerceRoute } from './router/lite.js';
 
 /**
  * @typedef {'seed' | 'pulse' | 'counterpoint' | 'chorus'} PhaseName

@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./rhythm-grid.js"
-  @path: ~"src/components/rhythm-grid.js"
+  @source: ~"./grid.js"
+  @path: ~"src/components/rhythm/grid.js"
 
   ^scan{
-    @id: components.rhythm-grid
+    @id: components.rhythm.grid
     @axis: svg-intensity-visualization
     @output: tempo-cells
-    @hotspots: rhythm-grid.js
+    @hotspots: rhythm/grid.js
   }
 
-  ^intent[module]{ id:components.rhythm-grid axis:svg-intensity-visualization output:tempo-cells }
+  ^intent[module]{ id:components.rhythm.grid axis:svg-intensity-visualization output:tempo-cells }
 
   ^prefix-utility{
     !:: role:set-intensity attr:0..3

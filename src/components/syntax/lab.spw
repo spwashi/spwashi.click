@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./syntax-lab.js"
-  @path: ~"src/components/syntax-lab.js"
+  @source: ~"./lab.js"
+  @path: ~"src/components/syntax/lab.js"
 
   ^scan{
-    @id: components.syntax-lab
+    @id: components.syntax.lab
     @axis: spw-exploration
     @output: brace+operator+facet-navigation
-    @hotspots: syntax-lab.js
+    @hotspots: syntax/lab.js
   }
 
-  ^intent[module]{ id:components.syntax-lab axis:spw-exploration output:brace+operator+facet-navigation }
+  ^intent[module]{ id:components.syntax.lab axis:spw-exploration output:brace+operator+facet-navigation }
 
   ^prefix-utility{
     !:: role:swap-operators action:two-step

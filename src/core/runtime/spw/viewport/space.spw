@@ -1,0 +1,70 @@
+~#module{
+  @source: ~"../../js/viewport/space.js"
+  @path: ~"src/core/runtime/js/viewport/space.js"
+
+  ^scan{
+    @id: core.viewport.space
+    @axis: viewport-space-projection
+    @output: responsive-space-contract
+    @hotspots: viewport/space.js
+  }
+
+  ^intent[module]{ id:core.viewport.space axis:viewport-space-projection output:responsive-space-contract }
+
+  ^prefix-utility{
+    !:: role:normalize tokens viewport+space+aspect
+    @:: role:resolve viewport-band breakpoints:compact+mobile
+    ~:: role:derive space-mode compact|balanced|expansive
+    &:: role:derive space-layer stack|nested|spread
+    =:: role:project viewport+space snapshot immutable
+  }
+
+  ^postfix-utility{
+    state~{ read:width+height+breakpoints+requested-mode }
+    view!{ write:mode+band+aspect+space+mobile projection }
+    bind@{ bridge:runtime+runtime-control+css-datasets }
+  }
+
+  ^operator-overload{
+    !{ role:normalize tokens viewport+space+aspect }
+    @{ role:resolve viewport-band breakpoints:compact+mobile }
+    ~{ role:derive space-mode compact|balanced|expansive }
+    &{ role:derive space-layer stack|nested|spread }
+    ={ role:project viewport+space snapshot immutable }
+  }
+
+  ^state-embed{
+    @reads: width+height+breakpoints+requested-mode
+    @writes: mode+band+mobile+aspect+space-mode+space-layer+area
+    @bridge: runtime+runtime-control+css-datasets+typed-viewport-events
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_viewport_space_scan]{
+      input: prefix+state
+      flow: read->map(viewport-space-projection)->project
+      output: responsive-space-contract
+    }
+    ^macro[core_viewport_space_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: viewport-space snapshot
+    }
+  }
+
+  ^invariants{
+    ^invariant[mode]{ viewport-mode-in:{adaptive,fixed} default:adaptive }
+    ^invariant[space]{ space-mode-in:{adaptive,compact,balanced,expansive} }
+    ^invariant[layer]{ layer-in:{stack,nested,spread} derived-by:mode+aspect }
+    ^invariant[breakpoints]{ compact+mobile bounded(320..2400) }
+    ^invariant[shape]{ snapshot:immutable includes:area+aspect+mobile flags }
+  }
+
+  ^potential{
+    ^potential[host-overrides]{ host can pin space-mode without bypassing viewport guards }
+    ^potential[container-sync]{ merge viewport snapshot with component space samplers }
+  }
+
+  ^compose[neighbors]{ ingress:runtime-config+window-dimensions egress:viewport+space snapshot bridge:runtime+runtime-control+css datasets }
+}

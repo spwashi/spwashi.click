@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"../../js/host/theme.js"
+  @path: ~"src/core/runtime/js/host/theme.js"
+
+  ^scan{
+    @id: core.host.theme
+    @axis: responsive-theme-combinatorics
+    @output: host-aware-token-composition
+    @hotspots: host/theme.js
+  }
+
+  ^intent[module]{ id:core.host.theme axis:responsive-theme-combinatorics output:host-aware-token-composition }
+
+  ^prefix-utility{
+    !:: role:match-theme-rules context:host+route+phase+media
+    @:: role:compose-theme-tokens layers:base+combinations
+    ~:: role:emit-theme-state event:spw:host:theme:changed
+  }
+
+  ^postfix-utility{
+    state~{ read:host-manifest+store+media }
+    view!{ write:root-style tokens+dataset }
+    bind@{ bridge:runtime+host-extensions }
+  }
+
+  ^operator-overload{
+    !{ role:match-theme-rules context:host+route+phase+media }
+    @{ role:compose-theme-tokens layers:base+combinations }
+    ~{ role:emit-theme-state event:spw:host:theme:changed }
+  }
+
+  ^state-embed{
+    @reads: host-manifest+store+media
+    @writes: root-style tokens+dataset
+    @bridge: runtime+host-extensions
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_host_theme_scan]{
+      input: prefix+state
+      flow: read->map(responsive-theme-combinatorics)->project
+      output: host-aware-token-composition
+    }
+    ^macro[core_host_theme_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: root-style tokens+dataset
+    }
+  }
+
+  ^invariants{
+    ^invariant[merge]{ theme-rules apply in manifest-order }
+    ^invariant[context]{ host+route+phase+media drive-active-rules }
+    ^invariant[state]{ active-rules projected to:data-spw-host-theme-rules }
+  }
+
+  ^potential{
+    ^potential[presets]{ host-level preset libraries }
+    ^potential[editor]{ theme-rule live-preview controls }
+  }
+
+  ^compose[neighbors]{ ingress:host-manifest+store+media egress:root-style tokens+dataset bridge:runtime+host-extensions }
+}

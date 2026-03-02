@@ -11,7 +11,7 @@
 
 ^subroot[core_runtime]{
   path: @runtime_js
-  subtree: [@runtime_js, @runtime_spw, @components, @shelves]
+  subtree: [@runtime_js, @runtime_spw, @components, @shelves_js]
   subagent: explorer
   cache_tree: @spw/cache/core_runtime
   cache_key_prefix: core_runtime
@@ -27,10 +27,10 @@
     @components/index.js,
     @content/index.js,
     @pages/index.js,
-    @shelves/index.js,
-    @shelves/runtime/index.js,
-    @shelves/ui/index.js,
-    @shelves/content/index.js,
+    @shelves_js/index.js,
+    @shelves_js/runtime.js,
+    @shelves_js/ui.js,
+    @shelves_js/content.js,
     @repo/sw.js,
     @repo/assets.manifest.json,
     @scripts/export-assets.js

@@ -1,4 +1,4 @@
-import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { noteComponentLifecycle } from '../../core/runtime/js/ecology.js';
 
 function summarizeSpecies(speciesSnapshot) {
   return Object.entries(speciesSnapshot)

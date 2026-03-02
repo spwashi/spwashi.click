@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./ecology-map.js"
-  @path: ~"src/components/ecology-map.js"
+  @source: ~"./map.js"
+  @path: ~"src/components/ecology/map.js"
 
   ^scan{
-    @id: components.ecology-map
+    @id: components.ecology.map
     @axis: ecology-telemetry
     @output: species-visibility
-    @hotspots: ecology-map.js
+    @hotspots: ecology/map.js
   }
 
-  ^intent[module]{ id:components.ecology-map axis:ecology-telemetry output:species-visibility }
+  ^intent[module]{ id:components.ecology.map axis:ecology-telemetry output:species-visibility }
 
   ^prefix-utility{
     !:: role:render-snapshot table:species+counts

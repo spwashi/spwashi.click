@@ -11,7 +11,7 @@
 }
 
 ^category[macro]{
-  subroots: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @pages, @shelves, @styles]
+  subroots: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @pages, @shelves_js, @styles]
   heuristics: {
     prefer_symbol_refs: true
     preserve_event_contracts: true

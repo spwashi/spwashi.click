@@ -1,0 +1,64 @@
+~#module{
+  @source: ~"../../js/runtime/contract.js"
+  @path: ~"src/core/runtime/js/runtime/contract.js"
+
+  ^scan{
+    @id: core.runtime.contract
+    @axis: api-version-contract
+    @output: compatibility-window-evaluation
+    @hotspots: runtime/contract.js
+  }
+
+  ^intent[module]{ id:core.runtime.contract axis:api-version-contract output:compatibility-window-evaluation }
+
+  ^prefix-utility{
+    !:: role:declare-api-version surface:runtime+interfaces
+    @:: role:compare-version semver-lite
+    ~:: role:evaluate-range min|max compatibility
+  }
+
+  ^postfix-utility{
+    state~{ read:runtime+enhancement+host requirements }
+    view!{ write:compatibility-projection }
+    bind@{ bridge:runtime-control+enhancement-gating+host-manifest }
+  }
+
+  ^operator-overload{
+    !{ role:declare-api-version surface:runtime+interfaces }
+    @{ role:compare-version semver-lite }
+    ~{ role:evaluate-range min|max compatibility }
+  }
+
+  ^state-embed{
+    @reads: runtime+enhancement+host requirements
+    @writes: compatibility-projection
+    @bridge: runtime-control+enhancement-gating+host-manifest
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_runtime_contract_scan]{
+      input: prefix+state
+      flow: read->map(api-version-contract)->project
+      output: compatibility-window-evaluation
+    }
+    ^macro[core_runtime_contract_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: compatibility-projection
+    }
+  }
+
+  ^invariants{
+    ^invariant[order]{ version-compare deterministic }
+    ^invariant[range]{ empty-bounds => pass-through }
+    ^invariant[contract]{ runtime+interface versions frozen runtime-api:1.3.0 registers:1.1.0 }
+  }
+
+  ^potential{
+    ^potential[migration]{ host-upgrade planning via:min/max windows }
+    ^potential[tooling]{ compatibility-check command-line projection }
+  }
+
+  ^compose[neighbors]{ ingress:runtime+enhancement+host requirements egress:compatibility-projection bridge:runtime-control+enhancement-gating+host-manifest }
+}

@@ -67,20 +67,31 @@ function resolveFromHost(host) {
   return null;
 }
 
-function resolveRuntimeParser() {
-  const hosts = [
-    globalThis.__SPW_WORKBENCH_RUNTIME__,
-    globalThis.spwWorkbenchRuntime,
-    globalThis.__spwWorkbenchParser,
-    globalThis.spwWorkbenchParser,
-    globalThis.__SPW_WORKBENCH__,
-    globalThis.spwWorkbench,
-    globalThis.SPW_WORKBENCH,
-    globalThis.__SPW_RUNTIME__,
-    globalThis.spwRuntime
-  ];
+const HOST_NAMESPACES = Object.freeze([
+  '__SPW_WORKBENCH_RUNTIME__',
+  'spwWorkbenchRuntime',
+  '__spwWorkbenchParser',
+  'spwWorkbenchParser',
+  '__SPW_WORKBENCH__',
+  'spwWorkbench',
+  'SPW_WORKBENCH',
+  '__SPW_RUNTIME__',
+  'spwRuntime'
+]);
 
-  for (const host of hosts) {
+function resolveWorkbenchHost() {
+  for (const key of HOST_NAMESPACES) {
+    const host = globalThis[key];
+    if (isRecord(host) || typeof host === 'function') {
+      return host;
+    }
+  }
+  return null;
+}
+
+function resolveRuntimeParser() {
+  for (const key of HOST_NAMESPACES) {
+    const host = globalThis[key];
     const resolved = resolveFromHost(host);
     if (resolved) {
       return resolved;
@@ -109,4 +120,78 @@ export function parseSpwForm(input) {
   } catch {
     return fallbackParse(input);
   }
+}
+
+function pluckFn(host, ...paths) {
+  for (const path of paths) {
+    const parts = path.split('.');
+    let target = host;
+    for (const part of parts) {
+      if (!isRecord(target)) { target = undefined; break; }
+      target = target[part];
+    }
+    if (typeof target === 'function') {
+      return target.bind(host);
+    }
+  }
+  return null;
+}
+
+function pluckValue(host, ...paths) {
+  for (const path of paths) {
+    const parts = path.split('.');
+    let target = host;
+    for (const part of parts) {
+      if (!isRecord(target)) { target = undefined; break; }
+      target = target[part];
+    }
+    if (target !== undefined && target !== null) {
+      return target;
+    }
+  }
+  return null;
+}
+
+export function resolveWorkbenchCapabilities() {
+  const host = resolveWorkbenchHost();
+  if (!host) {
+    return null;
+  }
+
+  const seed = isRecord(host.seed) ? host.seed : host;
+
+  return {
+    lex: pluckFn(seed, 'lex'),
+    tokenize: pluckFn(seed, 'tokenize'),
+    parseStream: pluckFn(seed, 'parseStream'),
+    parseWithLog: pluckFn(seed, 'parseWithLog'),
+    parseExpression: pluckFn(seed, 'parseExpression'),
+    parse: pluckFn(seed, 'parse'),
+
+    canonicalize: pluckFn(seed, 'canonicalize'),
+    desugar: pluckFn(seed, 'desugar'),
+    parseDesugared: pluckFn(seed, 'parseDesugared'),
+
+    walkAST: pluckFn(seed, 'walkAST'),
+    findNodes: pluckFn(seed, 'findNodes'),
+    countNodeTypes: pluckFn(seed, 'countNodeTypes'),
+    printAST: pluckFn(seed, 'printAST'),
+    getMaxDepth: pluckFn(seed, 'getMaxDepth'),
+    auditAST: pluckFn(seed, 'auditAST'),
+    previewAST: pluckFn(seed, 'previewAST'),
+
+    spwq: pluckFn(seed, 'spwq'),
+    matchAll: pluckFn(seed, 'matchAll'),
+    matchAt: pluckFn(seed, 'matchAt'),
+    parseSelector: pluckFn(seed, 'parseSelector'),
+
+    textFormatter: pluckValue(seed, 'textFormatter'),
+    jsonFormatter: pluckValue(seed, 'jsonFormatter'),
+    compactFormatter: pluckValue(seed, 'compactFormatter'),
+
+    filterEvents: pluckFn(seed, 'filterEvents'),
+    extractTokens: pluckFn(seed, 'extractTokens'),
+    extractErrors: pluckFn(seed, 'extractErrors'),
+    buildTrace: pluckFn(seed, 'buildTrace')
+  };
 }

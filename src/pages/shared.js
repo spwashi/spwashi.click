@@ -1,4 +1,4 @@
-import { isLikelySpwForm, parseSpwForm } from '../core/runtime/js/spwlang-parser.js';
+import { isLikelySpwForm, parseSpwForm } from '../core/runtime/js/spwlang/parser.js';
 
 export function applySlots(doc, slots = {}) {
   for (const [slotName, slotValue] of Object.entries(slots)) {

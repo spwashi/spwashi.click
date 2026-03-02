@@ -18,9 +18,7 @@
   @content: ~"../src/content"
   @pages: ~"../src/pages"
   @shelves: ~"../src/shelves"
-  @shelves_runtime: ~"../src/shelves/runtime"
-  @shelves_ui: ~"../src/shelves/ui"
-  @shelves_content: ~"../src/shelves/content"
+  @shelves_js: ~"../src/shelves/js"
   @styles: ~"../src/styles"
   @docs: ~"../docs"
   @seed: ~"../seed"
@@ -32,11 +30,11 @@
   @runtime_module: ~"../src/runtime/index.js"
   @runtime_boot: ~"../src/core/runtime/js/boot.js"
   @runtime_core: ~"../src/core/runtime/js/runtime.js"
-  @runtime_config: ~"../src/core/runtime/js/runtime-config.js"
-  @runtime_control: ~"../src/core/runtime/js/runtime-control.js"
-  @runtime_parser: ~"../src/core/runtime/js/spwlang-parser.js"
-  @runtime_intent_kit: ~"../src/core/runtime/js/intent-kit.js"
-  @runtime_spw_command: ~"../src/core/runtime/js/spw-command-surface.js"
+  @runtime_config: ~"../src/core/runtime/js/runtime/config.js"
+  @runtime_control: ~"../src/core/runtime/js/runtime/control.js"
+  @runtime_parser: ~"../src/core/runtime/js/spwlang/parser.js"
+  @runtime_intent_kit: ~"../src/core/runtime/js/intent/kit.js"
+  @runtime_spw_command: ~"../src/core/runtime/js/spw/command-surface.js"
   @runtime_pwa: ~"../src/core/runtime/js/pwa.js"
 
   @surfaces: ~"./surfaces/index.spw"
@@ -54,7 +52,7 @@
 
 ^"orientation"{
   macro: [@core_runtime, @runtime_js, @runtime_spw, @components, @content, @pages, @styles]
-  shelf_root: [@shelves, @shelves_runtime, @shelves_ui, @shelves_content]
+  shelf_root: [@shelves, @shelves_js]
   measurement: [@tests, @scripts, @state_observable]
   prose: [@docs, @crawler_json, @crawler_spw]
   runtime: [

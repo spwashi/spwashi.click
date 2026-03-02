@@ -1,4 +1,4 @@
-import { readRuntimeConfig } from './runtime-config.js';
+import { readRuntimeConfig } from './runtime/config.js';
 import { mountSpwRuntime, showBootFailureMessage } from './runtime.js';
 
 export { createSpwRuntime, mountSpwRuntime, showBootFailureMessage } from './runtime.js';

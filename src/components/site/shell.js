@@ -1,6 +1,6 @@
-import { ensureAriaCurrent } from '../core/runtime/js/a11y.js';
-import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
-import { EVENT_NAVIGATE, dispatchTypedEvent } from '../core/runtime/js/events.js';
+import { ensureAriaCurrent } from '../../core/runtime/js/a11y.js';
+import { noteComponentLifecycle } from '../../core/runtime/js/ecology.js';
+import { EVENT_NAVIGATE, dispatchTypedEvent } from '../../core/runtime/js/events.js';
 
 const ROUTE_ORDER = Object.freeze(['home', 'work', 'notes']);
 const OPERATOR_TOKENS = Object.freeze(['?', '~', '@', '&', '*', '^', '!', '=', '%', '#', '.']);

@@ -1,5 +1,5 @@
-import { phaseWeight } from '../core/runtime/js/motion.js';
-import { noteComponentLifecycle } from '../core/runtime/js/ecology.js';
+import { phaseWeight } from '../../core/runtime/js/motion.js';
+import { noteComponentLifecycle } from '../../core/runtime/js/ecology.js';
 
 function isUnlocked(activePhase, unlockAtPhase) {
   return phaseWeight(activePhase) >= phaseWeight(unlockAtPhase);

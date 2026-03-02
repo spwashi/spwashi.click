@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./site-shell.js"
-  @path: ~"src/components/site-shell.js"
+  @source: ~"./shell.js"
+  @path: ~"src/components/site/shell.js"
 
   ^scan{
-    @id: components.site-shell
+    @id: components.site.shell
     @axis: global-chrome
     @output: route-aware-shell
-    @hotspots: site-shell.js
+    @hotspots: site/shell.js
   }
 
-  ^intent[module]{ id:components.site-shell axis:global-chrome output:route-aware-shell }
+  ^intent[module]{ id:components.site.shell axis:global-chrome output:route-aware-shell }
 
   ^prefix-utility{
     !:: role:dispatch-navigate href:anchor-intent

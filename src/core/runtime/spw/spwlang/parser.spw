@@ -1,0 +1,81 @@
+~#module{
+  @source: ~"../../js/spwlang/parser.js"
+  @path: ~"src/core/runtime/js/spwlang/parser.js"
+
+  ^scan{
+    @id: core.spwlang.parser
+    @axis: spw-form-parse
+    @output: structured-copy-semantics
+    @hotspots: spwlang/parser.js
+  }
+
+  ^intent[module]{ id:core.spwlang.parser axis:spw-form-parse output:structured-copy-semantics }
+
+  ^prefix-utility{
+    !:: role:parse-form returns:{ok,parser,ast:sigil+symbol+selector+body}
+    @:: role:register-adapter source:spw-workbench exports:parseSpwForm|parseExpression|parse
+    ~:: role:fallback-parser subset:sigil+braces
+    $:: role:workbench-proxy exports:spwQuery|lexSpwInput|walkSpwAst|canonicalizeSpwForm|parseSpwStream
+  }
+
+  ^postfix-utility{
+    state~{ read:copy+command-surface }
+    view!{ write:parsed-forms }
+    bind@{ bridge:manifests+runtime-control+lab }
+  }
+
+  ^operator-overload{
+    !{ role:parse-form returns:{ok,parser,ast:sigil+symbol+selector+body} }
+    @{ role:register-adapter source:spw-workbench exports:parseSpwForm|parseExpression|parse }
+    ~{ role:fallback-parser subset:sigil+braces }
+  }
+
+  ^state-embed{
+    @reads: copy+command-surface
+    @writes: parsed-forms
+    @bridge: manifests+runtime-control+lab
+    @shape: deterministic-projection
+  }
+
+  ^macro-embed{
+    ^macro[core_spwlang_parser_scan]{
+      input: prefix+state
+      flow: read->map(spw-form-parse)->project
+      output: structured-copy-semantics
+    }
+    ^macro[core_spwlang_parser_patch]{
+      input: delta+intent
+      flow: validate->apply->emit
+      output: parsed-forms
+    }
+  }
+
+  ^invariants{
+    ^invariant[result]{ parse-return shape:stable ast:canonicalized }
+    ^invariant[adapter]{ adapter-fail => fallback-parse }
+    ^invariant[subset]{ unsupported-form => reason:explicit }
+  }
+
+  ^workbench-bridge{
+    @source: @workbench/src/seed
+    @adapter: @repo/seed/site/enhancements/workbench-parser-adapter.js
+    capabilities: [
+      lex, tokenize, parseStream, parseWithLog, parseExpression, parse,
+      canonicalize, desugar, parseDesugared,
+      walkAST, findNodes, countNodeTypes, printAST, auditAST, previewAST,
+      spwq, matchAll, matchAt, parseSelector,
+      textFormatter, jsonFormatter, compactFormatter,
+      filterEvents, extractTokens, extractErrors, buildTrace
+    ]
+    proxy_exports: [spwQuery, lexSpwInput, walkSpwAst, canonicalizeSpwForm, parseSpwStream, getWorkbenchCapabilities]
+    resolution: "installWorkbenchParserAdapter loads adapter; adapter.resolveWorkbenchCapabilities() populates capabilities"
+  }
+
+  ^potential{
+    ^potential[lsp-bridge]{ parser-ast alignment:editor-tools }
+    ^potential[semantic-color]{ parse-kind drives:syntax-lab rendering }
+    ^potential[spwq-lab]{ query dialect drives:syntax-lab facet filtering }
+  }
+
+  ^compose[neighbors]{ ingress:copy+command-surface egress:parsed-forms bridge:manifests+runtime-control+lab }
+}

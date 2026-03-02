@@ -1,15 +1,15 @@
 ~#module{
-  @source: ~"./click-stage.js"
-  @path: ~"src/components/click-stage.js"
+  @source: ~"./stage.js"
+  @path: ~"src/components/click/stage.js"
 
   ^scan{
-    @id: components.click-stage
+    @id: components.click.stage
     @axis: signature-interaction
     @output: phase-scene-builder
-    @hotspots: click-stage.js
+    @hotspots: click/stage.js
   }
 
-  ^intent[module]{ id:components.click-stage axis:signature-interaction output:phase-scene-builder }
+  ^intent[module]{ id:components.click.stage axis:signature-interaction output:phase-scene-builder }
 
   ^prefix-utility{
     !:: role:emit-click-intent source:pointer|keyboard
